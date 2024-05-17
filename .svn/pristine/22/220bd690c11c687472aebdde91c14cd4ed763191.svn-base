@@ -1,9 +1,0 @@
-package kr.co.itcruit.board.comment.service;
-
-import kr.co.itcruit.vo.BoardCommentVO;
-
-public interface IBoardCommentService {
-
-	public void insertComment(BoardCommentVO boardCommentVO);
-
-}

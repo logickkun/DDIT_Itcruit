@@ -1,9 +1,0 @@
-package kr.co.itcruit.mapper;
-
-import kr.co.itcruit.vo.AtchFileVO;
-
-public interface IAtchFileMapper {
-
-	public void atchFileInsert(AtchFileVO afv);
-
-}

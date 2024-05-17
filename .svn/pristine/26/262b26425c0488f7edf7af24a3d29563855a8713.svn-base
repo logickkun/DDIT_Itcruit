@@ -1,5 +1,0 @@
-package kr.co.itcruit.alarm.service;
-
-public interface IAlarmService {
-
-}

@@ -1,9 +1,0 @@
-package kr.co.itcruit.main.service;
-
-import kr.co.itcruit.vo.RecruitVO;
-
-public interface IRecruitListService {
-
-	public RecruitVO recruitDetail(int entNo);
-
-}

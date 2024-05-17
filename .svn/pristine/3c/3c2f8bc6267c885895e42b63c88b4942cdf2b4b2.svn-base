@@ -1,9 +1,0 @@
-package kr.co.itcruit.mapper;
-
-import kr.co.itcruit.vo.RecruitVO;
-
-public interface IRecruitMapper {
-
-	public RecruitVO recruitDetail(int entNo);
-
-}

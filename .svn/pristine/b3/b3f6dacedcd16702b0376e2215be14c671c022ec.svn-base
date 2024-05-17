@@ -1,9 +1,0 @@
-package kr.co.itcruit.mapper;
-
-import kr.co.itcruit.vo.hireInfoVO;
-
-public interface IMypageEnterpriseMapper {
-
-	public int hireRegisterinsert(hireInfoVO hireInfoVO);
-
-}

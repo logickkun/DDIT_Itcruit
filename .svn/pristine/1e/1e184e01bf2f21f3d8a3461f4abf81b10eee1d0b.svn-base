@@ -1,9 +1,0 @@
-package kr.co.itcruit.vo;
-
-import lombok.Data;
-
-//달력에 추가정보 입력위한 VO
-@Data
-public class ExtendVO {
-	public String recruitNo;
-}
