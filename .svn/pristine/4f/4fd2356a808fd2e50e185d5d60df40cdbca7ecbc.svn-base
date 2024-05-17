@@ -1,0 +1,79 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Repository;
+
+import kr.co.itcruit.vo.AtchVO;
+import kr.co.itcruit.vo.BoardCommentVO;
+import kr.co.itcruit.vo.BoardVO;
+import kr.co.itcruit.vo.ListPaginationVO;
+import kr.co.itcruit.vo.MidPaginationVO;
+
+
+public interface IFreeBoardMapper {
+
+	public List<BoardVO> list();
+
+	// 글 등록
+	public int insert(BoardVO boardVO);
+	
+	public void insertFile(AtchVO atchVO);
+
+	// 게시글 조회수 증가
+	public void incrementHit(BoardVO bvo);
+
+	// 상세정보
+	public BoardVO detail(BoardVO bvo);
+
+	// 수정
+	public int update(BoardVO boardVO);
+
+	// 목록
+	public int selectFreeBoardCount(MidPaginationVO<BoardVO> pagingVO);
+
+	public List<BoardVO> selectFreeBoardList(MidPaginationVO<BoardVO> pagingVO);
+
+	public AtchVO selectBoardFile(Integer integer);
+
+
+	// 수정 시 파일 삭제
+	public void deleteBoardFileList(Integer integer);
+
+	
+	
+	// 삭제
+	public void deleteBoardFile(BoardVO bvo);
+
+	public int delete(BoardVO bvo);
+	
+	// 다운
+	public AtchVO download(int fileNo);
+
+	
+	
+	
+	// 인기
+	public List<BoardVO> bestList();
+
+	
+	
+	// 댓글
+	public void insertComment(BoardCommentVO boardCommentVO);
+	public List<BoardCommentVO> commentList(BoardCommentVO boardCommentVO);
+	public int deleteComment(BoardCommentVO boardCommentVO);
+	public int updateComment(BoardCommentVO boardCommentVO);
+	
+
+
+
+	
+	
+
+
+
+	
+
+}

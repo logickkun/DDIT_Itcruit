@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="kr.co.itcruit.mapper.ICodingtestMapper">
+ 
+ 	<select id="selectList" resultType="codingtestVO">
+		select 
+			qstn_no,
+	        qstn_ttl,
+	        qstn_grd,
+	        qstn_exmpl,
+	        qstn_subject,
+	        pass_yn
+		from(
+		    select
+		        qstn_no,
+		        qstn_ttl,
+		        qstn_grd,
+		        qstn_exmpl,
+		        qstn_subject,
+		        pass_yn,
+		        rownum as rnum
+		    from(
+		        SELECT 
+		            q.qstn_no,
+		            q.qstn_ttl,
+		            q.qstn_grd,
+		            q.qstn_exmpl,
+		            q.qstn_subject,
+		            past_qstn_ctgry_nm,
+		            NVL(pass_yn, 'N') as pass_yn
+		        FROM 
+		            codingtest_question q
+		        LEFT OUTER JOIN 
+		            codingtest_solving s ON q.qstn_no = s.qstn_no
+		        WHERE 
+		            q.QSTN_RLS_YN = 'Y'       
+		            <if test="loginUser != null or loginUser !='' ">
+		            and (account_id = #{loginUser} or account_id is null)    
+		        	</if>
+		        order by q.qstn_no
+		        )
+		        where 1 = 1
+		     <if test="passYn != null and passYn !='' ">
+				and (pass_yn = #{passYn} or pass_yn is null)
+			</if>
+			<if test="qstnTtl != null and qstnTtl !='' ">
+			and (qstn_ttl like '%' || #{qstnTtl} || '%')
+			</if>
+			<if test="qstnGrd != null and qstnGrd !='' ">
+			and (qstn_Grd = #{qstnGrd} )
+			</if>
+		     <if test="qstnSubject != null and qstnSubject !='' ">
+			and (qstn_Subject = #{qstnSubject})
+			</if>
+		     <if test="pastQstnCtgryNm != null and pastQstnCtgryNm !='' ">
+			and (past_qstn_ctgry_nm) = #{pastQstnCtgryNm}
+			</if>
+		)
+		where rnum between 1 and 20
+		   
+ 	</select>
+ 
+<!--  	jdbcType="CLOB" javaType="java.lang.String" -->
+	<resultMap type="codingtestVO" id="codingtestMap">
+	    <result property="qstnNo" column="qstn_no" />
+	    <result property="qstnTtl" column="qstn_ttl" />
+	    <result property="qstnCn" column="qstn_cn" />
+	    <result property="qstnGrd" column="qstn_grd" />
+	    <result property="qstnScr" column="qstn_scr" />
+	    <result property="qstnExmpl" column="qstn_exmpl" />
+	    <result property="restriction" column="restriction" />
+	    <result property="qstnMcode" column="qstn_mcode"/>
+	    <result property="c" column="c"/>
+	    <result property="cpp" column="cpp"/>
+	    <result property="cs" column="cs"/>
+	    <result property="java" column="java"/>
+	    <result property="javascript" column="javascript"/>
+	    <result property="python" column="python"/>
+	    
+	    <result property="input" column="input" />
+	    <result property="output" column="output" />
+	   
+<!-- 	    <result property="qstnInputg" column="qstn_inputg" jdbcType="CLOB" javaType="java.lang.String"/> -->
+<!-- 	    <result property="qstnOutput" column="qstn_output" jdbcType="CLOB" javaType="java.lang.String"/> -->
+		
+	</resultMap>
+
+	<select id="selectQstnByNo" parameterType="int" resultMap="codingtestMap">
+	    SELECT 
+	        qstn_no,
+	        qstn_ttl,
+	        qstn_cn,
+	        qstn_grd,
+	        qstn_scr,
+	        qstn_exmpl,
+	        restriction,	    
+	        c,
+	        cpp,
+	        cs,
+	        java,
+	        javascript,
+	        python
+	    FROM codingtest_question
+	    WHERE qstn_rls_yn = 'Y'
+	    AND qstn_no = #{qstnNo}
+	</select>
+	
+	<select id="doTest" parameterType="codingtestVO" resultMap="codingtestMap">
+		select
+			cq.qstn_mcode,
+		    cq.qstn_no,
+		    ct.input,
+		    ct.output
+		from
+		    codingtest_question cq 
+		inner join codingtest_testcase ct
+		on cq.qstn_no = ct.qstn_no
+		where cq.qstn_no = #{qstnNo}
+	</select>
+ 
+ 	<select id="doSubmit" parameterType="codingtestVO" resultMap="codingtestMap">
+		select
+			qstn_mcode,
+		    qstn_no,
+		    input,
+		    output
+		from
+		    codingtest_question
+		where qstn_no = #{qstnNo}
+	</select>
+ 	
+ 	<select id="getCtgryList" resultType="string">
+ 		SELECT cmmncd_grp_nm || ' ' || cmmncd_nm1 AS ctgryList
+			FROM COMMONCODE
+		WHERE cmmncd_grp_cd BETWEEN 'CT1' AND 'CT4'
+		order by cmmncd
+ 	</select>
+ 	
+ 	
+ 	<select id="getSubjectList" resultType="string">
+		 SELECT cmmncd_grp_nm as qstnSubjectList
+			FROM COMMONCODE
+		 where CMMNCD_GRP_CD like 'CTSBJ'
+		 order by cmmncd_grp_nm
+ 	</select>
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ </mapper>

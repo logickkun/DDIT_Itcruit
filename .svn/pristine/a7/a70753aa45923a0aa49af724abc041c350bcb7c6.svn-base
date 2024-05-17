@@ -1,0 +1,1496 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<div class="page-content-wrapper border">
+<c:set value="제출" var="name"/>
+<c:if test="${status eq 'edit' }">
+	<c:set value="수정" var="name"/>
+</c:if>
+
+				<form class="row g-3" id="recruitRegiForm" action="/myPage/enterprise/recruitInsertProcess" method="post" enctype="multipart/form-data">
+					<h5 class="mb-0">채용 등록</h5>
+					
+
+					<hr class="my-4">
+					
+					
+					
+					<script>
+
+						document.addEventListener("DOMContentLoaded", function(){
+		
+							var checkImageBtn = document.getElementById("checkImage");
+							var fileAttachment = document.getElementById("recruitFile");
+							var modal = new bootstrap.Modal(document.getElementById('checkImageModal'));
+		
+		
+							checkImageBtn.addEventListener("click", function(){
+		
+								var file = fileAttachment.files[0];
+		
+								if(file) {
+		
+									var reader = new FileReader();
+		
+									reader.onload = function(e) {
+		
+										var previewImage = document.getElementById("previewImage");
+										previewImage.src = e.target.result;
+										modal.show();
+		
+									}
+		
+		
+									reader.readAsDataURL(file);
+		
+		
+								}else{
+									
+									var xhr = new XMLHttpRequest();
+									
+									xhr.open("get", "/myPage/enterprise/getRecruitImage?recruitNo=${recruitVO[0].recruitNo}", true);
+									
+									xhr.responseType = "blob";
+									xhr.onload = function(e) {
+										
+										if(this.status == 200){
+											
+											var blob = this.response;
+											
+											var reader = new FileReader();
+											
+											reader.onload = function(e) {
+												
+												var previewImage = document.getElementById("previewImage");
+												previewImage.src = e.target.result;
+												modal.show();
+				
+											}
+											
+											reader.readAsDataURL(blob);
+											
+										}
+										
+									};
+									
+									xhr.send();
+									
+									
+								}
+		
+							});
+		
+						})
+		
+					</script>
+
+					<!-- First name -->
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">공고 제목 <span class="text-danger">*</span></h6>
+							</div>
+							<div class="col-lg-6">
+								<input type="text" class="form-control" id="hireTitle" name="recruitTtl" style="width: 95%;" value="${recruitVO[0].recruitTtl}">
+							</div>
+							<div class="col-lg-2">
+								<input type="file" class="form-control" id="recruitFile" name="recruitFile">
+								<button type="button" class="input-group-text mt-2 w-50" id="checkImage">공고 파일 보기</button>
+							</div>
+						</div>
+					</div>
+					
+
+					<!-- Gender -->
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">고용 형태 <span class="text-danger">*</span></h6>
+							</div>
+							<div class="col-lg-8">
+								<div class="d-flex">
+								    <div class="form-check me-4">
+								    
+								        <input class="form-check-input" type="checkbox" value="정규직" name="hireCmmncdNms" id="flexCheckDefault1" <c:if test="${fn:contains(hireMap, '정규직')}">checked</c:if>>
+								        <label class="form-check-label" for="flexCheckDefault1">
+								           	 정규직
+								        </label>
+								        
+								    </div>
+								    <div class="form-check me-4">
+								    
+								        <input class="form-check-input" type="checkbox" value="계약직" name="hireCmmncdNms" id="flexCheckDefault2" <c:if test="${fn:contains(hireMap, '계약직')}">checked</c:if>>
+								        <label class="form-check-label" for="flexCheckDefault2">
+								            	계약직
+								        </label>
+								        
+								    </div>
+								    <div class="form-check me-4">
+								    
+								        <input class="form-check-input" type="checkbox" value="무기계약직" name="hireCmmncdNms" id="flexCheckDefault3"<c:if test="${fn:contains(hireMap, '무기계약직')}">checked</c:if>>
+								        <label class="form-check-label" for="flexCheckDefault3">
+								            	무기 계약직
+								        </label>
+								        
+								    </div>
+								    <div class="form-check me-4">
+								    
+								        <input class="form-check-input" type="checkbox" value="인턴" name="hireCmmncdNms" id="flexCheckDefault4" <c:if test="${fn:contains(hireMap, '인턴')}">checked</c:if>>
+								        <label class="form-check-label" for="flexCheckDefault4">
+								            	인턴
+								        </label>
+								        
+								    </div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+			
+
+					<!-- Date of birth -->
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">접수 기간</h6>
+							</div>
+
+							<div class="col-lg-8">
+							
+									<style>
+									/* Custom styling for the date range selector */
+									/* Custom styling for the date range selector */
+										.flatpickr-wrapper {
+											display: flex;
+											align-items: center;
+										}
+
+										.input-group-prepend {
+											flex: 0 0 auto; /* 자동으로 크기를 조절하지 않음 */
+										}
+
+										.input-group-text {
+											background-color: #f8f9fa;
+											border: 1.5px solid #ced4da;
+											height: 40px;
+											width: 45px;
+										
+										}
+
+										#startAndEnd {
+											width: 35%;
+										}
+									</style>
+
+
+									<div class="flatpickr-wrapper">
+										<input type="text" id="startAndEnd" placeholder="날짜 선택" data-input class="form-control" value="">
+
+										<input type="hidden" id="startDate" name="recruitStrtDt" value="${recruitVO[0].recruitStrtDt}">
+										<input type="hidden" id="endDate" name="recruitEndDt" value="${recruitVO[0].recruitEndDt}">
+
+										<div class="input-group-prepend">
+											<span class="input-group-text d-flex justify-content-center" title="toggle" id="calendarToggle" data-toggle>
+												<i class="fas fa-calendar-alt"></i>
+											</span>
+										</div>
+
+										<div class="input-group-append">
+											<span class="input-group-text d-flex justify-content-center" title="clear" id="clearDates" data-clear>
+												<i class="fas fa-times"></i>
+											</span>
+										</div>
+									</div>
+
+									
+
+								<script>
+
+									document.addEventListener("DOMContentLoaded", function(){
+
+
+										var calendarToggle = document.getElementById("calendarToggle");
+										var clearDates = document.getElementById("clearDates");
+										var startAndEndInput = document.getElementById("startAndEnd");
+										var startDate = document.getElementById("startDate");
+    									var endDate = document.getElementById("endDate");
+    									var initStrtDate = "${fn:substringBefore(recruitVO[0].recruitStrtDt,'T')} ${fn:substringAfter(recruitVO[0].recruitStrtDt,'T')}";
+										var initEndDate =  "${fn:substringBefore(recruitVO[0].recruitEndDt,'T')} ${fn:substringAfter(recruitVO[0].recruitEndDt,'T')}";
+
+
+										// 클릭 이벤트를 추가하여 캘린더를 토글합니다.
+										calendarToggle.addEventListener('click', function() {
+
+											startAndEndInput._flatpickr.toggle(); 
+										});
+
+										clearDates.addEventListener('click', function() {
+											startAndEndInput._flatpickr.clear(); 
+											startDate.value = "";
+        									endDate.value = "";
+										});
+
+
+										flatpickr("#startAndEnd", {
+
+											mode: "range",
+											minDate: "today",
+											dateFormat: "Y-m-d H:i",
+											enableTime: true,
+											time_24hr: true,
+											defaultDate: [initStrtDate, initEndDate],
+											onClose: function(selectedDates, dateStr, instance) {
+												
+// 												console.log(dateStr.split("to")[0].split(" ")[0] + "T" + dateStr.split("to")[0].split(" ")[1]);
+// 												console.log(dateStr.split("to")[1].split(" ")[1] + "T" + dateStr.split("to")[1].split(" ")[2]);
+
+
+												startDateValue = dateStr.split("to")[0].split(" ")[0] + "T" + dateStr.split("to")[0].split(" ")[1].trim();
+												endDateValue = dateStr.split("to")[1].split(" ")[1] + "T" + dateStr.split("to")[1].split(" ")[2].trim();
+
+
+												startDate.value = startDateValue;
+												endDate.value = endDateValue;
+
+											}
+											
+										});
+									});
+									
+								</script>
+					
+							</div>
+						</div>
+					</div>
+
+					<!-- Email -->
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">연봉<span class="text-danger">*</span></h6>
+							</div>
+							<div class="col-lg-8">
+								<input type="text" class="form-control" id="hireSal" name="recruitPay" value="${recruitVO[0].recruitPay}">
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">채용 URL <span class="text-danger">*</span></h6>
+							</div>
+							<div class="col-lg-8">
+								<input type="text" class="form-control" id="entUrl" name="entUrl" value="${recruitVO[0].entUrl }">
+							</div>
+						</div>
+					</div>
+					
+					<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+					<script>
+						function DaumPostcode() {
+							new daum.Postcode({
+								oncomplete : function(data) {
+									// 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+									// 각 주소의 노출 규칙에 따라 주소를 조합한다.
+									// 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+									var addr = ''; // 주소 변수
+									var extraAddr = ''; // 참고항목 변수
+
+									//사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+									if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+										addr = data.roadAddress;
+									} else { // 사용자가 지번 주소를 선택했을 경우(J)
+										addr = data.jibunAddress;
+									}
+
+									// 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+									if (data.userSelectedType === 'R') {
+										// 법정동명이 있을 경우 추가한다. (법정리는 제외)
+										// 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+										if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+											extraAddr += data.bname;
+										}
+										// 건물명이 있고, 공동주택일 경우 추가한다.
+										if (data.buildingName !== '' && data.apartment === 'Y') {
+											extraAddr += (extraAddr !== '' ? ', '
+													+ data.buildingName : data.buildingName);
+										}
+									}
+
+									// 우편번호와 주소 정보를 해당 필드에 넣는다.
+									document.getElementById('memPostCode').value = data.zonecode;
+									document.getElementById("memAddress1").value = addr;
+									document.getElementById("cmmncdGrpCd").value= addr.split(" ")[0].trim();
+									document.getElementById("cmmncdNm1").value= addr.split(" ")[1].trim();
+									
+// 									console.log(addr.split(" ")[0]);
+// 									console.log(addr.split(" ")[1]);
+								}
+							}).open();
+						}
+
+
+					</script>
+
+					<!-- City -->
+					<div class="col-12">
+					
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">우편번호 <span class="text-danger">*</span></h6>
+							</div>
+
+							<div class="col-lg-6">
+								<span class="d-flex justify-content-between">
+									<input type="text" class="form-control" id="memPostCode" name="entPostcode" value="${recruitVO[0].entPostcode}"> 
+									<button type="button" class="input-group-text" style="margin-bottom: 1px; width: 120px;" onclick="DaumPostcode()">우편번호 찾기</button>
+								</span>
+								
+							</div>
+							
+						</div>
+					</div>
+					
+					<!-- State -->
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">근무지 주소 <span class="text-danger">*</span></h6>
+							</div>
+							<div class="col-lg-6">
+								<input type="text" class="form-control" id="memAddress1" placeholder="주소를 입력해주세요" value="${recruitVO[0].cmmncdGrpCd} ${recruitVO[0].cmmncdNm1}">
+								<input type="hidden" id="cmmncdGrpCd" name="cmmncdGrpCd" value="${recruitVO[0].cmmncdGrpCd}"/>
+								<input type="hidden" id="cmmncdNm1" name="cmmncdNm1" value="${recruitVO[0].cmmncdNm1}"/>
+							</div>
+						</div>
+					</div>
+					
+					<!-- State -->
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">모집인원 <span class="text-danger">*</span></h6>
+							</div>
+							<div class="col-lg-6">
+								<input type="text" class="form-control" id="recruitCnt" name="recruitCnt" value="${recruitVO[0].recruitCnt }">
+							</div>
+						</div>
+					</div>
+					
+					<script>
+					
+						document.addEventListener("DOMContentLoaded", function(){
+
+							var careerlist = document.querySelector(".careerlist");
+							var career = document.querySelector(".career")
+							var checkbox3 = document.getElementById("checkbox3");
+							var recruitCareerDt = "${recruitVO[0].recruitCareerDt}";
+							
+// 							console.log(recruitCareerDt);
+							
+
+
+							careerlist.querySelectorAll("input").forEach(function(check){
+								
+								check.addEventListener("change", function(){
+
+									console.log(this.checked);
+
+									if(checkbox3.checked === true){
+
+
+										careerlist.insertAdjacentHTML('beforeend', `
+											<div class="form-group d-flex justify-content-between" id="careerDt">
+												<label for="careerDuration" style="width: 200px;">경력 기간 선택:</label>
+												<select class="form-control" id="careerDuration" name="recruitCareerDt">
+													<option value="1">1년 이상</option>
+													<option value="2">2년 이상</option>
+													<option value="3">3년 이상</option>
+													<option value="4">4년 이상</option>
+													<option value="5">5년 이상</option>
+												</select>
+											</div>
+										`);
+
+
+									}else{
+
+											var careerRemove = document.getElementById("careerDt");
+	
+											careerRemove.remove();
+
+									}
+
+
+								});
+								
+								
+								
+								if(check.checked) {
+									
+// 									console.log("체크");
+									
+									careerlist.insertAdjacentHTML('beforeend', `
+										<div class="form-group d-flex justify-content-between" id="careerDt">
+											<label for="careerDuration" style="width: 200px;">경력 기간 선택:</label>
+											<select class="form-control" id="careerDuration" name="recruitCareerDt">
+												<option value="1" >1년 이상</option>
+												<option value="2" >2년 이상</option>
+												<option value="3" >3년 이상</option>
+												<option value="4" >4년 이상</option>
+												<option value="5" >5년 이상</option>
+											</select>
+										</div>
+									`);
+									var selectElement = document.getElementById('careerDuration');
+									
+									if( selectElement.value != null){
+										
+								        selectElement.value = recruitCareerDt; // 해당 값이 있는 옵션을 자동으로 선택
+								        
+									}
+									
+								}
+								
+
+							});
+
+						});
+
+					</script>
+
+		
+	
+					<!-- Salutation -->
+					<div class="col-12 mt-4">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">지원 자격 <span class="text-danger">*</span></h6>
+							</div>
+							<div class="career col-lg-8">
+								<div class="careerlist d-flex">
+									<div class="form-check me-4">
+										<input class="form-check-input" type="radio" name="recruitCareerCodeNm" value="신입" id="checkbox1"  <c:if test="${recruitVO[0].recruitCareerCodeNm eq '신입'}">checked</c:if>>
+										<label class="form-check-label" for="checkbox1">
+											신입
+										</label>
+									</div>
+									<div class="form-check-box me-4">
+										<input class="form-check-input" type="radio" name="recruitCareerCodeNm" value="경력무관" id="checkbox2" <c:if test="${recruitVO[0].recruitCareerCodeNm eq '경력무관'}">checked</c:if>>
+										<label class="form-check-label" for="checkbox2">
+											경력무관
+										</label>
+									</div>
+									<div class="form-check-box me-4">
+										<input class="form-check-input" type="radio" name="recruitCareerCodeNm" value="경력" id="checkbox3" <c:if test="${recruitVO[0].recruitCareerCodeNm eq '경력'}">checked</c:if>/>
+										<label class="form-check-label" for="checkbox3">
+											경력
+										</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Salutation -->
+					<div class="col-12 mt-4">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">수시 채용 여부 <span class="text-danger">*</span></h6>
+							</div>
+							<div class="career col-lg-8">
+								<div class="careerlist d-flex">
+									<div class="form-check me-4">
+										<input class="form-check-input" type="radio" name="recruitYn" value="Y" id="checkbox1" <c:if test="${recruitVO[0].recruitYn eq 'Y'}">checked</c:if>>
+										<label class="form-check-label" for="checkbox1">
+											예
+										</label>
+									</div>
+									<div class="form-check-box me-4">
+										<input class="form-check-input" type="radio" name="recruitYn" value="N" id="checkbox2" <c:if test="${recruitVO[0].recruitYn eq 'N'}">checked</c:if>>
+										<label class="form-check-label" for="checkbox2">
+											아니오
+										</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					
+					<!-- 라디오 버튼 스크립트. -->
+					<script>
+
+						document.addEventListener("DOMContentLoaded", function(){
+
+							var checkboxContainer = document.querySelector(".checkbox-container");
+
+							var radioList = document.querySelectorAll(".checkboxlist");
+							
+							radioList.forEach(function(checkList){
+								
+								var checkRadio = checkList.querySelector("input[type='radio']:checked");
+								
+// 								console.log(checkRadio);
+								
+								if(checkRadio) {
+									
+									esntlAjax(checkRadio);
+									
+								}
+								
+								
+								checkList.addEventListener("change", function(){
+									
+									var selectedRadio = checkList.querySelector("input[type='radio']:checked");
+									
+									esntlAjax(selectedRadio);
+									
+								});
+								
+							})
+							
+							function esntlAjax(selectedRadio){
+								
+								checkboxContainer.innerHTML = "";
+								
+								//AJAX
+								var xhr = new XMLHttpRequest();
+									
+								xhr.open("GET", "/myPage/enterprise/esntLangList?pstnCmmncdNm=" + encodeURIComponent(selectedRadio.id), true);
+								
+								xhr.onreadystatechange = function() {
+									
+									if(xhr.readyState === XMLHttpRequest.DONE){
+										
+										if(xhr.status === 200){
+											
+// 											console.log("요청 성공");
+
+											var responseData = JSON.parse(xhr.responseText);
+// 											console.log(responseData);
+											
+											responseData.forEach(function(e){
+												
+												const upperCase = e.cmmncdNm1.charAt(0).toUpperCase() + e.cmmncdNm1.slice(1);
+												
+												var checkbox = createCheckedbox(upperCase, upperCase);
+					                            checkboxContainer.appendChild(checkbox);
+											});
+											
+											upCheckedBox();
+											
+											
+										}else{
+											
+// 											console.log("요청 실패");
+											
+										}
+										
+										
+									}
+									
+								}
+								
+								
+								
+								xhr.send();
+								
+							}
+
+						});
+						
+						
+						function upCheckedBox(){
+							
+							var upCheckBoxOne = document.querySelector(".upCheckBoxOne");
+							var upCheckBoxTwo = document.querySelector(".upCheckBoxTwo");
+							var upCheckBoxThree = document.querySelector(".upCheckBoxThree");
+							
+					        var checkedInput1 = upCheckBoxOne.querySelector('input[type="radio"]:checked');
+					        var checkedInput2 = upCheckBoxTwo.querySelector('input[type="radio"]:checked');
+					        var checkedInput3 = upCheckBoxThree.querySelector('input[type="radio"]:checked');
+					        
+					        if (checkedInput1) {
+					        	
+					        	upCheckBoxOne.prepend(checkedInput1.parentElement);
+					        	
+					        }else if(checkedInput2){
+					        	
+					        	upCheckBoxTwo.prepend(checkedInput2.parentElement);
+					        	
+					        }else if(checkedInput3){
+					        	
+					        	upCheckBoxThree.prepend(checkedInput3.parentElement);
+					        	
+					        }
+							
+						}
+						
+						function createCheckedbox(id, label){
+							
+							var esntlCheckedList = "${esntlMap}"; //String 형식 ex) {MySQL=MySQL Oracle=Oracle}
+							
+// 							console.log(esntlCheckedList);
+// 							var esntlParseList = {};
+							
+// 							console.log(esntlCheckedList);
+							
+							var esntl = esntlCheckedList.slice(1, -1).split(" ");
+// 							console.log(esntl);
+							
+							// 포문 형식
+// 							for(let i = 0; i < esntl.size(); i++){
+								
+// 								esntlParseList = esntl[i].split("=")[0];
+								
+// 							}
+							
+							//맵 형식으로 담기.
+							var esntlList = esntl.map(function(part) {
+								
+// 								console.log(part)
+							    return part.split("=")[0];
+							    
+							});
+							
+							
+// 							console.log(esntlList);
+// 							console.log(id);
+							
+							var checkbox = document.createElement("div");
+							checkbox.classList.add("form-check", "me-4");
+							
+							if(esntlList.includes(id)){
+								
+								checkbox.innerHTML = 
+									
+									'<input class="form-check-input" type="checkbox" name="esntlLangCmmncdNms" value="'+ id +'" id="checkbox' + id + '"  checked>' +
+							        '<label class="form-check-label" for="checkbox' + id + '">' + label + '</label>';
+								
+							}else{
+								
+								checkbox.innerHTML = 
+									
+									'<input class="form-check-input" type="checkbox" name="esntlLangCmmncdNms" value="'+ id +'" id="checkbox' + id + '">' +
+							        '<label class="form-check-label" for="checkbox' + id + '">' + label + '</label>';
+							}
+							
+							return checkbox;
+							
+						}
+
+					</script>
+					<div class="col-12 mt-4">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">모집 분야 <span class="text-danger">*</span></h6>
+							</div>
+							<!-- 라디오 버튼에 따라 필수조건 요소들이 동적으로 변하게 하기 -->
+							<div class="col-lg-4 border p-2" style="height: 100px; overflow-y: auto; overflow-x: hidden;">
+								<div class="row checkboxlist">
+								
+								
+<c:if test="${status eq 'edit' }"></c:if>
+									<div class="col-lg-6 upCheckBoxOne">
+										<div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="서버" value="서버"  <c:if test="${recruitVO[0].pstnCmmncdNm eq '서버'}" >checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if> >
+											<label class="form-check-label" for="checkbox71">서버</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="웹백엔드" value="웹백엔드" <c:if test="${recruitVO[0].pstnCmmncdNm eq '웹백엔드'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>>
+											<label class="form-check-label" for="checkbox72">웹백엔드</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="웹프런트" value="웹프런트" <c:if test="${recruitVO[0].pstnCmmncdNm eq '웹프런트'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>>
+											<label class="form-check-label" for="checkbox73">웹프런트</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="응용소프트웨어" value="응용소프트웨어" <c:if test="${recruitVO[0].pstnCmmncdNm eq '응용소프트웨어'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>>
+											<label class="form-check-label" for="checkbox74">응용소프트웨어</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="시스템소프트웨어" value="시스템소프트웨어" <c:if test="${recruitVO[0].pstnCmmncdNm eq '시스템소프트웨어'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>>
+											<label class="form-check-label" for="checkbox75">시스템소프트웨어</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="앱개발자" value="앱개발자" <c:if test="${recruitVO[0].pstnCmmncdNm eq '앱개발자'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>>
+											<label class="form-check-label" for="checkbox76">앱개발자</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="크로스플랫폼" value="크로스플랫폼" <c:if test="${recruitVO[0].pstnCmmncdNm eq '크로스플랫폼'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>> 
+											<label class="form-check-label" for="checkbox77">크로스플랫폼</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="게임개발" value="게임개발" <c:if test="${recruitVO[0].pstnCmmncdNm eq '게임개발'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>>
+											<label class="form-check-label" for="checkbox78">게임개발</label>
+										  </div>
+									</div>
+									
+									<div class="col-lg-6 upCheckBoxTwo">
+										<div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="DBA" value="DBA" <c:if test="${recruitVO[0].pstnCmmncdNm eq 'DBA'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>>
+											<label class="form-check-label" for="checkbox79">DBA</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="빅데이터" value="빅데이터" <c:if test="${recruitVO[0].pstnCmmncdNm eq '빅데이터'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>>
+											<label class="form-check-label" for="checkbox80">빅데이터</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="인공지능/머신러닝" value="인공지능/머신러닝" <c:if test="${recruitVO[0].pstnCmmncdNm eq '인공지능/머신러닝'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>>
+											<label class="form-check-label" for="checkbox81">인공지능/머신러닝</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="devops/시스템 엔지니어" value="devops/시스템 엔지니어" <c:if test="${recruitVO[0].pstnCmmncdNm eq 'devops/시스템 엔지니어'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>>
+											<label class="form-check-label" for="checkbox82">devops/시스템 엔지니어</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="HW/임베디드" value="HW/임베디드" <c:if test="${recruitVO[0].pstnCmmncdNm eq 'HW/임베디드'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>>
+											<label class="form-check-label" for="checkbox83">HW/임베디드</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="radio" name="pstnCmmncdNm" id="블록체인" value="블록체인" <c:if test="${recruitVO[0].pstnCmmncdNm eq '블록체인'}">checked</c:if> <c:if test="${status eq 'edit' }">disabled</c:if>>
+											<label class="form-check-label" for="checkbox84">블록체인</label>
+										  </div>
+									</div>
+									
+
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 mt-4">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">필수 조건 <span class="text-danger">*</span></h6>
+							</div>
+
+							<div class="col-lg-4 border p-2">
+								<div class="row">
+
+									<div class="col-lg-6 checkbox-container upCheckBoxThree">
+										<!-- <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" id="checkbox11">
+											<label class="form-check-label" for="checkbox11">JAVA</label>
+										</div>
+										
+									</div>
+
+									<div class="col-lg-6">
+										<!-- <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" id="checkbox14">
+											<label class="form-check-label" for="checkbox14">C++</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" id="checkbox15">
+											<label class="form-check-label" for="checkbox15">파이썬</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" id="checkbox16">
+											<label class="form-check-label" for="checkbox16">JAVASCRIPT</label>
+										</div> -->
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 mt-4">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">우대 언어 <span class="text-danger">*</span></h6>
+							</div>
+
+							<div class="col-lg-4 border p-2" style="height: 100px; overflow-y: auto; overflow-x: hidden;">
+								<div class="row">
+
+									<div class="col-lg-6 upCheckBoxFour">
+
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox33" value="SwiftUI" <c:if test="${fn:contains(preferMap, 'SwiftUI')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox33">SwiftUI</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox34" value="Xcode" <c:if test="${fn:contains(preferMap, 'Xcode')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox34">Xcode</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox35" value="Flutter" <c:if test="${fn:contains(preferMap, 'Flutter')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox35">Flutter</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox36" value="React Native" <c:if test="${fn:contains(preferMap, 'ReactNative')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox36">ReactNative</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox37" value="Unity" <c:if test="${fn:contains(preferMap, 'Unity')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox37">Unity</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox38" value="UnrealEngine" <c:if test="${fn:contains(preferMap, 'UnrealEngine')}">checked</c:if> >
+											<label class="form-check-label" for="checkbox38">Unreal Engine</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox39" value="MSSQL" <c:if test="${fn:contains(preferMap, 'MSSQL')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox39">MSSQL</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox40" value="PostgreSQL" <c:if test="${fn:contains(preferMap, 'PostgreSQL')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox40">PostgreSQL</label>
+										</div>
+
+										
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox41" value="NoSql" <c:if test="${fn:contains(preferMap, 'NoSql')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox41">NoSql</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox42" value="MariaDB" <c:if test="${fn:contains(preferMap, 'MariaDB')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox42">MariaDB</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox43" value="MongoDB" <c:if test="${fn:contains(preferMap, 'MongoDB')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox43">MongoDB</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox44" value="SQL" <c:if test="${fn:contains(preferMap, 'SQL')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox44">SQL</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox45" value="R" <c:if test="${fn:contains(preferMap, 'R')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox45">R</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox46" value="Hadoop" <c:if test="${fn:contains(preferMap, 'Hadoop')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox46">Hadoop</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox47" value="Spark" <c:if test="${fn:contains(preferMap, 'Spark')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox47">Spark</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox48" value="Kafka" <c:if test="${fn:contains(preferMap, 'Kafka')}">checked</c:if>> 
+											<label class="form-check-label" for="checkbox48">Kafka</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox49" value="TensorFlow" <c:if test="${fn:contains(preferMap, 'TensorFlow')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox49">TensorFlow</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox50" value="PyTorch" <c:if test="${fn:contains(preferMap, 'PyTorch')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox50">PyTorch</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox51" value="Elasticsearch" <c:if test="${fn:contains(preferMap, 'Elasticsearch')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox51">Elasticsearch</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox52" value="OpenCV" <c:if test="${fn:contains(preferMap, 'OpenCV')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox52">OpenCV</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox53" value="Kubernetes" <c:if test="${fn:contains(preferMap, 'Kubernetes')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox53">Kubernetes</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox54" value="Docker" <c:if test="${fn:contains(preferMap, 'Docker')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox54">Docker</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox55" value="Network" <c:if test="${fn:contains(preferMap, 'Network')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox55">Network</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox56" value="GCP" <c:if test="${fn:contains(preferMap, 'GCP')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox56">GCP</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox57" value="Windows" <c:if test="${fn:contains(preferMap, 'Windows')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox57">Windows</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox58" value="AZURE" <c:if test="${fn:contains(preferMap, 'AZURE')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox58">AZURE</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox59" value="Terraform" <c:if test="${fn:contains(preferMap, 'Terraform')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox59">Terraform</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox60" value="FW" <c:if test="${fn:contains(preferMap, 'FW')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox60">FW</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox61" value="Embedded" <c:if test="${fn:contains(preferMap, 'Embedded')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox61">Embedded</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox62" value="Pads" <c:if test="${fn:contains(preferMap, 'Pads')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox62">Pads</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox63" value="FPGA" <c:if test="${fn:contains(preferMap, 'FPGA')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox63">FPGA</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox64" value="PCB" <c:if test="${fn:contains(preferMap, 'PCB')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox64">PCB</label>
+										</div>
+													<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox66" value="MATLAB" <c:if test="${fn:contains(preferMap, 'MATLAB')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox66">MATLAB</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox67" value="Blockchain" <c:if test="${fn:contains(preferMap, 'Blockchain')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox67">Blockchain</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox70" value="Golang" <c:if test="${fn:contains(preferMap, 'Golang')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox70">Golang</label>
+										</div>
+										  
+										  
+									</div>
+
+									<div class="col-lg-6 upCheckBoxFive">
+
+
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox1" value="Linux" <c:if test="${fn:contains(preferMap, 'Linux')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox1">Linux</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox2" value="Rust" <c:if test="${fn:contains(preferMap, 'Rust')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox2">Rust</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox3" value="Java" <c:if test="${fn:contains(preferMap, 'Java')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox3">Java</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox4" value="Spring" <c:if test="${fn:contains(preferMap, 'Spring')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox4">Spring</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox5" value="Node.js" <c:if test="${fn:contains(preferMap, 'Node.js')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox5">Node.js</label>
+										</div>
+
+
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox6" value="Python" <c:if test="${fn:contains(preferMap, 'Python')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox6">Python</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox7" value="Django" <c:if test="${fn:contains(preferMap, 'Django')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox7">Django</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox8" value="PHP" <c:if test="${fn:contains(preferMap, 'PHP')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox8">PHP</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox9" value="JSP"  <c:if test="${fn:contains(preferMap, 'JSP')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox9">JSP</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox10" value="ASP" <c:if test="${fn:contains(preferMap, 'ASP')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox10">ASP</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox11" value="C++" <c:if test="${fn:contains(preferMap, 'C++')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox11">C++</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox12" value="C#" <c:if test="${fn:contains(preferMap, 'C#')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox12">C#</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox13" value="MySQL" <c:if test="${fn:contains(preferMap, 'MySQL')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox13">MySQL</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox14" value="Oracle" <c:if test="${fn:contains(preferMap, 'Oracle')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox14">Oracle</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox15" value="React" <c:if test="${fn:contains(preferMap, 'React')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox15">React</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox16" value="Vue.js" <c:if test="${fn:contains(preferMap, 'Vue.js')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox16">Vue.js</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox17" value="JavaScript" <c:if test="${fn:contains(preferMap, 'JavaScript')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox17">JavaScript</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox18" value="TypeScript" <c:if test="${fn:contains(preferMap, 'TypeScript')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox18">TypeScript</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox19" value="Svelte" <c:if test="${fn:contains(preferMap, 'Svelte')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox19">Svelte</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox20" value="HTML5" <c:if test="${fn:contains(preferMap, 'HTML5')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox20">HTML5</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox21" value="CSS3" <c:if test="${fn:contains(preferMap, 'CSS3')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox21">CSS3</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox22" value="AngularJS" <c:if test="${fn:contains(preferMap, 'AngularJS')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox22">AngularJS</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox23" value="jQuery" <c:if test="${fn:contains(preferMap, 'jQuery')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox23">jQuery</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox24" value="GO" <c:if test="${fn:contains(preferMap, 'GO')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox24">GO</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox25" value="Fortran" <c:if test="${fn:contains(preferMap, 'Fortran')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox25">Fortran</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox26" value="Ada" <c:if test="${fn:contains(preferMap, 'Ada')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox26">Ada</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox27" value="C" <c:if test="${fn:contains(preferMap, 'C')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox27">C</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox28" value="COBOL" <c:if test="${fn:contains(preferMap, 'COBOL')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox28">COBOL</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox29" value="Kotlin" <c:if test="${fn:contains(preferMap, 'Kotlin')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox29">Kotlin</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox30" value="RxJava" <c:if test="${fn:contains(preferMap, 'RxJava')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox30">RxJava</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox31" value="Swift" <c:if test="${fn:contains(preferMap, 'Swift')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox31">Swift</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox32" value="Rxswift" <c:if test="${fn:contains(preferMap, 'Rxswift')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox32">Rxswift</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox65" value="RF" <c:if test="${fn:contains(preferMap, 'RF')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox65">RF</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox68" value="Solidity" <c:if test="${fn:contains(preferMap, 'Solidity')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox68">Solidity</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncdNms" id="checkbox69" value="Nft" <c:if test="${fn:contains(preferMap, 'Nft')}">checked</c:if>>
+											<label class="form-check-label" for="checkbox69">Nft</label>
+										</div>
+										
+								
+										  
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+					<!-- Divider -->
+					<!-- <hr class="my-5"> -->
+
+					<!-- Education -->
+					<h6 class="text-center mt-5" style="margin-left: -40px;">채용프로세스 사용여부</h6>
+					<div class="row justify-content-center mt-3">
+						<div class="col-lg-2">
+							<div class="form-check me-4">
+								<input class="form-check-input" type="radio" name="processYn" id="radioYes" value="Y">
+								<label class="form-check-label" for="radioYes">네</label>
+							</div>
+						</div>
+						<div class="col-lg-1">
+							<div class="form-check me-4">
+								<input class="form-check-input" type="radio" name="processYn" id="radioNo" value="N">
+								<label class="form-check-label" for="radioNo">아니오</label>
+							</div>
+						</div>
+					</div>
+
+					<input type="hidden" name="processAmt" id="processAmt" value="1000"/>
+					<!-- Button trigger modal -->
+					<div class="col-12">
+						<div class="d-flex justify-content-end">
+								<button class="btn btn-primary me-2" type="button" id="submitBtn">${name}</button>
+								<c:if test="${status eq 'edit' }">
+										<button class="btn btn-warning me-2" type="button" id="cancelBtn">취소</button>
+								</c:if>
+								
+								<c:if test="${status ne 'edit' }">
+										<button class="btn btn-danger me-2" type="button" id="delBtn">삭제</button>
+								</c:if>
+							
+						</div>
+					</div>
+					
+					<c:if test="${status eq 'edit' }">
+						<input type="hidden" name="recruitNo" value="${recruitVO[0].recruitNo }">
+						<input type="hidden" name="entNo" value="${recruitVO[0].entNo }">
+						<input type="hidden" name="entNm" value="${recruitVO[0].entNm }">
+					</c:if>    
+					<sec:csrfInput/>
+				</form>
+
+</div>
+
+		<!-- Modal Script-->
+		<script>
+
+			var number = 1;
+
+			document.addEventListener("DOMContentLoaded", function() {
+
+				var products = document.querySelector("#payment-products");
+
+				var recruitmentProcess = document.querySelector(".recruitment-process");
+
+				var totalPrice = document.querySelector(".total-price span");
+
+
+				products.querySelectorAll("a").forEach(function(product){
+
+					product.addEventListener("click", function(){
+						
+						addProduct(this);
+
+					});
+
+				});
+	
+			
+
+			function addProduct(product) {
+
+
+				var isFirstProduct = recruitmentProcess.children.length === 0;
+    
+				// 첫 번째 상품이 아닐 경우, '>' 문자를 추가
+				if (!isFirstProduct) {
+					var separator = document.createElement("div");
+					separator.classList.add("separator");
+					separator.textContent = ">";
+					recruitmentProcess.appendChild(separator);
+				}
+
+
+				var containerDiv = document.createElement("div");
+				containerDiv.classList.add("d-flex", "flex-column", "align-items-center");
+				containerDiv.setAttribute("data-order-number", number);
+
+				var orderSpan = document.createElement("span");
+				orderSpan.classList.add("order-number");
+				orderSpan.style.marginRight = "65px";
+				orderSpan.textContent = number + "차";
+				
+
+				containerDiv.append(orderSpan);
+
+
+				var productClone = product.cloneNode(true);
+				containerDiv.appendChild(productClone);
+
+
+				recruitmentProcess.appendChild(containerDiv);
+
+
+				number += 1;
+
+
+				var productValue = parseInt(product.getAttribute("value"), 10);
+				var currentValue = parseInt(totalPrice.textContent, 10);
+				totalPrice.textContent = currentValue + productValue;
+
+
+
+				containerDiv.addEventListener("click", function(){
+
+					removeProduct(this);
+
+				});
+
+				
+
+			}
+
+			function removeProduct(element) {
+
+				var productValue = parseInt(element.querySelector("a").getAttribute("value"), 10);
+				var currentTotal = parseInt(totalPrice.textContent, 10);
+				totalPrice.textContent = currentTotal - productValue;
+
+				
+				var isFirstChild = element.previousElementSibling === null;
+				
+				if (isFirstChild) {
+					// element가 첫 번째 요소이면 다음 '>' 문자 제거
+					if (element.nextElementSibling && element.nextElementSibling.classList.contains("separator")) {
+						recruitmentProcess.removeChild(element.nextElementSibling);
+					}
+				} else {
+					// element가 첫 번째 요소가 아니면 이전 '>' 문자 제거
+					if (element.previousElementSibling && element.previousElementSibling.classList.contains("separator")) {
+						recruitmentProcess.removeChild(element.previousElementSibling);
+					}
+				}
+				
+				element.remove();
+
+				updateOrderNumbers();
+
+
+			};
+
+
+			function updateOrderNumbers(){
+
+				var currentOrder = 1;
+
+				recruitmentProcess.querySelectorAll("div[data-order-number]").forEach(function(element){
+
+					element.querySelector("span").textContent = currentOrder + "차";
+					element.setAttribute("data-order-number", currentOrder);
+					currentOrder += 1;
+
+
+				});
+
+
+				number = currentOrder;
+
+
+
+			};
+
+
+			var termsAndConditions = document.getElementById('terms-and-conditions');
+			var payButton = document.getElementById('pay-button');
+
+			termsAndConditions.addEventListener('scroll', function() {
+				var element = this;
+
+				// 맨 아래까지 스크롤되었는지 확인
+				if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+					payButton.disabled = false; // 결제 버튼 활성화
+				}
+			});
+
+
+			var radioYes = document.getElementById('radioYes');
+    		var submitButton = document.getElementById('submitBtn');
+    		var recruitRegiForm = document.getElementById("recruitRegiForm");
+    		var payTotalPrice = document.getElementById("payTotalPrice");
+    		var processAmt = document.getElementById("processAmt");
+
+			var confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+			var paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+			var checkModal = new bootstrap.Modal(document.getElementById('checkModal'));
+
+
+			submitButton.addEventListener("click", function(){
+				
+				
+				if(this.innerText === "수정"){
+					
+					
+					recruitRegiForm.action = "/myPage/enterprise/recruitEdit";
+					console.log(recruitRegiForm);
+					recruitRegiForm.submit();
+					
+				}else{
+					
+					if(radioYes.checked){
+	
+						paymentModal.show();
+	
+	
+					}else if(radioNo.checked){
+	
+						confirmModal.show();
+	
+					}else{
+	
+	
+						checkModal.show();
+	
+					}
+					
+				}
+
+			});
+			
+			payButton.addEventListener("click", function(){
+				
+// 				console.log(payTotalPrice.innerText);
+				processAmt.value = payTotalPrice.innerText;
+				
+				
+				recruitRegiForm.submit();
+				
+				
+			})
+
+		});
+
+		</script>
+		
+			
+		
+		<!-- ***** MODAL *******-->
+		<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-scrollable">
+			  <div class="modal-content">
+				<div class="modal-header">
+				  <h5 class="modal-title" id="exampleModalLabel">결제</h5>
+
+				  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modal-close-button"></button>
+
+				</div>
+				<div class="modal-body">
+					<legend>결제 상품</legend>
+
+					<div class="justify-content-center" id="payment-products">
+						<a class="btn btn-primary-soft" value="10000">지원 접수</a>
+						<a class="btn btn-primary-soft" value="20000">Coding text</a>
+						<a class="btn btn-primary-soft" value="30000">화상 면접</a>
+					</div>	
+
+					
+					<div class="recruitment-process d-flex flex-row gap-2">
+					</div>
+
+					<legend>이용 약관</legend>
+					<div id="terms-and-conditions" style="height: 200px; overflow-y: scroll; overflow-x: 10px;">
+						
+<pre>
+본 이용 약관(이하 "약관")은 사용자(이하 "회원")가 [서비스명] (이하 "서비스")를 이용함에 있어 회원과 [회사명] (이하 "회사") 사이의 권리, 의무 및 책임사항, 이용 조건 및 절차, 기타 필요한 사항을 규정함을 목적으로 합니다.
+
+1. 약관의 동의
+1.1 회원가입 시 본 약관의 내용에 대해 "동의합니다" 버튼을 클릭할 경우, 본 약관의 내용에 동의한 것으로 간주합니다.
+
+1.2 회사는 필요한 경우 약관을 수정할 수 있으며, 약관이 변경될 경우 최소 7일 전에 서비스 내에 공지합니다. 변경된 약관은 공지된 날로부터 효력이 발생합니다.
+
+2. 회원 가입 및 관리
+2.1 회원 가입은 서비스의 회원가입 양식에 따라 회원 정보를 정확하게 입력하고, 본 약관에 동의함으로써 가입이 완료됩니다.
+
+2.2 회원은 가입 시 등록한 정보에 변경이 있는 경우, 즉시 해당 정보를 수정해야 합니다.
+
+2.3 회사는 회원이 약관에 위배되는 행위를 할 경우, 회원에 대해 서비스 이용 제한, 계약 해지 등의 조치를 취할 수 있습니다.
+
+3. 서비스 이용
+3.1 회사는 회원에게 아래와 같은 서비스를 제공합니다.
+
+지원 접수 서비스
+코딩 테스트 서비스
+화상 면접 서비스
+3.2 서비스 이용 시간은 회사의 업무 상황 또는 기술적 문제에 따라 달라질 수 있으며, 이로 인해 서비스 제공에 차질이 생길 경우 사전에 공지합니다.
+
+4. 개인정보 보호
+4.1 회사는 회원의 개인정보를 보호하기 위해 최선을 다합니다. 회원의 개인정보 처리 및 보호에 관한 사항은 관련 법령 및 회사의 개인정보처리방침에 따릅니다.
+
+5. 면책사항
+5.1 회사는 천재지변, 전쟁, 테러 공격 등 불가항력적인 사유로 인한 서비스의 중단에 대하여 책임을 지지 않습니다.
+
+5.2 회사는 회원이 서비스를 이용하여 기대하는 수익을 얻지 못하거나 서비스 자료에 대한 손실이 발생하였을 경우, 그 책임을 지지 않습니다.
+
+6. 약관의 적용
+6.1 본 약관에 명시되지 않은 사항에 대해서는 관련 법령 또는 상관례에 따릅니다.
+</pre>
+
+					</div>
+				</div>
+			
+				<div class="modal-footer">
+					<div class="total-price">
+	
+						<h4>총 금액:<span id="payTotalPrice">0</span></h4>
+	
+					</div>
+					<button type="button" class="btn btn-primary" id="pay-button" disabled>결제</button>
+				</div>
+			  </div>
+			</div>
+		</div>
+
+
+		<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+			  <div class="modal-content">
+				<div class="modal-header">
+				  <h5 class="modal-title" id="confirmModalLabel">진행 확인</h5>
+				  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+				  진행하시겠습니까?
+				</div>
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+				  <button type="button" class="btn btn-primary">진행</button>
+				</div>
+			  </div>
+			</div>
+		</div>
+		
+		
+		
+		<div class="modal fade" id="checkModal" tabindex="-1" aria-labelledby="checkModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+			  <div class="modal-content">
+				<div class="modal-header">
+				  <h5 class="modal-title" id="confirmModalLabel">진행 확인</h5>
+				  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+				  채용 프로세스 사용 여부를 체크해주세요
+				</div>
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+				</div>
+			  </div>
+			</div>
+		</div>
+		
+		<div class="modal fade" id="checkImageModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+				<h5 class="modal-title" id="modalLabel">이미지 미리보기</h5>
+				</div>
+				<div class="modal-body">
+				<img id="previewImage" src="" alt="Image preview" class="img-fluid">
+				</div>
+				<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				</div>
+			</div>
+			</div>
+		</div>

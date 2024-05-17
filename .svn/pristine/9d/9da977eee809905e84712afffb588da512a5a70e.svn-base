@@ -1,0 +1,1778 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IMyEnterpriseMapper">
+ 
+ 
+ 	<resultMap type="recruitVO" id="recruitMap">
+ 		<id property="recruitNo" column="recruit_no" />
+		<result property="entNo" column="ent_no" />
+		<result property="recruitTtl" column="recruit_ttl" />
+		<result property="recruitStrtDt" column="recruit_strt_dt" />
+		<result property="recruitEndDt" column="recruit_end_dt" />
+		<result property="recruitYn" column="recruit_yn" />
+		<result property="recruitCareerCodeNm" column="recruit_career_code_nm" />
+		<result property="recruitCareerDt" column="recruit_career_dt" />
+		<result property="entUrl" column="ent_url" />
+		<result property="recruitHit" column="recruit_hit" />
+		<result property="processYn" column="process_yn" />
+		<result property="processAmt" column="process_amt" />
+		<result property="recruitPay" column="recruit_pay" />
+		<result property="recruitEnrollYmd" column="recruit_enroll_ymd" />
+		<result property="entPostcode" column="ent_postcode" />
+		<result property="cmmncdGrpCd" column="cmmncd_grp_cd" />
+		<result property="cmmncdNm1" column="cmmncd_nm1" />
+		<result property="recruitCnt" column="recruit_cnt" />
+		<result property="pstnCmmncdNm" column="pstn_cmmncd_nm" />
+ 		<collection property="hireSttsList" resultMap="hireSttsMap"/>
+ 		<collection property="PreferLangList" resultMap="PreferLangMap"/>
+ 		<collection property="esntlLangList" resultMap="esntlLangMap"/>
+ 	</resultMap>
+ 	
+ 	
+ 	<resultMap type="hireSttsVO" id="hireSttsMap">
+	 	<id property="hireSttsNo" column="hire_stts_no" />
+		<result property="recruitNo" column="recruit_no" />
+		<result property="hireCmmndNm" column="hire_cmmnd_nm" />
+ 	</resultMap>
+ 	
+ 	<resultMap type="preferLangVO" id="PreferLangMap">
+ 		<id property="preferLangNo" column="prefer_lang_no" />
+		<result property="recruitNo" column="recruit_no" />
+		<result property="preferLangCmmncdNm" column="prefer_lang_cmmncd_nm" />
+ 	</resultMap>
+ 	
+ 	<resultMap type="esntlLangVO" id="esntlLangMap">
+ 		<id property="esntlLangNo" column="esntl_lang_no" />
+		<result property="recruitNo" column="recruit_no" />
+		<result property="esntlLangCmmncdNm" column="esntl_lang_cmmncd_nm" />
+ 	</resultMap>
+
+	<insert id="recruitRegisterInsert" parameterType="recruitVO">
+	
+		INSERT INTO recruit (
+		
+		    recruit_no,
+		    recruit_ttl,
+		    recruit_strt_dt,
+		    recruit_end_dt,
+		    recruit_yn,
+		    recruit_career_code_nm,
+		    recruit_career_dt,
+		    ent_url,
+		    recruit_hit,
+		    process_yn,
+		    process_amt,
+		    recruit_pay,
+		    recruit_enroll_ymd,
+		    cmmncd_grp_cd,
+		    cmmncd_nm1,
+		    recruit_cnt,
+		    pstn_cmmncd_nm,
+		    ent_postcode,
+		    ent_nm,
+		    ent_no
+		    
+		) VALUES (
+		
+		    #{recruitNo},
+		    #{recruitTtl},
+		   	#{recruitStrtDt},
+		    #{recruitEndDt},
+		    #{recruitYn},
+		    #{recruitCareerCodeNm},
+		    #{recruitCareerDt},
+		    #{entUrl},
+		    #{recruitHit},
+		    #{processYn},
+		    #{processAmt},
+		    #{recruitPay},
+		    SYSDATE,
+		    #{cmmncdGrpCd},
+		    #{cmmncdNm1},
+		    #{recruitCnt},
+		    #{pstnCmmncdNm},
+		    #{entPostcode},
+		    #{entNm},
+		    #{entNo}
+		    
+		)
+	
+	</insert>
+	
+	<update id="recruitRegisterEdit" parameterType="recruitVO">
+		
+		UPDATE RECRUIT
+		
+		SET
+		
+		    RECRUIT_TTL = #{recruitTtl},
+		    RECRUIT_STRT_DT = #{recruitStrtDt},
+		    RECRUIT_END_DT = #{recruitEndDt},
+		    RECRUIT_YN = #{recruitYn},
+		    RECRUIT_CAREER_CODE_NM = #{recruitCareerCodeNm},
+		    RECRUIT_CAREER_DT = #{recruitCareerDt},
+		    ENT_URL = #{entUrl},
+		    RECRUIT_HIT = #{recruitHit},
+		    PROCESS_YN = #{processYn},
+		    PROCESS_AMT = #{processAmt},
+		    RECRUIT_PAY = #{recruitPay},
+		    RECRUIT_ENROLL_YMD = SYSDATE,
+		    CMMNCD_GRP_CD = #{cmmncdGrpCd},
+		    CMMNCD_NM1 = #{cmmncdNm1},
+		    RECRUIT_CNT = #{recruitCnt},
+		    ENT_POSTCODE = #{entPostcode},
+		    ENT_NM = #{entNm},
+		    ENT_NO = #{entNo}
+		    
+		WHERE
+		
+	    RECRUIT_NO = #{recruitNo} 
+	    
+	    AND
+	    
+	    PSTN_CMMNCD_NM = #{pstnCmmncdNm}
+
+	
+	
+	</update>
+	
+	<delete id="recruitRegisterRemove" parameterType="recruitVO">
+		
+		DELETE FROM RECRUIT
+		
+		WHERE
+		
+		RECRUIT_NO = #{recruitNo} 
+		
+		AND
+		
+		PSTN_CMMNCD_NM = #{pstnCmmncdNm}
+	
+	</delete>
+	
+	
+	<insert id="recruitHireSttsInsert" parameterType="recruitVO">
+	
+	    INSERT INTO HIRE_STTS(
+	    
+	        HIRE_STTS_NO, RECRUIT_NO, HIRE_CMMND_NM, PSTN_CMMNCD_NM
+	        
+	    ) VALUES
+	    
+	        (SEQ_HIRE_STTS_NO.NEXTVAL, #{recruitNo}, #{hireCmmncdNm}, #{pstnCmmncdNm})
+	        
+	</insert>
+	
+	<delete id="recruitHireSttsRemove" parameterType="recruitVO">
+	
+		DELETE FROM HIRE_STTS
+		
+		WHERE
+		
+		    RECRUIT_NO = #{recruitNo} 
+		    
+		    AND
+		    
+		    PSTN_CMMNCD_NM = #{pstnCmmncdNm}
+		    
+	</delete>
+	
+	
+	<insert id="recruitPreferLangInsert" parameterType="recruitVO">
+	
+	    INSERT INTO PREFER_LANG(
+	    
+	        PREFER_LANG_NO, RECRUIT_NO, PREFER_LANG_CMMNCD_NM, PSTN_CMMNCD_NM
+	        
+	    ) VALUES
+	    
+	        (SEQ_PREFER_LANG_NO.NEXTVAL, #{recruitNo}, #{preferLangCmmncdNm} , #{pstnCmmncdNm})
+	        
+	</insert>
+	
+	<delete id="recruitPreferLangRemove" parameterType="recruitVO">
+	
+		DELETE FROM PREFER_LANG
+		
+		WHERE
+		
+		    RECRUIT_NO = #{recruitNo} 
+		    
+		    AND
+		    
+		    PSTN_CMMNCD_NM = #{pstnCmmncdNm}
+		    
+	</delete>
+	
+	<insert id="recruitEsntlLangInsert" parameterType="recruitVO">
+	
+	    INSERT INTO ESNTL_LANG(
+	    
+	        ESNTL_LANG_NO, RECRUIT_NO, ESNTL_LANG_CMMNCD_NM, PSTN_CMMNCD_NM
+	        
+	    ) VALUES
+	    
+	        (SEQ_ESNTL_LANG_NO.NEXTVAL, #{recruitNo}, #{esntlLangCmmncdNm} , #{pstnCmmncdNm})
+	        
+	</insert>
+	
+	<delete id="recruitEsntlLangRemove" parameterType="recruitVO">
+	
+		DELETE FROM ESNTL_LANG
+		
+		WHERE
+		
+		    RECRUIT_NO = #{recruitNo} 
+		    
+		    AND
+		    
+		    PSTN_CMMNCD_NM = #{pstnCmmncdNm}
+	
+	</delete>
+	
+ 	
+ 	<select id="recruitSelectList" resultType="recruitVO">
+ 	
+ 		
+		SELECT 
+		
+			RECRUIT_STRT_DT,
+			RECRUIT_END_DT,
+			RECRUIT_NO,
+			RECRUIT_TTL,
+			RECRUIT_YN,
+			RECRUIT_CAREER_CODE_NM,
+			RECRUIT_CAREER_DT,
+			ENT_URL,
+			RECRUIT_HIT,
+			PROCESS_YN,
+			PROCESS_AMT,
+			RECRUIT_PAY,
+			RECRUIT_ENROLL_YMD,
+			CMMNCD_GRP_CD,
+			CMMNCD_NM1,
+			RECRUIT_CNT,
+			PSTN_CMMNCD_NM,
+			ENT_POSTCODE,
+			ENT_NM,
+			ENT_NO,
+		 <![CDATA[
+			CASE 
+			
+				WHEN TRUNC(SYSDATE) < TRUNC(TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN
+					'D-' || (TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) - TRUNC(TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI')))
+				WHEN TRUNC(SYSDATE) <= TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN
+				
+				CASE 
+					WHEN TRUNC(SYSDATE) = TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN 'D-0'
+					ELSE 'D-' || (TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) - TRUNC(SYSDATE))
+				END
+			ELSE
+			
+				'D+1'
+		]]>
+			
+		END AS DEADLINE_DAY,
+		
+		<![CDATA[
+		    
+		    CASE
+		        WHEN TRUNC(SYSDATE) < TRUNC(TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN '공고전'
+		        WHEN TRUNC(SYSDATE) BETWEEN TRUNC(TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI')) AND TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN '공고중'
+		        ELSE '공고 마감'
+		        
+		]]>
+		
+	    END AS RECRUIT_STATUS
+		
+		FROM 
+		
+			Recruit
+		
+ 	
+ 	</select>
+ 	
+ 	<select id="recruitSelectListByEntNo" parameterType="int" resultType="recruitVO">
+ 	
+    
+    SELECT 
+        RECRUIT_STRT_DT,
+        RECRUIT_END_DT,
+        RECRUIT_NO,
+        RECRUIT_TTL,
+        RECRUIT_YN,
+        RECRUIT_CAREER_CODE_NM,
+        RECRUIT_CAREER_DT,
+        ENT_URL,
+        RECRUIT_HIT,
+        PROCESS_YN,
+        PROCESS_AMT,
+        RECRUIT_PAY,
+        RECRUIT_ENROLL_YMD,
+        CMMNCD_GRP_CD,
+        CMMNCD_NM1,
+        RECRUIT_CNT,
+        PSTN_CMMNCD_NM,
+        ENT_POSTCODE,
+        ENT_NM,
+        ENT_NO,
+        CASE
+        <![CDATA[ 
+            WHEN TRUNC(SYSDATE) < TRUNC(TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN
+                'D-' || (TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) - TRUNC(TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI')))
+            WHEN TRUNC(SYSDATE) <= TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN
+                CASE 
+                    WHEN TRUNC(SYSDATE) = TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN 'D-0'
+                    ELSE 'D-' || (TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) - TRUNC(SYSDATE))
+                END
+            ELSE
+                'D+1'
+        ]]>
+        END AS DEADLINE_DAY,
+        
+ 		<![CDATA[
+			    
+		    CASE
+		        WHEN TRUNC(SYSDATE) < TRUNC(TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN '공고전'
+		        WHEN TRUNC(SYSDATE) BETWEEN TRUNC(TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI')) AND TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN '공고중'
+		        ELSE '공고 마감'
+		        
+		]]>
+		
+	    END AS RECRUIT_STATUS
+	    
+       
+    FROM 
+        Recruit
+    WHERE ent_no = #{entNo}
+    
+ 	
+ 	</select>
+ 	
+ 	
+ 	<select id="recruitSelectInfo" parameterType="String" resultMap="recruitMap">
+ 	
+		SELECT
+		    r.recruit_no,
+		    r.ent_no,
+		    r.ent_postcode,
+		    r.recruit_ttl,
+		    r.recruit_strt_dt,
+		    r.recruit_end_dt,
+		    r.recruit_yn,
+		    r.recruit_career_code_nm,
+		    r.recruit_career_dt,
+		    r.ent_url,
+		    r.recruit_hit,
+		    r.process_yn,
+		    r.process_amt,
+		    r.recruit_pay,
+		    r.recruit_enroll_ymd,
+		    r.cmmncd_grp_cd,
+		    r.cmmncd_nm1,
+		    r.recruit_cnt,
+		    r.ent_nm,
+		    r.pstn_cmmncd_nm,
+		    hs.hire_cmmnd_nm,
+		    hs.pstn_cmmncd_nm,
+		    pl.prefer_lang_cmmncd_nm,
+		    pl.pstn_cmmncd_nm,
+		    el.esntl_lang_cmmncd_nm,
+		    el.pstn_cmmncd_nm
+		FROM
+		
+		    recruit r
+		    
+		LEFT JOIN
+		
+    		hire_stts hs ON r.recruit_no = hs.recruit_no AND r.pstn_cmmncd_nm = hs.pstn_cmmncd_nm
+
+		    
+		LEFT JOIN
+		
+    		prefer_lang pl ON r.recruit_no = pl.recruit_no AND r.pstn_cmmncd_nm = pl.pstn_cmmncd_nm
+
+		LEFT JOIN
+		
+    		esntl_lang el ON r.recruit_no = el.recruit_no AND r.pstn_cmmncd_nm = el.pstn_cmmncd_nm
+		    
+		WHERE
+		
+		    r.recruit_no = #{recruitNo} AND r.pstn_cmmncd_nm = #{pstnCmmncdNm}
+ 	
+ 	</select>
+ 	
+	<sql id="recruitSearch">
+	
+		<if test="searchType != null and searchType == 'defaultSort'">
+			AND (recruit_ttl like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'descStrtDate'">
+			AND (recruit_ttl like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'ascStrtDate'">
+			AND (recruit_ttl like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'descDday'">
+			AND (recruit_ttl like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'ascDday'">
+			AND (recruit_ttl like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'decsHit'">
+			AND (recruit_ttl like '%'||#{searchWord}||'%')
+		</if>
+		<if test="searchType != null and searchType == 'ascHit'">
+			AND (recruit_ttl like '%'||#{searchWord}||'%')
+		</if>
+ 	
+ 	</sql>
+ 	
+	<sql id="recruitSort">
+	
+		<if test="searchType != null and searchType == 'defaultSort'">
+			ORDER BY B.RECRUIT_ENROLL_YMD DESC
+		</if>
+		<if test="searchType != null and searchType == 'descStrtDate'">
+			ORDER BY B.RECRUIT_STRT_DT DESC
+		</if>
+		<if test="searchType != null and searchType == 'ascStrtDate'">
+			ORDER BY B.RECRUIT_STRT_DT ASC
+		</if>
+		<if test="searchType != null and searchType == 'descDday'">
+			ORDER BY B.DEADLINE_DAY DESC
+		</if>
+		<if test="searchType != null and searchType == 'ascDday'">
+			ORDER BY B.DEADLINE_DAY ASC
+		</if>
+		<if test="searchType != null and searchType == 'decsHit'">
+			ORDER BY B.RECRUIT_HIT DESC
+		</if>
+		<if test="searchType != null and searchType == 'ascHit'">
+			ORDER BY B.RECRUIT_HIT ASC
+		</if>
+		
+ 	</sql>
+ 	
+ 	<sql id="recruitProcessYn">
+ 	
+ 		<if test="recruitYn != null">
+ 		
+ 			AND recruit_yn = #{recruitYn}
+ 		
+ 		</if>
+ 		
+ 		<if test="processYn != null">
+ 		
+ 			AND process_yn = #{processYn}
+ 		
+ 		</if>
+ 	
+ 	</sql>
+ 	
+ 	
+ 	<select id="selectRecruitCount" parameterType="customPagingVO" resultType="int">
+ 	
+ 		SELECT COUNT(recruit_no)
+ 		
+ 		FROM RECRUIT
+ 		
+ 		WHERE 
+ 		
+			ent_no = #{entNo}
+			
+			
+		<include refid="recruitProcessYn"/>
+ 		<include refid="recruitSearch"/>
+ 	
+ 	</select>
+ 	
+ 	
+ 	<select id="selectRecruitList" parameterType="customPagingVO" resultType="recruitVO"> 
+ 		
+ 		SELECT
+ 		
+ 			B.*
+ 			
+ 		FROM
+ 			(
+ 		
+	 		SELECT
+	 		
+	 			A.*, ROW_NUMBER() OVER (ORDER BY A.RECRUIT_ENROLL_YMD DESC) RNUM
+	 			
+	 		FROM(
+	 		
+				SELECT 	
+				
+					RECRUIT_STRT_DT, RECRUIT_END_DT, RECRUIT_NO, RECRUIT_TTL, RECRUIT_YN, RECRUIT_CAREER_CODE_NM,
+					RECRUIT_CAREER_DT, ENT_URL, RECRUIT_HIT, PROCESS_YN, PROCESS_AMT, RECRUIT_PAY, RECRUIT_ENROLL_YMD,
+					CMMNCD_GRP_CD, CMMNCD_NM1, RECRUIT_CNT, PSTN_CMMNCD_NM, ENT_POSTCODE, ENT_NM, ENT_NO, ENT_APPLY, 
+					<![CDATA[
+					CASE 
+					
+						WHEN TRUNC(SYSDATE) < TRUNC(TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN
+							'D-' || (TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) - TRUNC(TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI')))
+						WHEN TRUNC(SYSDATE) <= TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN
+						
+						CASE 
+							WHEN TRUNC(SYSDATE) = TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN 'D-0'
+							ELSE 'D-' || (TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) - TRUNC(SYSDATE))
+						END
+					ELSE
+					
+						'D+1'
+					]]>
+					
+					END AS DEADLINE_DAY,
+				
+			 		<![CDATA[
+			    
+				    CASE
+				        WHEN TRUNC(SYSDATE) < TRUNC(TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN '공고전'
+				        WHEN TRUNC(SYSDATE) BETWEEN TRUNC(TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI')) AND TRUNC(TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI')) THEN '공고중'
+				        ELSE '공고 마감'
+		        
+					]]>
+		
+	    			END AS RECRUIT_STATUS
+				
+				FROM 
+				
+					Recruit
+					
+				WHERE 
+					
+					ENT_NO = #{entNo}
+					<include refid="recruitProcessYn"/>
+					<include refid="recruitSearch"/>
+		 		
+	 			) A
+	 		) B
+	 		
+	 		<![CDATA[
+			WHERE B.RNUM >= #{startRow} AND B.RNUM <= #{endRow}
+			]]>
+			<include refid="recruitSort"/>
+ 	
+ 	</select>
+ 	
+ 	
+ 	<insert id="applyProcessListInsert" parameterType="applyProcessListVO" useGeneratedKeys="true">
+ 	
+		<selectKey keyProperty="processSeq" resultType="int" order="BEFORE">
+	 		
+	 		SELECT SEQ_APPLY_PROCESS_LIST_NO.NEXTVAL FROM DUAL
+	 	
+	 	</selectKey>
+	 	
+ 		
+ 		
+ 		INSERT INTO apply_process_list (
+
+		    process_seq,
+		    recruit_no,
+		    apply_process_cost,
+		    cls_nm,
+		    STRT_YMD,
+		    PRSNTN_YMD,
+		    apply_process_order,
+		    pstn_cmmncd_nm
+
+		) VALUES (
+		    #{processSeq},
+		    #{recruitNo},
+		    #{applyProcessCost},
+		    #{clsNm},
+		    #{strtYmd},
+		    #{prsntnYmd},
+		    #{applyProcessOrder},
+		    #{pstnCmmncdNm}
+		)
+ 	
+ 	</insert>
+ 	
+ 	<select id="selectApplyProcessList" parameterType="String" resultType="applyProcessListVO">
+ 		
+ 		SELECT
+ 		
+		    process_seq,
+		    recruit_no,
+		    strt_ymd,
+		    prsntn_ymd,
+		    apply_process_cost,
+		    cls_nm,
+		    apply_process_order,
+		    pstn_cmmncd_nm
+		    
+		FROM
+		
+		    apply_process_list
+		    
+		WHERE
+		
+		    recruit_no = #{recruitNo}
+		    AND pstn_cmmncd_nm = #{pstnCmmncdNm}
+	   	ORDER BY
+           APPLY_PROCESS_ORDER
+ 	
+ 	</select>
+ 	
+ 	<insert id="applyProcessListPayInsert" parameterType="applyProcessListPayVO">
+ 	
+ 		INSERT INTO apply_process_list_pay (
+ 		
+		    STLM_NO,
+		    stlm_amt,
+		    recruit_no
+		    
+		) VALUES (
+		    SEQ_APPLY_PROCESS_LIST_PAY_NO.NEXTVAL,
+		    #{stlmAmt},
+		    #{recruitNo}
+		)
+ 	
+ 	
+ 	
+ 	</insert>
+ 	
+ 	
+ 	<select id="selectProcess" parameterType="String" resultType="applyProcessListVO">
+ 		
+ 		SELECT
+		    process_seq,
+		    recruit_no,
+		    strt_ymd,
+		    prsntn_ymd,
+		    apply_process_cost,
+		    cls_nm,
+		    apply_process_order,
+		    pstn_cmmncd_nm
+		FROM
+    		apply_process_list
+    	WHERE
+    		recruit_no = #{recruitNo}
+    		AND
+    		pstn_cmmncd_nm = #{pstnCmmncdNm}
+ 
+            	
+ 	</select>
+ 	
+ 	<insert id="entIntroQSTNInsert" parameterType="entIntroQSTNVO">
+ 		
+ 		INSERT INTO ent_intro_qstn (
+ 		
+		    ent_intro_qstn_no,
+		    process_seq,
+		    recruit_no,
+		    pstn_cmmncd_nm,
+		    qstn_order
+		    
+		) VALUES (
+		
+		    SEQ_ENT_INTRO_QSTN_NO.NEXTVAL,
+		    #{processSeq},
+		    #{recruitNo},
+		    #{pstnCmmncdNm},
+		    #{qstnOrder}
+		    
+		)
+ 	
+ 	</insert>
+ 	
+ 	<select id="selectDsnct" parameterType="String" resultType="entIntroQSTNDSNCTVO">
+  
+	  	SELECT
+		    EID.ENT_INTRO_QSTN_DSNCT_SEQ,
+		    EID.ENT_INTRO_QSTN_NO,
+		    EID.ENT_INTRO_QSTN_CN
+		FROM
+		    ENT_INTRO_QSTN EI
+		JOIN
+		    ENT_INTRO_QSTN_DSNCT EID ON EI.ENT_INTRO_QSTN_NO = EID.ENT_INTRO_QSTN_NO
+		WHERE
+		    EI.RECRUIT_NO = #{recruitNo}
+		    AND EI.PSTN_CMMNCD_NM = #{pstnCmmncdNm}
+		ORDER BY
+			EID.ENT_INTRO_QSTN_DSNCT_SEQ ASC
+			  
+		  
+ 	
+ 	</select>
+ 	
+ 	<select id="selectOrderDsnct" parameterType="String" resultType="entIntroQSTNDSNCTVO">
+  
+	  	SELECT
+		    EID.ENT_INTRO_QSTN_DSNCT_SEQ,
+		    EID.ENT_INTRO_QSTN_NO,
+		    EID.ENT_INTRO_QSTN_CN
+		FROM
+		    ENT_INTRO_QSTN EI
+		JOIN
+		    ENT_INTRO_QSTN_DSNCT EID ON EI.ENT_INTRO_QSTN_NO = EID.ENT_INTRO_QSTN_NO
+		WHERE
+		    EI.RECRUIT_NO = #{recruitNo}
+		    AND EI.PSTN_CMMNCD_NM = #{pstnCmmncdNm}
+		    AND EI.QSTN_ORDER = #{orderNumber}
+		ORDER BY
+			EID.ENT_INTRO_QSTN_DSNCT_SEQ ASC
+			  
+		  
+ 	
+ 	</select>
+ 	
+	<insert id="qstnDSNCTInsert">
+	
+		INSERT INTO ent_intro_qstn_dsnct (
+		    ent_intro_qstn_dsnct_seq,
+		    ent_intro_qstn_no,
+		    ent_intro_qstn_cn
+		) VALUES (
+		    ENT_INTRO_QSTN_DSNCT_NO.NEXTVAL,
+		    #{entIntroQstnNo},
+		    #{entIntroQstnCn}
+		)
+	</insert>
+
+ 	
+ 	<update id="qstnDSNCTUpdate">
+ 	
+ 		UPDATE ent_intro_qstn_dsnct
+ 		
+		SET
+		    ent_intro_qstn_cn = #{entIntroQstnUpdateCn}
+		    
+		WHERE
+		    ent_intro_qstn_dsnct_seq = #{entIntroQstnSeqNo}
+ 	
+ 	</update>
+ 	
+ 	<select id="getentIntroQstnNo" parameterType="String" resultType="entIntroQSTNVO">
+ 	
+ 		SELECT
+		    ent_intro_qstn_no,
+		    recruit_no,
+		    pstn_cmmncd_nm,
+		    process_seq
+		FROM
+		    ent_intro_qstn
+		WHERE
+		    recruit_no = #{recruitNo}
+		    AND pstn_cmmncd_nm = #{pstnCmmncdNm}
+ 	
+ 	</select>
+ 	
+<!--  	<resultMap type="accountVO" id="accountMap"> -->
+<!--  		<id property="accountId" column="account_id" /> -->
+<!-- 		<result property="accountNm" column="account_nm" /> -->
+<!-- 		<result property="accountNick" column="account_nick" /> -->
+<!-- 		<result property="accountMail" column="account_mail" /> -->
+<!-- 		<result property="accountTell" column="account_tell" /> -->
+<!-- 		<result property="accountZip" column="account_zip" /> -->
+<!-- 		<result property="accountAddr1" column="account_addr1" /> -->
+<!-- 		<result property="accountAddr2" column="account_addr2" /> -->
+<!-- 		<result property="accountPswd" column="account_pswd" /> -->
+<!-- 		<result property="enabled" column="enabled" /> -->
+<!-- 		<result property="authCmmncd" column="auth_cmmncd" /> -->
+<!-- 		<result property="joinYmd" column="join_ymd" /> -->
+<!-- 		<result property="accountSttsCmmncd" column="account_stts_cmmncd" /> -->
+<!-- 		<result property="socialName" column="social_name" /> -->
+<!-- 		<result property="birthYmd" column="birth_ymd" /> -->
+<!-- 		<result property="gender" column="gender" /> -->
+<!-- 		<result property="codingtestScore" column="codingtest_score" /> -->
+<!-- 		<result property="passYn" column="pass_yn" /> -->
+ 	
+<!--  	</resultMap> -->
+ 	
+ 	
+ 	<select id="selectOrderList" parameterType="customPagingVO" resultType="accountVO">
+ 	
+ 	
+			SELECT B.*
+			FROM (
+			    SELECT A.*, ROW_NUMBER() OVER (ORDER BY A.ACCOUNT_ID DESC) AS RNUM
+			    FROM (
+			    
+			          
+			        SELECT
+					    a.*, RSM.RSM_CAREER_YEAR, EPAP.*
+					FROM
+					    EACH_PROCESS_APPLY_PASS EPAP
+					JOIN
+					    RECRUIT_APPLICANT RA ON EPAP.APPLY_NO = RA.APPLY_NO
+					JOIN
+					    RESUME RSM ON RA.RSM_NO = RSM.RSM_NO
+					JOIN
+					    ACCOUNT A ON RSM.ACCOUNT_ID = A.ACCOUNT_ID
+					WHERE
+					    EPAP.EACH_ORDER = #{orderNumber}
+					    AND EPAP.PSTN_CMMNCD_NM = #{pstnCmmncdNm}
+					    AND EPAP.RECRUIT_NO = #{recruitNo}
+					    AND EPAP.PASS_YN = 'N'
+			          
+			    ) A
+			) B
+			
+			<![CDATA[
+			WHERE B.RNUM >= #{startRow} AND B.RNUM <= #{endRow}
+			]]>
+ 	
+ 	</select>
+ 	
+ 	<select id="selecetAccountListCount" parameterType="customPagingVO" resultType="int">
+ 	
+ 		SELECT COUNT(*)
+ 		
+		FROM ACCOUNT a
+		
+		INNER JOIN RECRUIT_APPLICANT ra ON a.ACCOUNT_ID = ra.ACCOUNT_ID
+		
+		INNER JOIN EACH_PROCESS_APPLY_PASS ep ON ra.APPLY_NO = ep.APPLY_NO
+		
+		WHERE ep.EACH_ORDER = #{orderNumber}
+		
+		  AND ep.PSTN_CMMNCD_NM = #{pstnCmmncdNm}
+		  
+		  AND ep.RECRUIT_NO = #{recruitNo}
+ 	
+ 	
+ 	</select>
+ 	
+ 	
+ 	<insert id="insetEachProcess" parameterType="eachProcessApplyPassVO">
+ 		INSERT INTO each_process_apply_pass (
+		    each_process_no, apply_no, process_seq, recruit_no,
+		    pass_yn, each_order, cls_nm, pstn_cmmncd_nm, rsm_no
+		) VALUES (
+		    #{eachProcessNo}, #{applyNo}, #{processSeq}, #{recruitNo},
+			'N', #{eachOrder}, #{clsNm}, #{pstnCmmncdNm}, #{rsmNo}
+		)
+ 	</insert>
+ 	
+ 	<select id="selectEachProcessNo" parameterType="eachProcessApplyPassVO" resultType="string">
+		SELECT each_process_no 
+		FROM (
+		    SELECT each_process_no 
+		    FROM each_process_apply_pass  
+		    ORDER BY each_process_no DESC
+		)
+		<![CDATA[ 
+		WHERE ROWNUM <= 1
+		]]>
+ 	</select>
+ 	
+ 	<delete id="qstnDSNCTDelete" parameterType="int">
+ 	
+ 		DELETE FROM ent_intro_qstn_dsnct
+ 		
+		WHERE
+		
+		    ENT_INTRO_QSTN_DSNCT_SEQ = #{entIntroQstnSeqNo}
+ 	
+ 	</delete>
+
+ 	
+ 	
+	<select id="getApplyNumber" resultType="recruitApplicantVO">
+	    <![CDATA[
+	    SELECT
+	        apply_no,
+	        apply_dt,
+	        recruit_no,
+	        account_id,
+	        rsm_no
+	    FROM
+	        recruit_applicant
+	    WHERE
+	        APPLY_NO LIKE '%' || #{applyNo} || '%'
+	    ]]>
+	</select>
+
+ 	
+ 	
+ 	<select id="getApplyHit" resultType="LogRecruitTableVO">
+ 		
+ 		SELECT
+		    log_date,
+		    recruit_no,
+		    pstn_cmmncd_nm,
+		    increase_count
+		FROM
+		    log_recruit_hit
+		WHERE
+		    recruit_no = #{recruitNo}
+		    AND pstn_cmmncd_nm = #{pstnCmmncdNm}
+ 	</select>
+ 	
+ 	<select id="getApplyPass" resultType="applicantPassStatVO">
+ 		SELECT
+		    RA.APPLY_DT,
+		    EPAP.PASS_YN
+		FROM
+		    RECRUIT_APPLICANT RA
+		JOIN
+		    EACH_PROCESS_APPLY_PASS EPAP
+		ON
+		    RA.APPLY_NO = EPAP.APPLY_NO
+		WHERE
+		
+		 <![CDATA[
+		 
+		    RA.APPLY_NO LIKE '%' || #{applyNo} || '%'
+		    AND EPAP.PASS_YN = #{yn}
+		    
+		   ]]>
+		    
+ 	</select>
+ 	
+ 	<select id="getApplyCareer" resultType="applicantCareerStatVO">
+ 	
+ 		SELECT
+		    RA.APPLY_DT,
+		    R.RSM_CAREER_YEAR
+		    
+		FROM
+		    RECRUIT_APPLICANT RA
+		JOIN
+		    RESUME R ON RA.RSM_NO = R.RSM_NO
+		WHERE
+		<![CDATA[
+		    RA.APPLY_NO LIKE '%' || #{applyNo} || '%'
+	 	]]>
+ 	
+ 	</select>
+ 	
+ 	<select id="getApplyGender" resultType="applicantGenderStatVO">
+ 	
+ 		SELECT
+		    RA.APPLY_DT,
+		    R.RSM_GENDER
+		    
+		FROM
+		    RECRUIT_APPLICANT RA
+		JOIN
+		    RESUME R ON RA.RSM_NO = R.RSM_NO
+		WHERE
+		    <![CDATA[
+		    RA.APPLY_NO LIKE '%' || #{applyNo} || '%'
+	 		]]>
+	 		
+ 	
+ 	</select>
+ 	
+ 	<select id="getApplyEdu" resultType="applicantEduStatVO">
+ 	
+ 		SELECT
+		    RA.APPLY_DT,
+		    R.EDU_ACDMCR
+		    
+		FROM
+		    RECRUIT_APPLICANT RA
+		JOIN
+		    RESUME R ON RA.RSM_NO = R.RSM_NO
+		WHERE
+		    <![CDATA[
+		    RA.APPLY_NO LIKE '%' || #{applyNo} || '%'
+	 		]]>
+	 		
+ 	
+ 	</select>
+ 	
+ 	<update id="updateApplicantFail">
+ 	
+		UPDATE each_process_apply_pass
+		
+		SET 
+		    pass_yn = 'D'
+		    
+		WHERE
+		
+		    each_process_no = #{eachProcessSeq}
+ 	
+ 	</update>
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	<select id="getQstnAnswer" resultType="map">
+ 	
+ 		 SELECT 
+		    eia.ENT_INTRO_QSTN_CN, 
+		    eia.ENT_INTRO_QSTN_ANSR, 
+		    eia.ACCOUNT_ID
+		FROM 
+		    ENT_INTRO_QSTN eiq
+		JOIN 
+		    ENT_INTRO_QSTN_DSNCT eid
+		ON 
+		    eiq.ENT_INTRO_QSTN_NO = eid.ENT_INTRO_QSTN_NO
+		JOIN 
+		    ENT_INTRO_QSTN_ANSR eia
+		ON 
+		    eid.ENT_INTRO_QSTN_CN = eia.ENT_INTRO_QSTN_CN
+		WHERE 
+		    eiq.RECRUIT_NO = #{recruitNo}
+		    AND eiq.PSTN_CMMNCD_NM = #{pstnCmmncdNm}
+		    AND eiq.QSTN_ORDER = #{orderNumber}
+		    AND eia.ACCOUNT_ID = #{id}
+ 	
+ 	</select>
+ 	
+ 	
+ 	<select id="selectEntInfoByEntNo" resultType="enterpriseVO">
+ 		
+ 		SELECT
+		    ent_no,
+		    biz_type_nm,
+		    ksic_nm,
+		    brno,
+		    ent_nm,
+		    rprsv_nm,
+		    rprs_telno,
+		    ent_img,
+		    fndn_yr,
+		    emp_cnt,
+		    cptl,
+		    ent_sls_amt,
+		    ent_ebit,
+		    ent_url
+		FROM
+		    enterprise
+		WHERE
+		    ent_no = #{entNo}
+ 	
+ 	</select>
+ 	
+ 	
+ 	
+ 	<update id="updateApplicantPass">
+ 	
+ 		UPDATE each_process_apply_pass
+		SET
+		    each_order = #{updateOrderNumber},
+		    cls_nm = #{updateClsNm},
+		    PROCESS_SEQ = PROCESS_SEQ + 1
+		    
+		WHERE
+		
+		    EACH_PROCESS_NO = #{eachProcessSeq}
+ 	
+ 	</update>
+ 	
+ 	
+ 	<insert id="insertApplicantPass" parameterType="map">
+ 	
+ 		INSERT INTO each_process_apply_pass (
+		    each_process_no,
+		    apply_no,
+		    process_seq,
+		    recruit_no,
+		    pass_yn,
+		    each_order,
+		    cls_nm,
+		    pstn_cmmncd_nm,
+		    rsm_no
+		) VALUES (
+		    #{inserteachProcessSeq},
+		    #{applyNo},
+		    #{processSeq},
+		    #{recruitNo},
+		    'Y',
+		    #{orderNumber},
+		    #{clsNm},
+		    #{pstnCmmncdNm},
+		    #{rsmNo}
+		)
+ 	
+ 	
+ 	</insert>
+ 	
+ 	
+ 	<select id="getPstnCmmncdList" resultType="map">
+ 	
+ 		SELECT DISTINCT
+		    cmmncd_grp_nm
+		FROM
+		    commoncode
+		WHERE
+		
+		 <![CDATA[
+		    CMMNCD_GRP_CD LIKE '%'||'PSTN'||'%'
+		 ]]>	
+ 	
+ 	</select>
+ 	
+ 	<select id="getPreferCmmncdNm" resultType="map">
+ 	
+ 		SELECT DISTINCT
+		    CMMNCD_NM1
+		FROM
+		    commoncode
+		WHERE
+		
+		 <![CDATA[
+		    CMMNCD_GRP_CD LIKE '%'||'PSTN0'||'%'
+		 ]]>	
+ 	
+ 	</select>
+ 	
+ 	
+ 	<update id="updateProcessDate" parameterType="map">
+ 	
+ 		UPDATE apply_process_list
+		SET
+		    STRT_YMD = #{startDate},
+		    PRSNTN_YMD = #{endDate}
+		WHERE
+		    process_seq = #{updateSeq}
+ 	
+ 	</update>
+ 	
+ 	<select id="getTodayApply" resultType="int"> 
+ 		
+ 		SELECT COUNT(*)
+		FROM RECRUIT_APPLICANT
+		<![CDATA[
+		WHERE RECRUIT_NO LIKE '%'|| #{customEntNo}||'%'
+		]]>	
+		AND TRUNC(APPLY_DT) = TRUNC(SYSDATE)
+ 	
+ 	
+ 	</select>
+ 	
+ 	<select id="getTotalRecruitCount" resultType="int">
+ 		SELECT COUNT(*)
+		FROM RECRUIT
+		<![CDATA[
+		WHERE RECRUIT_NO LIKE '%'|| #{customEntNo}||'%'
+		]]>	
+ 		
+ 	</select>
+ 	<select id="getTotalApply" resultType="int">
+ 		SELECT COUNT(*)
+		FROM RECRUIT_APPLICANT
+		<![CDATA[
+		WHERE RECRUIT_NO LIKE '%'|| #{customEntNo}||'%'
+		]]>	
+ 	</select>
+
+ 	<select id="getEndedRecruitCount" resultType="int">
+ 		SELECT COUNT(*)
+		FROM RECRUIT
+		<![CDATA[
+		WHERE RECRUIT_NO LIKE '%'|| #{customEntNo}||'%'
+      	AND TO_DATE(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI') < SYSDATE
+		]]>
+ 	</select>
+ 	
+
+
+ 	<select id="getEnterMyInfo" resultType="enterpriseVO">
+ 		SELECT e.ENT_NO, e.ENT_NM, e.BIZ_TYPE_NM, e.KSIC_NM, e.BRNO, e.ENT_NM, e.RPRSV_NM, e.RPRS_TELNO, e.ENT_IMG, e.FNDN_YR, e.EMP_CNT, e.CPTL, e.ENT_SLS_AMT, e.ENT_EBIT, e.ENT_URL,a.account_addr1,a.account_addr2,
+	   	ROW_NUMBER() OVER (PARTITION BY e.ENT_NO ORDER BY e.ENT_NO) AS rn
+		FROM enterprise e
+		JOIN ent_account ea ON e.ENT_NO = ea.ENT_NO
+		JOIN account a ON ea.ACCOUNT_ID = a.ACCOUNT_ID
+		WHERE e.ENT_NO = #{entNo}
+		AND ROWNUM = 1
+ 	</select>
+ 	
+ 	<select id="getProgressRecruit" resultType="map">
+		SELECT 
+		    R.RECRUIT_TTL,
+		    R.RECRUIT_NO,
+		    R.PSTN_CMMNCD_NM,
+		    APL.CLS_NM,
+		    APL.PROCESS_SEQ,
+		    APL.STRT_YMD,
+		    APL.PRSNTN_YMD,
+		    EPA.EACH_ORDER,
+		    COUNT(EPA.EACH_PROCESS_NO) AS COUNT
+		FROM 
+		    RECRUIT R
+		JOIN 
+		    APPLY_PROCESS_LIST APL ON R.RECRUIT_NO = APL.RECRUIT_NO AND R.PSTN_CMMNCD_NM = APL.PSTN_CMMNCD_NM
+		LEFT JOIN 
+		    EACH_PROCESS_APPLY_PASS EPA ON APL.PROCESS_SEQ = EPA.PROCESS_SEQ
+		WHERE 
+		    R.ENT_NO = #{entNo}
+		    AND CURRENT_DATE BETWEEN APL.STRT_YMD AND APL.PRSNTN_YMD
+		GROUP BY 
+		    R.RECRUIT_TTL,
+		    R.RECRUIT_NO,
+		    R.PSTN_CMMNCD_NM,
+		    APL.CLS_NM,
+		    APL.PROCESS_SEQ,
+		    APL.STRT_YMD,
+		    APL.PRSNTN_YMD,
+		    EPA.EACH_ORDER
+		 	
+ 	</select>
+ 	
+ 	<select id="getRecentApply" resultType="map">
+ 		<![CDATA[
+ 		SELECT
+		    r.RSM_CAREER_YEAR,
+		    a.account_nm,
+		    SUBSTR(ra.apply_no, 
+		           INSTR(ra.apply_no, '_', 1, 2) + 1,
+		           INSTR(ra.apply_no, '_', 1, 3) - INSTR(ra.apply_no, '_', 1, 2) - 1
+		    ) AS position
+		FROM
+		    recruit_applicant ra
+		JOIN
+		    RESUME r ON ra.rsm_no = r.rsm_no
+		JOIN
+		    account a ON a.account_id = r.account_id
+		WHERE
+    	APPLY_NO LIKE '%'|| #{customEntNo2}||'%'
+    	AND TRUNC(ra.APPLY_DT) BETWEEN TRUNC(SYSDATE) - 3 AND TRUNC(SYSDATE)
+ 		
+ 		]]>
+ 	
+ 	</select>
+ 	
+ 	<select id="getDeadLineRecruit" resultType="recruitVO">
+ 		SELECT
+		    r.recruit_no,
+		    r.recruit_ttl,
+		    r.recruit_strt_dt,
+		    r.recruit_end_dt,
+		    r.recruit_yn,
+		    r.recruit_career_code_nm,
+		    r.recruit_career_dt,
+		    r.ent_url,
+		    r.recruit_hit,
+		    r.process_yn,
+		    r.process_amt,
+		    r.recruit_pay,
+		    r.recruit_enroll_ymd,
+		    r.cmmncd_grp_cd,
+		    r.cmmncd_nm1,
+		    r.recruit_cnt,
+		    r.pstn_cmmncd_nm,
+		    r.ent_postcode,
+		    r.ent_nm,
+		    r.ent_no,
+		    r.ent_apply,
+		    <![CDATA[
+		    LISTAGG(el.esntl_lang_cmmncd_nm, ', ') WITHIN GROUP (ORDER BY el.esntl_lang_cmmncd_nm) AS esntlLangCmmncdNm,
+		    TRUNC(TO_DATE(r.recruit_end_dt, 'YYYY-MM-DD"T"HH24:MI') - TRUNC(SYSDATE)) AS deadLineDay
+		    ]]>
+		FROM
+		    recruit r
+		LEFT JOIN
+		    ESNTL_LANG el ON r.recruit_no = el.recruit_no
+		WHERE
+		    r.ent_no = #{entNo}
+		    <![CDATA[
+		    AND TRUNC(TO_DATE(r.recruit_end_dt, 'YYYY-MM-DD"T"HH24:MI') - TRUNC(SYSDATE)) <= 3
+    		AND TRUNC(TO_DATE(r.recruit_end_dt, 'YYYY-MM-DD"T"HH24:MI') - TRUNC(SYSDATE)) >= 0
+    		]]>
+		GROUP BY
+		    r.recruit_no,
+		    r.recruit_ttl,
+		    r.recruit_strt_dt,
+		    r.recruit_end_dt,
+		    r.recruit_yn,
+		    r.recruit_career_code_nm,
+		    r.recruit_career_dt,
+		    r.ent_url,
+		    r.recruit_hit,
+		    r.process_yn,
+		    r.process_amt,
+		    r.recruit_pay,
+		    r.recruit_enroll_ymd,
+		    r.cmmncd_grp_cd,
+		    r.cmmncd_nm1,
+		    r.recruit_cnt,
+		    r.pstn_cmmncd_nm,
+		    r.ent_postcode,
+		    r.ent_nm,
+		    r.ent_no,
+		    r.ent_apply
+		ORDER BY
+		    deadLineDay ASC
+ 	
+ 	</select>
+ 	
+ 	
+ 	
+ 	<select id="selecteResumeByRsmNo" resultType="accountVO">
+ 		<![CDATA[
+ 		SELECT a.*
+		FROM RESUME r
+		JOIN
+		    account a
+		ON 
+		    r.account_id = a.account_id
+		where
+		    r.rsm_no = #{rsmNo}
+ 		]]>
+ 	</select>
+ 	<select id="selecteEducationByRsmNo" resultType="resumeVO">
+ 		<![CDATA[
+	 	SELECT 
+
+		    r.rsm_no,
+		    r.account_id,
+		    r.rsm_gender,
+		    r.rsm_ttl,
+		    r.rsm_career_year,
+		    r.rsm_rls_yn,
+		    r.rsm_photo AS rsmPhotoByte,
+		    r.rsm_introduction,
+		    r.edu_end,
+		    r.edu_nm,
+		    r.grade,
+		    r.full,
+		    r.rsm_mjr_nm,
+		    r.rsm_mjr_cd,
+		    r.rsm_new_career,
+		    r.edu_acdmcr
+		FROM RESUME r
+		JOIN
+		    account a
+		ON 
+		    r.account_id = a.account_id
+		where
+		    r.rsm_no = #{rsmNo}
+		    ]]>
+ 	</select>
+ 	<select id="selecteCareerByRsmNo" resultType="careerVO">
+ 	<![CDATA[
+ 		SELECT *
+		FROM career
+		WHERE 
+		    rsm_no = #{rsmNo}
+		    ]]>
+ 	</select>
+ 	<select id="selectExperienceByRsmNo" resultType="experienceVO">
+ 	<![CDATA[
+ 		SELECT *
+		FROM
+		    experience
+		WHERE
+		    rsm_no = #{rsmNo}
+    ]]>
+ 	</select>
+ 	<select id="selectCertificateByRsmNo" resultType="certificateVO">
+ 	<![CDATA[
+		SELECT *
+		FROM 
+		    certificate
+		WHERE
+		    rsm_no = #{rsmNo}
+		    ]]> 	
+ 	</select>
+ 	<select id="selectPortfolioByRsmNo" resultType="portfolioVO">
+ 	<![CDATA[
+		SELECT*
+		FROM
+		portfolio
+		WHERE
+		rsm_no = #{rsmNo}
+		]]>
+ 	</select>
+ 	<select id="selectAvailLangListByRsmNo" resultType="availLangVO">
+ 	<![CDATA[
+ 		SELECT *
+		FROM
+		    avail_lang_list
+		WHERE
+		    rsm_no = #{rsmNo}
+		    ]]>
+ 	</select>
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	<!-- 김영상 -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<select id="BBS201Count" parameterType="int" resultType="int">
+		select count(*)
+		from board
+		where BBS_CTGRY_CMMNCD = 'BBS201' and ent_no = #{entNo}
+	</select>
+
+	<select id="BBS201List" parameterType="bbs201PagingVO" resultType="boardVO">
+ 		select
+	 		b.*
+	 	from(
+		 	select
+		 		a.*, row_number() over(order by a.bbs_reg_dt desc) rnum
+	 		from(
+		select *
+		from board
+		where BBS_CTGRY_CMMNCD = 'BBS201' and ent_no = #{entNo}
+			) a
+		 ) b
+		 <![CDATA[
+		 	where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		 ]]>
+	</select>
+
+	<resultMap type="boardVO" id="boardMap">
+		<id property="bbsNo" column="bbs_no"/>
+		<result property="bbsNo" column="bbs_no"/>
+		<result property="bbsTtl" column="bbs_ttl"/>
+		<result property="bbsCn" column="bbs_cn"/>
+		<result property="bbsWriter" column="bbs_writer"/>
+		<result property="bbsCtgryCmmncd" column="bbs_ctgry_cmmncd"/>
+		<result property="entNo" column="ent_no"/>
+		<result property="bbsRegDt" column="bbs_reg_dt"/>
+	</resultMap>
+
+	<resultMap type="atchVO" id="noticeFileMap">
+		<id property="fileNo" column="file_no"/>
+		<result property="fileNo" column="file_no"/>
+		<result property="fileName" column="file_name"/>
+		<result property="fileSize" column="file_size"/>
+		<result property="fileFancysize" column="file_fancysize"/>
+		<result property="fileMime" column="file_mime"/>
+		<result property="filePath" column="file_path"/>
+		<result property="fileSrcNo" column="file_downcount"/>
+		<result property="orgnCmmncd" column="file_downcount"/>
+		
+	</resultMap>
+	
+	<insert id="noticeInsert" parameterType="boardVO" useGeneratedKeys="true">
+		<selectKey keyProperty="bbsNo" resultType="string" order="BEFORE">
+			select seq_board.nextval from dual
+		</selectKey>
+		INSERT INTO board (
+		    bbs_no
+		    , bbs_reg_dt
+		    , bbs_ttl
+		    , bbs_cn
+		    , bbs_writer
+		    , bbs_ctgry_cmmncd
+		    , ent_no
+		) VALUES (
+		    #{bbsNo}
+		  , sysdate
+		  , #{bbsTtl}
+		  , #{bbsCn}
+		  , #{bbsWriter}
+		  , 'BBS202'
+		  , #{entNo}
+		)
+		
+		
+	</insert>
+
+	<insert id="insertNoticeFile" parameterType="atchVO">
+		INSERT INTO atch (
+		    file_no
+		    , file_src_no
+		    , orgn_cmmncd
+		    , file_path
+		    , file_size
+		    , file_fancysize
+		    , file_mime
+		    , file_name
+		) VALUES (
+		    seq_atch.nextval
+		  , #{bbsNo}
+		  , 'BBS202'
+		  , #{filePath}
+		  , #{fileSize}
+		  , #{fileFancysize}
+		  , #{fileMime}
+		  , #{fileName}
+		)
+	</insert>
+
+	<select id="BBS202Count" parameterType="int" resultType="int">
+		select count(*)
+		from board
+		where ent_no = #{entNo} and bbs_ctgry_cmmncd = 'BBS202'
+	</select>
+	
+	<select id="BBS202List" parameterType="bbs202PagingVO" resultType="boardVO">
+ 		select
+ 				b.*
+ 			from(
+	 	select
+	 			a.*, row_number() over(order by a.bbs_reg_dt desc) rnum
+ 			from(
+		select *
+		from board
+		where ent_no = #{entNo} and bbs_ctgry_cmmncd = 'BBS202'
+			) a
+		 ) b
+		 <![CDATA[
+		 	where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		 ]]>
+	</select>
+
+	<select id="idCheck" parameterType="string" resultType="int">
+		select
+		    count(account_id)
+		from account
+		where account_id = #{id}
+	</select>
+
+	<insert id="signUp" parameterType="accountVO">
+		INSERT INTO account (
+		    account_id
+		    , account_nm
+		    , account_nick
+		    , account_mail
+		    , account_tell
+		    , account_zip
+		    , account_addr1
+		    , account_addr2
+		    , account_pswd
+		    , enabled
+		    , auth_cmmncd
+		    , join_ymd
+		    , account_stts_cmmncd
+		) VALUES (
+		    #{accountId}
+		  , #{accountNm}
+		  , #{accountNick}
+		  , #{accountMail}
+		  , #{accountTell}
+		  , #{accountZip}
+		  , #{accountAddr1}
+		  , #{accountAddr2}
+		  , #{accountPswd}
+		  , '1'
+		  , 'AUTH103'
+		  , sysdate
+		  , 'STTS0101'
+		)
+	</insert>
+
+	<insert id="accountAuth" parameterType="string">
+		insert into account_auth(
+		    account_id
+		    ,auth
+		)values(
+		    #{accountId}
+		    ,'ROLE_AUTH103'
+		)
+	</insert>
+	
+	<insert id="entAccount" parameterType="accountVO">
+		insert into ent_account(
+		    ent_no
+		    ,account_id
+		)values(
+		    #{entNo}
+		    ,#{accountId}
+		)
+	</insert>
+	
+	<select id="countId" parameterType="int" resultType="int">
+		select count(ent_no)
+		from ent_account
+		where ent_no = #{entNo}
+	</select>
+	
+	<select id="selectId" parameterType="int" resultType="entAccountVO">
+		SELECT e.*,
+		       a.account_nm,
+		       a.join_ymd
+		FROM ent_account e
+		LEFT JOIN account a ON e.account_id = a.account_id
+		WHERE e.ent_no = #{entNo} AND a.join_ymd > (
+		    SELECT MIN(join_ymd)
+		    FROM account
+		    WHERE account_id IN (
+		        SELECT account_id
+		        FROM ent_account
+		        WHERE ent_no = #{entNo}
+		    )
+		)
+	</select>
+	
+	<delete id="deleteId" parameterType="string">
+		DELETE FROM account WHERE account_id = #{accountId}
+	</delete>
+	
+	<delete id="deleteAccountAuth" parameterType="string">
+		DELETE FROM account_auth WHERE account_id = #{accountId}
+	</delete>
+
+	<delete id="deleteEntAccount" parameterType="string">
+		DELETE FROM ent_account WHERE account_id = #{accountId}
+	</delete>
+	
+	
+ </mapper>

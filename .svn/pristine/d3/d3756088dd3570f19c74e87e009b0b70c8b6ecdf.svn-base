@@ -1,0 +1,51 @@
+
+
+// CKEDITOR
+$(function(){
+	CKEDITOR.replace("content", {
+	    filebrowserUploadUrl: '/imageUpload.do',
+	    height: "450px"
+	});
+	
+
+});
+
+
+// 신고
+// 아이콘과 버튼 요소 가져오기
+const reportIcon = document.getElementById('reportIcon');
+const reportButton = document.getElementById('reportButton');
+
+// 아이콘 클릭 이벤트 처리
+reportIcon.addEventListener('click', function() {
+  // 신고 버튼 토글
+  if (reportButton.style.display === 'block') {
+    reportButton.style.display = 'none';
+  } else {
+    reportButton.style.display = 'block';
+  }
+});
+
+// 다른 곳 클릭 시 신고 버튼 숨기기
+document.addEventListener('click', function(event) {
+  const targetElement = event.target; // 클릭된 요소 가져오기
+  if (targetElement !== reportIcon && targetElement !== reportButton) {
+    reportButton.style.display = 'none';
+  }
+});
+
+// 신고 버튼 클릭 이벤트 처리
+reportButton.addEventListener('click', function() {
+    // 신고 알림
+    var confirmed = confirm('이 항목을 신고하시겠습니까?');
+    if (confirmed) {
+      // 확인을 선택한 경우에만 실행됩니다.
+      alert('신고되었습니다.');
+      // 여기에 추가적인 신고 처리 로직을 작성할 수 있습니다.
+    } else {
+      // 취소를 선택한 경우에 실행될 수 있는 로직을 여기에 작성할 수 있습니다.
+    }
+  })
+  
+
+

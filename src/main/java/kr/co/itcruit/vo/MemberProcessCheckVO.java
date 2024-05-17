@@ -1,0 +1,25 @@
+package kr.co.itcruit.vo;
+
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class MemberProcessCheckVO {
+	
+	//각 프로세스별 구분
+	private String applyNo;
+	private String accountId;
+	private String entNm;
+	private String applyDt;
+	private String recruitNo;
+	private String pstnCmmncdNm;
+	private String entNo;
+	private String recruitTtl;
+	private String recruitStrtDt;
+	private String recruitEndDt;
+	
+	
+	private List<MemberProcessStatVO> memberProcessStatList;
+
+}

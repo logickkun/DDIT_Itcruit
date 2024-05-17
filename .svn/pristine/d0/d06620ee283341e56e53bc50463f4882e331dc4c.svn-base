@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="kr.co.itcruit.mapper.IAdminMapper">
+ 
+ 	<sql id="entSearch">
+ 		<if test="searchType != null and searchType == 'entNo'">
+ 			and (ent_no like '%'||#{searchWord}||'%')
+ 		</if>
+ 		<if test="searchType != null and searchType == 'entNm'">
+ 			and (ent_nm like '%'||#{searchWord}||'%')
+ 		</if>
+ 	</sql>
+ 
+ 	
+ 	
+ 	<select id="entSttsCount" resultType="int">
+ 	SELECT count(*)
+	FROM 
+	    account a
+	JOIN 
+	    ent_account ea ON a.ACCOUNT_ID = ea.ACCOUNT_ID
+	JOIN 
+	    enterprise e ON ea.ENT_NO = e.ENT_NO
+	JOIN 
+	    atch at ON to_char(at.FILE_SRC_NO) = to_char(e.ENT_NO)  
+	WHERE 
+	    a.ACCOUNT_STTS_CMMNCD = 'STTS0103'  
+ 	</select>
+ 
+ 
+ 	<select id="entSttsList" resultType="atchVO">
+	 SELECT b.*
+	    FROM (
+	        SELECT
+	            a.ACCOUNT_ID,
+	            a.AUTH_CMMNCD,
+	            a.ACCOUNT_STTS_CMMNCD,
+	            e.ENT_NO,
+	            e.ENT_NM,
+	            at.FILE_SRC_NO,
+	            at.ORGN_CMMNCD,
+	            at.FILE_PATH,
+	            at.FILE_SIZE,
+	            at.FILE_FANCYSIZE,
+	            at.FILE_MIME,
+	            at.FILE_NAME,
+	            ROW_NUMBER() OVER (ORDER BY e.ENT_NO DESC) AS rnum
+	        FROM account a
+	        JOIN ent_account ea ON a.ACCOUNT_ID = ea.ACCOUNT_ID
+	        JOIN enterprise e ON ea.ENT_NO = e.ENT_NO
+	        JOIN atch at ON to_char(at.FILE_SRC_NO) = to_char(e.ENT_NO)
+	        WHERE a.ACCOUNT_STTS_CMMNCD = 'STTS0103'
+	    ) b
+     <![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+ 	</select>
+ 
+ 	<update id="entApproval" parameterType="accountVO">
+ 		UPDATE account
+		SET
+		    account_stts_cmmncd = 'STTS0101'
+		WHERE
+		        account_id = #{accountId}
+ 	</update>
+
+ 	
+ 	<select id="selectEntCount" parameterType="pagingVO" resultType="int">
+ 		select count(ent_no)
+ 		from enterprise
+ 		where 1 = 1
+ 		<include refid="entSearch"/>
+ 	</select>
+ 	
+ 	<select id="selectEntList" parameterType="pagingVO" resultType="enterpriseVO">
+ 		select
+	 		b.*
+	 	from(
+		 	select
+		 		a.*, row_number() over(order by a.ent_no desc) rnum
+	 		from(
+		 		select
+		 			ent_no, biz_type_nm, ksic_nm, brno,
+		    		ent_nm, rprsv_nm, rprs_telno, ent_img,
+		    		fndn_yr, emp_cnt, cptl, ent_sls_amt,
+		    		ent_ebit, ent_url
+		    	from enterprise
+		 		where 1 = 1
+ 				<include refid="entSearch"/>
+		 		order by ent_no desc
+		 	) a
+		 ) b
+		 <![CDATA[
+		 	where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		 ]]>
+ 	</select>
+ 
+ 	<select id="reportCount" resultType="int">
+ 		SELECT count(*)
+		FROM board_report br
+		INNER JOIN account a
+		  ON br.write_id = a.account_nick
+		WHERE br.HANDLING_YN = 'N' and a.account_stts_cmmncd IN ('STTS0101', 'STTS0103')
+ 	</select>
+ 
+ 	<select id="reportList" resultType="boardReportVO">
+ 		
+		SELECT *
+		FROM (
+		    SELECT
+		        br.write_id,
+		        br.REPORT_NO,
+		        br.BBS_REPORT_ID,
+		        br.BBS_REPORT_CMMNCD,
+		        br.BBS_NO,
+		        br.CMMT_NO,
+		        br.REPORT_YMD,
+		        br.HANDLING_YN,
+		        a.account_id,
+		        ROW_NUMBER() OVER (ORDER BY br.REPORT_YMD DESC) as rnum
+		    FROM board_report br
+		    INNER JOIN account a ON br.write_id = a.account_nick -- 조인 조건
+		    WHERE br.HANDLING_YN = 'N' AND a.account_stts_cmmncd IN ('STTS0101', 'STTS0103')
+		) b
+    <![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+ 	</select>
+ 
+ 	<update id="handlingYn" parameterType="boardReportVO">
+ 		UPDATE board_report
+		SET
+		     HANDLING_YN = 'Y'
+		WHERE
+		        report_no = #{reportNo}
+		    AND write_id = #{writeId}
+ 	</update>
+ 
+ 	<update id="stopAccount" parameterType="accountVO">
+ 		update account
+		set
+		    account_stts_cmmncd = 'STTS0102'
+		where 
+		    account_id = #{accountId}
+ 	</update>
+ 	
+ 	<select id="mainChart" resultType="recruitVO">
+ 		SELECT RP.RECRUIT_ENROLL_YMD, rp.process_yn, APP.STLM_AMT
+			FROM APPLY_PROCESS_LIST_PAY APP
+			JOIN RECRUIT RP ON APP.RECRUIT_NO = RP.RECRUIT_NO
+			WHERE TO_CHAR(RP.RECRUIT_ENROLL_YMD, 'YYYY-MM') = TO_CHAR(SYSDATE, 'YYYY-MM')
+ 	</select>
+ 	
+ 	<select id="accountNum" resultType="int">
+	    SELECT COUNT(*) FROM account
+	</select>
+	
+ 	<select id="entNum" resultType="int">
+	    SELECT COUNT(*) FROM ENTERPRISE
+	</select>
+	
+ 	<select id="monthNum" resultType="int">
+	    SELECT COUNT(*)
+	    FROM account
+	    WHERE TO_CHAR(join_ymd, 'YYYY-MM') = TO_CHAR(SYSDATE, 'YYYY-MM')
+	</select>
+	
+	<select id="horizontalChartChart" resultType="recruitVO">
+		SELECT
+		    recruit_no
+		  , process_yn
+		  , process_amt
+		  , recruit_enroll_ymd
+		  , ent_nm
+		  , ent_no
+		FROM
+		    recruit
+		where process_yn = 'Y'
+ 	</select>
+
+
+ 
+ </mapper>

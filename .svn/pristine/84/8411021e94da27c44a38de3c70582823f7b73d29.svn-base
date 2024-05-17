@@ -1,0 +1,23 @@
+package kr.co.itcruit.vo;
+
+import lombok.Data;
+
+@Data
+public class CodingtestVO {
+	
+	//코딩테스트 문제 관련
+	private int qstnNo;
+	private int pastQstnCtgryNo;
+	private String qstnTtl;
+	private String qstnCn;
+	private int qstnGrd;
+	private int qstnScr;
+	private String qstnExmpl;
+	private String qstnRlsYn;
+	private String restriction;
+	private String qstnMcode;
+	private String qstnForm;
+	private String input;
+	private String output;
+	
+}

@@ -1,0 +1,37 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+
+import kr.co.itcruit.vo.CalendarVO;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.PaginationInfoVO;
+import kr.co.itcruit.vo.RecruitVO;
+
+public interface IRecruitMapper {
+
+
+//	public List<RecruitVO> getRecruitList();
+
+	public RecruitVO applyCheck(RecruitVO recruitVO);
+
+	public List<RecruitVO> selectInitRecruitList(PaginationInfoVO<RecruitVO> pagingVO);
+
+	public RecruitVO recruitDetail(String recruitNo);
+
+	public List<String> hireCmmnd(String recruitNo);
+
+	public EnterpriseVO selectLikeEnt(EnterpriseVO enterpriseVO);
+
+	public int hateRecruit(RecruitVO recruitVO);
+
+	public int loveRecruit(RecruitVO recruitVO);
+
+	public RecruitVO selectLikeRecruit(RecruitVO recruitVO);
+	
+
+	
+	public List<CalendarVO> getRecruitEndList(String time);
+
+	public List<CalendarVO> getRecruitStartList(String time);
+	
+}

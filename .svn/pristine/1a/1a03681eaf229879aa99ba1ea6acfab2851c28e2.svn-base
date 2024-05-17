@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.itcruit.mapper.IEnterpriseMapper">
+
+
+<!-- 김영상 -->
+	<sql id="entSearch">
+		<if test="searchEnt != null and searchEnt != '' ">
+			and (ent_nm like '%' || #{searchEnt} || '%')
+		</if>
+		<if test="searchJob != null and searchJob !='' ">
+			and (ksic_nm like '%' || #{searchJob} || '%')
+		</if>
+		<if test="searchLoc != null and searchLoc !='' ">
+			and (ent_addr like '%' || #{searchLoc} || '%')
+		</if>
+
+	</sql>
+	
+	<sql id="reviewSearch">
+		<if test="reviewJob != null and reviewJob != '' ">
+			and(pstn_cmmncd = #{reviewJob})
+		</if>
+		<if test="reviewWorkStts != null and reviewWorkStts != '' ">
+			and(work_stts like '%' || #{reviewWorkStts} || '%')
+		</if>
+	</sql>
+
+
+	<sql id="interviewSearch">
+		<if test="searchType != null and searchType!= '' ">
+			and (rvw_stts = #{searchType})
+		</if>
+	</sql>
+
+
+	<select id="selectEntCount" parameterType="listPagingVO"
+		resultType="int">
+		select count(ent_no)
+		from enterprise
+		where 1=1
+		<include refid="entSearch" />
+	</select>
+
+	<!-- <resultMap type="enterpriseVO" id="enterpriseMap"> <id property="entNo" 
+		column="ENT_NO"/> <result property="bizTypeNm" column="BIZ_TYPE_NM"/> <result 
+		property="ksicNm" column="KSIC_NM"/> <result property="brno" column="BRNO"/> 
+		<result property="entNm" column="ENT_NM"/> <result property="rprsvNm" column="RPRSV_NM"/> 
+		<result property="rprsTelno" column="RPRS_TELNO"/> <result property="entImg" 
+		column="ENT_IMG"/> <result property="fndnYr" column="FNDN_YR"/> <result property="empCnt" 
+		column="EMP_CNT"/> <result property="cptl" column="CPTL"/> <result property="entSlsAmt" 
+		column="ENT_SLS_AMT"/> <result property="entEbit" column="ENT_EBIT"/> <result 
+		property="entUrl" column="ENT_URL"/> </resultMap> -->
+
+
+
+	<select id="selectEntList" parameterType="listPagingVO"
+		resultType="enterpriseVO">
+		SELECT
+		b.*
+		<if test="accountId != null and accountId != ''">
+			, EL.ACCOUNT_ID as accountId
+		</if>
+		FROM (
+		SELECT
+		a.*,
+		ROW_NUMBER() OVER (ORDER BY a.ent_no DESC) rnum
+		FROM (
+		SELECT
+		ent_no,
+		biz_type_nm,
+		ksic_nm,
+		brno,
+		ent_nm,
+		rprsv_nm,
+		rprs_telno,
+		fndn_yr,
+		emp_cnt,
+		cptl,
+		ent_sls_amt,
+		ent_ebit,
+		ent_url
+		FROM
+		enterprise
+		WHERE
+		1=1
+		<include refid="entSearch" />
+		order by ent_no desc
+		) a
+		) b
+		<if test="accountId != null and accountId != ''">
+			LEFT JOIN ENT_LIKE EL ON b.ent_no = EL.ENT_NO AND EL.ACCOUNT_ID =
+			#{accountId}
+		</if> 
+		<![CDATA[
+		where b.rnum >= #{startRow} and b.rnum <= #{endRow} 
+		]]>
+	</select>
+
+	<delete id="deleteLikeEnt" parameterType="enterpriseVO">
+		DELETE FROM ent_like
+		WHERE
+		ent_no = #{entNo} AND account_id = #{accountId}
+	</delete>
+
+	<insert id="insertLikeEnt" parameterType="enterpriseVO">
+		INSERT INTO ent_like (
+		ent_no , account_id
+		) VALUES (
+		#{entNo} , #{accountId}
+		)
+	</insert>
+
+	<select id="selectEnt" parameterType="int"
+		resultType="enterpriseVO">
+		select
+		ent_no
+		, biz_type_nm
+		, ksic_nm
+		, brno
+		, ent_nm
+		, rprsv_nm
+		, rprs_telno
+		<!-- , ent_img -->
+		, fndn_yr
+		, emp_cnt
+		, cptl
+		, ent_sls_amt
+		, ent_ebit
+		, ent_url
+		FROM
+		enterprise
+		where
+		ent_no = #{entNo}
+	</select>
+
+	<insert id="entReviewInsert" parameterType="entscoreVO">
+
+		INSERT INTO ent_score (
+		ent_scr_no
+		, ent_no
+		, account_id
+		, ent_scr_tscr
+		, ent_scr_evl
+		, ent_scr_advantage
+		, ent_scr_weakness
+		, ent_scr_wish
+		, ent_scr_promotion
+		, ent_scr_welfare
+		, ent_scr_wnl
+		, ent_scr_culture
+		, ent_scr_management
+		, ent_scr_ceoevl
+		, ent_scr_future_cmmncd
+		, ent_scr_rcmd_yn
+		, pstn_cmmncd
+		, hire_cmmncd
+		, work_stts
+		, ent_scr_date
+		) VALUES (
+		SEQ_SCORE.nextval
+		, #{entNo}
+		, #{accountId}
+		, #{entScrTscr}
+		, #{entScrEvl}
+		, #{entScrAdvantage}
+		, #{entScrWeakness}
+		, #{entScrWish}
+		, #{entScrPromotion}
+		, #{entScrWelfare}
+		, #{entScrWnl}
+		, #{entScrCulture}
+		, #{entScrManagement}
+		, #{entScrCeoevl}
+		, #{entScrFutureCmmncd}
+		, #{entScrRcmdYn}
+		, #{pstnCmmncd}
+		, #{hireCmmncd}
+		, #{workStts}
+		, sysdate
+
+		)
+	</insert>
+
+	<select id="entReviewCount" parameterType="reviewPagingVO"
+		resultType="int">
+		select count(*)
+		from ent_score
+		where 1=1 and ent_no = #{entNo} 
+		<include refid="reviewSearch"/>
+	</select>
+
+
+	<select id="entReviewList" parameterType="reviewPagingVO"
+		resultType="entscoreVO">
+		select
+				b.*
+			from(
+				select
+					a.* , row_number() over(order by a.ent_scr_no desc) rnum
+			from(
+				select
+					ent_scr_no
+					, ent_no
+					, account_id
+					, ent_scr_tscr
+					, ent_scr_evl
+					, ent_scr_advantage
+					, ent_scr_weakness
+					, ent_scr_wish
+					, ent_scr_promotion
+					, ent_scr_welfare
+					, ent_scr_wnl
+					, ent_scr_culture
+					, ent_scr_management
+					, ent_scr_ceoevl
+					, ent_scr_future_cmmncd
+					, ent_scr_rcmd_yn
+					, pstn_cmmncd
+					, hire_cmmncd
+					, substr(work_stts,0,3) as work_stts
+					, substr(ent_scr_date,0,5) as ent_scr_date
+			FROM
+				ent_score
+			where 1=1 and ent_no = #{entNo}
+			<include refid="reviewSearch"/>
+				order by ent_scr_no desc
+			) a
+		) b	
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+
+	<select id="entReviewAvg" parameterType="int" resultType="entscoreVO">
+		SELECT
+		    ent_no,
+		    ROUND(AVG(ENT_SCR_TSCR), 1) AS AVG_TSCR,
+		    ROUND(AVG(ENT_SCR_PROMOTION), 1) AS AVG_PROMOTION,
+		    ROUND(AVG(ENT_SCR_WELFARE), 1) AS AVG_WELFARE,
+		    ROUND(AVG(ENT_SCR_WNL), 1) AS AVG_WNL,
+		    ROUND(AVG(ent_scr_culture), 1) AS AVG_CULTURE,
+		    ROUND(AVG(ent_scr_management), 1) AS AVG_MANAGEMENT
+		FROM
+		    ent_score
+		WHERE
+		    ent_no = #{entNo}
+		GROUP BY
+		    ent_no
+	</select>
+
+	<insert id="entInterviewInsert" parameterType="entinterviewVO">
+		INSERT INTO interviewreview (
+		    rvw_no
+		    , ent_no
+		    , account_id
+		    , rvw_level
+		    , rvw_stts
+		    , rvw_experience
+		    , rvw_crs
+		    , rvw_int_ymd
+		    , rvw_ann_ymd
+		    , rvw_que
+		    , rvw_ans
+		    , rvw_cmmncd
+		    , rvw_ymd
+		) VALUES (
+		    SEQ_REVIEW.nextval
+		  , #{entNo}
+		  , #{accountId}
+		  , #{rvwLevel}
+		  , #{rvwStts}
+		  , #{rvwExperience}
+		  , #{rvwCrs}
+		  , #{rvwIntYmd}
+		  , #{rvwAnnYmd}
+		  , #{rvwQue}
+		  , #{rvwAns}
+		  , #{rvwCmmncd}
+		  , sysdate
+		)
+	</insert>	
+	
+	<select id="entInterviewCount" parameterType="interviewPagingVO" resultType="int">
+	select count(rvw_stts)
+	from interviewreview
+	where 1=1 and ent_no = #{entNo}
+	<include refid="interviewSearch"/>
+	</select>
+	
+	<select id="entInterviewList" parameterType="interviewPagingVO" resultType="entinterviewVO">
+	select
+				b.*
+			from(
+				select
+					a.* , row_number() over(order by a.rvw_no desc) rnum
+			from(
+				select
+			  rvw_no
+			  , ent_no
+			  , account_id
+			  , rvw_level
+			  , rvw_stts
+			  , rvw_experience
+			  , rvw_crs
+			  , substr(rvw_int_ymd,0,5) as rvw_int_ymd
+			  , substr(rvw_ann_ymd,0,8) as rvw_ann_ymd
+			  , rvw_que
+			  , rvw_ans
+			  , rvw_cmmncd
+			  , substr(rvw_ymd,0,10) as rvw_ymd
+			FROM
+				interviewreview
+			where 1=1 
+				<include refid="interviewSearch"/>
+				and ent_no = #{entNo}
+				order by rvw_no desc
+			) a
+		) b	
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<select id="entInterviewAvg" parameterType="int" resultType="entinterviewVO">
+		select
+			ent_no
+			, round(avg(rvw_level),1) as avg_level
+		from 
+			interviewreview
+		where 1=1 and ent_no = #{entNo}
+        group by
+            ent_no
+	</select>
+	
+	
+<!-- 김영상 끝 -->
+
+
+	<insert id="insert" parameterType="enterpriseVO">
+		insert into enterprise(
+			ent_no,	biz_type_nm, ksic_nm, brno,
+			ent_nm,	rprsv_nm, rprs_telno,
+			fndn_yr, emp_cnt, cptl, ent_sls_amt,
+			ent_ebit, ent_url, ent_img
+		) values (
+			seq_entno.nextval, '형태', '산업', #{brno},
+			#{entNm}, #{rprsvNm}, #{rprsTelno},
+			'2024/03', '200', '200', '100',
+			'300', 'url', #{entImg}
+		)
+	</insert>
+
+</mapper>

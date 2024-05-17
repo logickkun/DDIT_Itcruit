@@ -1,0 +1,27 @@
+package kr.co.itcruit.board.controller;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.co.itcruit.board.service.IEnterpriseFreeBoardService;
+//import kr.co.itcruit.board.enterprise.service.IEnterpriseNoticeBoardService;
+
+@RequestMapping("/board/ent")
+@Controller
+public class EnterpriseFreeBoardController {
+
+	
+	@Inject
+	private IEnterpriseFreeBoardService entFreeBoardService;
+//	/private IEnterpriseNoticeBoardService entNotieBoardService;
+	//이렇게 나눠서 해도 되고
+	//기업게시판 관련 부분을 통채로 합쳐서 진행하는 것도 가능합니다 
+	//그렇게 되면
+	//private IEnterpriseNoticeBoardService entNotieBoardService;
+	//를 선언 해주면 됩니다
+	
+	//@RequestMapping(value="/free")
+	
+}

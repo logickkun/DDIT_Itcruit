@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.itcruit.mapper.IResumeMapper">
+
+	<select id="selectMember" parameterType="string" resultType="accountVO">
+		select
+			account_id
+			, account_pswd
+			, account_nm
+			, gender
+			, birth_ymd
+			, account_nick
+			, account_mail
+			, account_tell
+			, account_zip
+			, account_addr1
+			, account_addr2
+			, enabled
+			, auth_cmmncd
+			, join_ymd
+			, account_stts_cmmncd
+			, TO_CHAR(birth_ymd, 'yyyy') birthY
+		from 
+			account
+		where 
+			account_id = #{accountId}
+	</select>
+	
+	<select id="langList" parameterType="map" resultType="commoncodeVO">
+		SELECT DISTINCT
+			cmmncd_nm1
+		FROM
+		    commoncode
+		WHERE
+		    CMMNCD_GRP_CD LIKE 'PSTN%'
+		AND
+			TO_NUMBER(SUBSTR(CMMNCD_GRP_CD, 5)) <![CDATA[<]]>= 14
+		AND
+		    initcap(CMMNCD_NM1) LIKE initcap('%'||#{value}||'%')
+		ORDER BY
+            CMMNCD_NM1
+	</select>
+	
+	<select id="selectResume" parameterType="string" resultType="resumeVO">
+		SELECT
+		    rsm_no,
+		    account_id,
+		    birth_ymd,
+		    rsm_ttl,
+		    rsm_career_year,
+		    rsm_rls_yn,
+		    rsm_photo,
+		    rsm_introduction,
+		    edu_end,
+		    edu_nm,
+		    grade,
+		    full,
+		    rsm_mjr_nm,
+		    rsm_mjr_cd
+		FROM
+		    resume
+		where account_id = #{accountId}
+	</select>
+	
+	<insert id="insertResume" parameterType="resumeVO" useGeneratedKeys="true">
+		<selectKey keyProperty="rsmNo" resultType="int" order="BEFORE">
+			select SEQ_RESUME.nextval from dual
+		</selectKey>
+		insert into resume (
+			rsm_no
+			, account_id
+			, rsm_gender
+			, rsm_ttl
+			, rsm_new_career
+			, rsm_career_year
+			, rsm_rls_yn
+		) values (
+			#{rsmNo}
+			, #{accountId}
+			, #{rsmGender}
+			, #{rsmTtl}
+			, #{rsmNewCareer}
+			, #{rsmCareerYear}
+			, #{rsmRlsYn}
+			
+		)
+	</insert>
+	
+	<select id="selectCommncdLang" parameterType="String" resultType="String">
+		SELECT 
+		    CMMNCD
+		FROM 
+		(
+		    SELECT 
+		        CMMNCD
+		        , CMMNCD_NM1
+		        , ROW_NUMBER() OVER (ORDER BY CMMNCD) rn
+		    FROM 
+		        COMMONCODE
+		    WHERE 
+		        CMMNCD_NM1 = #{cmmncdNm1}
+		) sub
+		WHERE rn = 1
+	</select>
+	
+	<insert id="insertResumeLang" parameterType="availLangVO">
+		INSERT INTO AVAIL_LANG_LIST (
+			AVAIL_LANG_SEQ
+			, AVAIL_LANG_CMMNCD
+			, RSM_NO
+			
+		) VALUES (
+			SEQ_RESUME_LANG.nextval
+			, #{availLangCmmncd}
+			, #{rsmNo}
+		)
+	</insert>
+	
+	<select id="selectCommncdPosition" parameterType="String" resultType="String">
+		SELECT 
+		    CMMNCD
+		FROM 
+		(
+		    SELECT 
+		        CMMNCD
+		        , CMMNCD_GRP_NM
+		        , ROW_NUMBER() OVER (ORDER BY CMMNCD) rn
+		    FROM 
+		        COMMONCODE
+		    WHERE
+		        CMMNCD_GRP_NM = #{cmmncdGrpNm}
+		) sub
+		WHERE rn = 1
+	</select>
+	
+	<insert id="insertResumePosition" parameterType="positionVO">
+		INSERT INTO POSITION (
+			PSTN_SEQ
+			, PSTN_CMMNCD
+			, RSM_NO
+			
+		) VALUES (
+			SEQ_RESUME_POSI.nextval
+			, #{pstnCmmncd}
+			, #{rsmNo}
+		)
+	</insert>
+	
+	<insert id="insertResumePortfolioUrl" parameterType="portfolioVO">
+		INSERT INTO PORTFOLIO (
+			PORT_NO
+			, RSM_NO
+			, PORT_URL_TTL
+			, PORT_URL
+			
+		) VALUES (
+			SEQ_RESUME_PORT.nextval
+			, #{rsmNo}
+			, #{portUrlTtl}
+			, #{portUrl}
+		)
+	</insert>
+	
+	<insert id="insertResumePortfolioFileTtl" parameterType="portfolioFileVO">
+		INSERT INTO PORTFOLIOFILE (
+			PORTFILE_NO
+			, RSM_NO
+			, PORT_FILE_TTL
+			
+		) VALUES (
+			SEQ_RESUME_PORT_FILE.nextval
+			, #{rsmNo}
+			, #{portFileTtl}
+		)
+	</insert>
+	
+	<insert id="updateResumeEducation" parameterType="resumeVO">
+		UPDATE RESUME
+		SET
+			EDU_END = #{eduEnd}
+			, EDU_ACDMCR = #{eduAcdmcr}
+			, EDU_NM = #{eduNm}
+			, RSM_MJR_NM = #{rsmMjrNm}
+			, GRADE = #{grade}
+		WHERE
+			RSM_NO = #{rsmNo}
+	</insert>
+	
+	<insert id="insertResumeCareer" parameterType="careerVO">
+		<selectKey keyProperty="careerNo" resultType="int" order="BEFORE">
+			select SEQ_RESUME_CAREER.nextval from dual
+		</selectKey>
+		INSERT INTO career (
+			CAREER_NO
+			, RSM_NO
+			, CAREER_CO_NM
+			, CAREER_DEPT_NM
+			, CAREER_JBGD_NM
+			, CAREER_TKCG_TASK_NM
+			, CAREER_JNCMP_YM
+			, CAREER_RSGNTN_YM
+			, CAREER_HDOF_YN
+			
+		) VALUES (
+			#{careerNo}
+			, #{rsmNo}
+			, #{careerCoNm}
+			, #{careerDeptNm}
+			, #{careerJbgdNm}
+			, #{careerTkcgTaskNm}
+			, #{careerJncmpYm}
+			, #{careerRsgntnYm}
+			, #{careerHdofYn}
+		)
+	</insert>
+	
+	<insert id="insertResumeCert" parameterType="certificateVO">
+		INSERT INTO CERTIFICATE (
+			CRTFCT_SEQ
+			, RSM_NO
+			, CRTFCT_NM
+			, CRTFCT_NO
+			, CRTFCT_QLFC_ACQS_YM
+			, CRTFCT_PBLCN_INST_NM
+			
+		) VALUES (
+			SEQ_RESUME_CERT.nextval
+			, #{rsmNo}
+			, #{crtfctNm}
+			, #{crtfctNo}
+			, #{crtfctQlfcAcqsYm}
+			, #{crtfctPblcnInstNm}
+		)
+	</insert>
+	
+	<insert id="insertResumeExp" parameterType="experienceVO">
+		INSERT INTO EXPERIENCE (
+			EXPER_NO
+			, RSM_NO
+			, EXPER_NM
+			, EXPER_TYPE
+			, EXPER_CO_NM
+			, EXPER_CN
+			, EXPER_BGNG_YM
+			, EXPER_END_YM
+			, EXPER_PRGRS_YN
+			
+		) VALUES (
+			SEQ_RESUME_EXP.nextval
+			, #{rsmNo}
+			, #{experNm}
+			, #{experType}
+			, #{experCoNm}
+			, #{experCn}
+			, #{experBgngYm}
+			, #{experEndYm}
+			, #{experPrgrsYn}
+		)
+	</insert>
+
+	
+	
+
+</mapper>

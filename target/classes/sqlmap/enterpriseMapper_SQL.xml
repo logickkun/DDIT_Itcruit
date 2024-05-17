@@ -1,0 +1,741 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.itcruit.mapper.IEnterpriseMapper">
+
+
+<!-- 김영상 -->
+	<sql id="entSearch">
+		<if test="searchEnt != null and searchEnt != '' ">
+			and (b.ent_nm like '%' || #{searchEnt} || '%')
+		</if>
+
+		<if test="searchLoc != null and searchLoc !='' ">
+			and (acc.ACCOUNT_ADDR1 like '%' || #{searchLoc} || '%')
+		</if>
+
+	</sql>
+	
+	<sql id="recruitCount">
+		<if test="searchCount != null and searchCount !='' ">
+			HAVING
+        	COUNT(CASE WHEN TO_TIMESTAMP(r.RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI') > SYSDATE THEN r.RECRUIT_NO ELSE NULL END) > 0
+		</if>
+	</sql>
+	
+	
+	
+	
+	
+	<sql id="reviewSearch">
+		<if test="reviewJob != null and reviewJob != '' ">
+			and(pstn_cmmncd = #{reviewJob})
+		</if>
+		<if test="reviewWorkStts != null and reviewWorkStts != '' ">
+			and(work_stts like '%' || #{reviewWorkStts} || '%')
+		</if>
+	</sql>
+
+
+	<sql id="interviewSearch">
+		<if test="searchType != null and searchType!= '' ">
+			and (rvw_stts = #{searchType})
+		</if>
+	</sql>
+
+
+	<select id="selectEntCount" parameterType="listPagingVO"
+		resultType="int">
+		SELECT COUNT(distinct b.ent_no)
+		FROM enterprise b
+		JOIN ent_account ON b.ENT_NO = ent_account.ENT_NO
+		LEFT JOIN ENT_LIKE ON b.ent_no = ENT_LIKE.ENT_NO
+		JOIN account acc ON ent_account.ACCOUNT_ID = acc.ACCOUNT_ID
+		LEFT JOIN recruit r ON b.ent_no = r.ENT_NO
+		WHERE 1=1
+		<include refid="entSearch" />
+	</select>
+
+	<!-- <resultMap type="enterpriseVO" id="enterpriseMap"> <id property="entNo" 
+		column="ENT_NO"/> <result property="bizTypeNm" column="BIZ_TYPE_NM"/> <result 
+		property="ksicNm" column="KSIC_NM"/> <result property="brno" column="BRNO"/> 
+		<result property="entNm" column="ENT_NM"/> <result property="rprsvNm" column="RPRSV_NM"/> 
+		<result property="rprsTelno" column="RPRS_TELNO"/> <result property="entImg" 
+		column="ENT_IMG"/> <result property="fndnYr" column="FNDN_YR"/> <result property="empCnt" 
+		column="EMP_CNT"/> <result property="cptl" column="CPTL"/> <result property="entSlsAmt" 
+		column="ENT_SLS_AMT"/> <result property="entEbit" column="ENT_EBIT"/> <result 
+		property="entUrl" column="ENT_URL"/> </resultMap> -->
+
+
+
+	<select id="selectEntList" parameterType="listPagingVO" resultType="enterpriseVO">
+    SELECT
+        b.ent_no,
+        b.biz_type_nm,
+        b.ksic_nm,
+        b.brno,
+        b.ent_nm,
+        b.rprsv_nm,
+        b.rprs_telno,
+        b.fndn_yr,
+        b.emp_cnt,
+        b.cptl,
+        b.ent_sls_amt,
+        b.ent_ebit,
+        b.ent_url,
+        acc.ACCOUNT_ADDR1,
+        acc.ACCOUNT_STTS_CMMNCD,
+        COUNT(CASE WHEN TO_TIMESTAMP(r.RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI') > SYSDATE THEN r.RECRUIT_NO ELSE NULL END) AS recruit_count
+        , EL.ACCOUNT_ID as loginId
+
+    FROM (
+        SELECT
+            e.ent_no,
+            e.biz_type_nm,
+            e.ksic_nm,
+            e.brno,
+            e.ent_nm,
+            e.rprsv_nm,
+            e.rprs_telno,
+            e.fndn_yr,
+            e.emp_cnt,
+            e.cptl,
+            e.ent_sls_amt,
+            e.ent_ebit,
+            e.ent_url,
+            ea.ACCOUNT_ID,
+             ROW_NUMBER() OVER (PARTITION BY e.ent_no ORDER BY e.ent_no DESC) as rnum
+        FROM
+            enterprise e
+        JOIN ent_account ea ON e.ENT_NO = ea.ENT_NO
+    ) b
+        LEFT JOIN ENT_LIKE EL ON b.ent_no = EL.ENT_NO AND EL.ACCOUNT_ID = #{loginId}
+        LEFT JOIN account acc ON b.ACCOUNT_ID = acc.ACCOUNT_ID
+        LEFT JOIN recruit r ON b.ent_no = r.ENT_NO
+
+        WHERE b.rnum = 1 and b.rnum BETWEEN #{startRow} AND #{endRow} and acc.ACCOUNT_STTS_CMMNCD = 'STTS0101'
+        <include refid="entSearch"/>
+    GROUP BY
+        b.ent_no,
+        b.biz_type_nm,
+        b.ksic_nm,
+        b.brno,
+        b.ent_nm,
+        b.rprsv_nm,
+        b.rprs_telno,
+        b.fndn_yr,
+        b.emp_cnt,
+        b.cptl,
+        b.ent_sls_amt,
+        b.ent_ebit,
+        b.ent_url,
+        acc.ACCOUNT_ADDR1,
+        acc.ACCOUNT_STTS_CMMNCD,
+        EL.ACCOUNT_ID
+        <include refid="recruitCount"/>
+	</select>	
+
+	<delete id="deleteLikeEnt" parameterType="enterpriseVO">
+		DELETE FROM ent_like
+		WHERE
+		ent_no = #{entNo} AND account_id = #{loginId}
+	</delete>
+
+	<insert id="insertLikeEnt" parameterType="enterpriseVO">
+		INSERT INTO ent_like (
+		ent_no , account_id
+		) VALUES (
+		#{entNo} , #{loginId}
+		)
+	</insert>
+
+
+	<select id="selectEnt" parameterType="int" resultType="enterpriseVO">
+		SELECT *
+		FROM (
+		    SELECT e.ENT_NO, e.BIZ_TYPE_NM, e.KSIC_NM, e.BRNO, e.ENT_NM, e.RPRSV_NM, e.RPRS_TELNO, e.ENT_IMG, e.FNDN_YR, e.EMP_CNT, e.CPTL, e.ENT_SLS_AMT, e.ENT_EBIT, e.ENT_URL,a.account_addr1,a.account_addr2,
+		           ROW_NUMBER() OVER (PARTITION BY e.ENT_NO ORDER BY e.ENT_NO) AS rn
+		    FROM enterprise e
+		    JOIN ent_account ea ON e.ENT_NO = ea.ENT_NO
+		    JOIN account a ON ea.ACCOUNT_ID = a.ACCOUNT_ID
+		    WHERE e.ENT_NO = #{entNo}
+		) WHERE rn = 1
+
+	</select>
+
+	<insert id="entReviewInsert" parameterType="entscoreVO">
+
+		INSERT INTO ent_score (
+		ent_scr_no
+		, ent_no
+		, account_id
+		, ent_scr_tscr
+		, ent_scr_evl
+		, ent_scr_advantage
+		, ent_scr_weakness
+		, ent_scr_wish
+		, ent_scr_promotion
+		, ent_scr_welfare
+		, ent_scr_wnl
+		, ent_scr_culture
+		, ent_scr_management
+		, ent_scr_ceoevl
+		, ent_scr_future_cmmncd
+		, ent_scr_rcmd_yn
+		, pstn_cmmncd
+		, hire_cmmncd
+		, work_stts
+		, ent_scr_date
+		) VALUES (
+		SEQ_SCORE.nextval
+		, #{entNo}
+		, #{accountId}
+		, #{entScrTscr}
+		, #{entScrEvl}
+		, #{entScrAdvantage}
+		, #{entScrWeakness}
+		, #{entScrWish}
+		, #{entScrPromotion}
+		, #{entScrWelfare}
+		, #{entScrWnl}
+		, #{entScrCulture}
+		, #{entScrManagement}
+		, #{entScrCeoevl}
+		, #{entScrFutureCmmncd}
+		, #{entScrRcmdYn}
+		, #{pstnCmmncd}
+		, #{hireCmmncd}
+		, #{workStts}
+		, sysdate
+		)
+	</insert>
+
+	<select id="entReviewCount" parameterType="reviewPagingVO"
+		resultType="int">
+		select count(*)
+		from ent_score
+		where 1=1 and ent_no = #{entNo} 
+		<include refid="reviewSearch"/>
+	</select>
+
+
+	<select id="entReviewList" parameterType="reviewPagingVO"
+		resultType="entscoreVO">
+		select
+				b.*
+			from(
+				select
+					a.* , row_number() over(order by a.ent_scr_no desc) rnum
+			from(
+				select
+					ent_scr_no
+					, ent_no
+					, account_id
+					, ent_scr_tscr
+					, ent_scr_evl
+					, ent_scr_advantage
+					, ent_scr_weakness
+					, ent_scr_wish
+					, ent_scr_promotion
+					, ent_scr_welfare
+					, ent_scr_wnl
+					, ent_scr_culture
+					, ent_scr_management
+					, ent_scr_ceoevl
+					, ent_scr_future_cmmncd
+					, ent_scr_rcmd_yn
+					, pstn_cmmncd
+					, hire_cmmncd
+					, substr(work_stts,0,3) as work_stts
+					, substr(ent_scr_date,0,5) as ent_scr_date
+					, ent_scr_like_count
+			FROM
+				ent_score
+			where 1=1 and ent_no = #{entNo}
+			<include refid="reviewSearch"/>
+				order by ent_scr_no desc
+			) a
+		) b	
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+
+	<select id="entReviewAvg" parameterType="int" resultType="entscoreVO">
+		SELECT
+		    ent_no,
+		    ROUND(AVG(ENT_SCR_TSCR), 1) AS AVG_TSCR,
+		    ROUND(AVG(ENT_SCR_PROMOTION), 1) AS AVG_PROMOTION,
+		    ROUND(AVG(ENT_SCR_WELFARE), 1) AS AVG_WELFARE,
+		    ROUND(AVG(ENT_SCR_WNL), 1) AS AVG_WNL,
+		    ROUND(AVG(ent_scr_culture), 1) AS AVG_CULTURE,
+		    ROUND(AVG(ent_scr_management), 1) AS AVG_MANAGEMENT
+		FROM
+		    ent_score
+		WHERE
+		    ent_no = #{entNo}
+		GROUP BY
+		    ent_no
+	</select>
+
+	<insert id="entInterviewInsert" parameterType="entinterviewVO">
+		INSERT INTO interviewreview (
+		    rvw_no
+		    , ent_no
+		    , account_id
+		    , rvw_level
+		    , rvw_stts
+		    , rvw_experience
+		    , rvw_crs
+		    , rvw_int_ymd
+		    , rvw_ann_ymd
+		    , rvw_que
+		    , rvw_ans
+		    , rvw_cmmncd
+		    , rvw_ymd
+		    , rvw_course
+		) VALUES (
+		    SEQ_REVIEW.nextval
+		  , #{entNo}
+		  , #{accountId}
+		  , #{rvwLevel}
+		  , #{rvwStts}
+		  , #{rvwExperience}
+		  , #{rvwCrs}
+		  , #{rvwIntYmd}
+		  , #{rvwAnnYmd}
+		  , #{rvwQue}
+		  , #{rvwAns}
+		  , #{rvwCmmncd}
+		  , sysdate
+		  , #{rvwCourse}
+		)
+	</insert>	
+	
+	<select id="entInterviewCount" parameterType="interviewPagingVO" resultType="int">
+	select count(rvw_stts)
+	from interviewreview
+	where 1=1 and ent_no = #{entNo}
+	<include refid="interviewSearch"/>
+	</select>
+	
+	<select id="entInterviewList" parameterType="interviewPagingVO" resultType="entinterviewVO">
+	select
+				b.*
+			from(
+				select
+					a.* , row_number() over(order by a.rvw_no desc) rnum
+			from(
+				select
+			  rvw_no
+			  , ent_no
+			  , account_id
+			  , rvw_level
+			  , rvw_stts
+			  , rvw_experience
+			  , rvw_crs
+			  , substr(rvw_int_ymd,0,5) as rvw_int_ymd
+			  , substr(rvw_ann_ymd,0,8) as rvw_ann_ymd
+			  , rvw_que
+			  , rvw_ans
+			  , rvw_cmmncd
+			  , substr(rvw_ymd,0,10) as rvw_ymd
+			  , rvw_course
+			  , rvw_like_count
+			FROM
+				interviewreview
+			where 1=1 
+				<include refid="interviewSearch"/>
+				and ent_no = #{entNo}
+				order by rvw_no desc
+			) a
+		) b	
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<select id="entInterviewAvg" parameterType="int" resultType="entinterviewVO">
+		select
+			ent_no
+			, round(avg(rvw_level),1) as avg_level
+		from 
+			interviewreview
+		where 1=1 and ent_no = #{entNo}
+        group by
+            ent_no
+	</select>
+	
+	<select id="entInterviewPositiveCount" parameterType="int" resultType="int">
+	    select count(*)
+    	from interviewreview
+    	where 1=1 and ent_no = #{entNo}
+    	and rvw_experience = '긍정적'
+	
+	</select>
+
+	<select id="entInterviewNormalCount" parameterType="int" resultType="int">
+	    select count(*)
+    	from interviewreview
+    	where 1=1 and ent_no = #{entNo}
+    	and rvw_experience = '보통'
+	
+	</select>
+
+	<select id="entInterviewNegativeCount" parameterType="int" resultType="int">
+	    select count(*)
+    	from interviewreview
+    	where 1=1 and ent_no = #{entNo}
+    	and rvw_experience = '부정적'
+	
+	</select>
+	
+	<select id="entInterviewPassCount" parameterType="int" resultType="int">
+	    select count(*)
+    	from interviewreview
+    	where 1=1 and ent_no = #{entNo}
+    	and rvw_stts = '합격'
+	
+	</select>
+	
+	<select id="entInterviewWaitingCount" parameterType="int" resultType="int">
+	    select count(*)
+    	from interviewreview
+    	where 1=1 and ent_no = #{entNo}
+    	and rvw_stts = '대기중'
+	
+	</select>
+	
+	<select id="entInterviewNotPassCount" parameterType="int" resultType="int">
+	    select count(*)
+    	from interviewreview
+    	where 1=1 and ent_no = #{entNo}
+    	and rvw_stts = '불합격'
+	</select>
+	
+	<select id="entInterviewOnlineCount" parameterType="int" resultType="int">
+	    select count(*)
+    	from interviewreview
+    	where 1=1 and ent_no = #{entNo}
+    	and rvw_course = '온라인 지원'
+	</select>
+	
+	<select id="entInterviewFriendCount" parameterType="int" resultType="int">
+	    select count(*)
+    	from interviewreview
+    	where 1=1 and ent_no = #{entNo}
+    	and rvw_course = '직원추천'
+	</select>
+	
+	<select id="entInterviewHeadHunterCount" parameterType="int" resultType="int">
+	    select count(*)
+    	from interviewreview
+    	where 1=1 and ent_no = #{entNo}
+    	and rvw_course = '헤드헌터'
+	</select>
+	
+	<select id="entInterviewPublicCount" parameterType="int" resultType="int">
+	    select count(*)
+    	from interviewreview
+    	where 1=1 and ent_no = #{entNo}
+    	and rvw_course = '공개채용'
+	</select>
+	
+	<select id="entInterviewSchoolCount" parameterType="int" resultType="int">
+	    select count(*)
+    	from interviewreview
+    	where 1=1 and ent_no = #{entNo}
+    	and rvw_course = '학교 취업지원 센터'
+	</select>
+	
+	<select id="entInterviewEtcCount" parameterType="int" resultType="int">
+	    select count(*)
+    	from interviewreview
+    	where 1=1 and ent_no = #{entNo}
+    	and rvw_course = '기타'
+	</select>
+	
+	
+	<select id="entScrRcmdYCount" parameterType="int" resultType="int">
+		select count(*)
+		from ent_score
+		where 1=1 and ent_no = #{entNo} and ent_scr_rcmd_yn = '네, 추천해요'
+	</select>
+
+	<select id="entScrRcmdNCount" parameterType="int" resultType="int">
+		select count(*)
+		from ent_score
+		where 1=1 and ent_no = #{entNo} and ent_scr_rcmd_yn = '아니요, 추천하지 않습니다'
+	</select>
+
+	<select id="entScrCeoGoodCount" parameterType="int" resultType="int">
+		select count(*)
+		from ent_score
+		where 1=1 and ent_no = #{entNo} and ent_scr_ceoevl = '지지해요'
+	</select>
+
+	<select id="entScrCeoBadCount" parameterType="int" resultType="int">
+		select count(*)
+		from ent_score
+		where 1=1 and ent_no = #{entNo} and ent_scr_ceoevl = '지지하지 않아요'
+	</select>
+
+	<select id="entScrFutureYCount" parameterType="int" resultType="int">
+		select count(*)
+		from ent_score
+		where 1=1 and ent_no = #{entNo} and ent_scr_future_cmmncd = '성장'
+	</select>
+
+	<select id="entScrFutureNCount" parameterType="int" resultType="int">
+		select count(*)
+		from ent_score
+		where 1=1 and ent_no = #{entNo} and (ent_scr_future_cmmncd = '비슷' or ent_scr_future_cmmncd = '하락')
+	</select>
+	
+	
+	<select id="entRecruitCount" parameterType="int" resultType="recruitstatsVO">
+			SELECT
+			    (SELECT COUNT(*)
+			     FROM recruit
+			     WHERE ent_no = #{entNo}) AS totalRecruit,
+			
+                ( SELECT COUNT(*) 
+                FROM recruit r
+                INNER JOIN hire_stts hs 
+                    ON r.RECRUIT_NO = hs.RECRUIT_NO 
+                    AND r.PSTN_CMMNCD_NM = hs.PSTN_CMMNCD_NM
+                WHERE r.ENT_NO = #{entNo} 
+                    AND hs.hire_cmmnd_nm = '정규직')AS regularCount,
+			
+			    (SELECT COALESCE(SUM(CASE WHEN recruit_career_code_nm = '경력' THEN 1 ELSE 0 END), 0)
+			     FROM recruit
+			     WHERE ent_no = #{entNo}) AS careerCount,
+			
+			    (SELECT COALESCE(SUM(CASE WHEN recruit_career_code_nm = '신입' THEN 1 ELSE 0 END), 0)
+			     FROM recruit
+			     WHERE ent_no = #{entNo}) AS newCareerCount,
+			
+			    (SELECT COALESCE(SUM(CASE WHEN recruit_career_code_nm = '경력무관' THEN 1 ELSE 0 END), 0)
+			     FROM recruit
+			     WHERE ent_no = #{entNo}) AS nothingCount
+		FROM dual
+	
+	</select>
+	
+	
+	
+	
+<!-- 김영상 끝 -->
+
+
+	<insert id="insert" parameterType="enterpriseVO" useGeneratedKeys="true">
+		<selectKey keyProperty="entNo" resultType="int" order="BEFORE">
+			select seq_entno.nextval from dual
+		</selectKey>
+		insert into enterprise(
+			ent_no,	biz_type_nm, ksic_nm, brno,
+			ent_nm,	rprsv_nm, rprs_telno,
+			fndn_yr, emp_cnt, cptl, ent_sls_amt,
+			ent_ebit, ent_url, ent_img
+		) values (
+			#{entNo}, #{bizTypeNm}, #{ksicNm}, #{brno},
+			#{entNm}, #{rprsvNm}, #{rprsTelno},
+			#{fndnYr}, #{empCnt}, #{cptl}, #{entSlsAmt},
+			#{entEbit}, #{entUrl}, #{entImg}
+		)
+	</insert>
+	
+	<select id="countLikeEnt" parameterType="enterpriseVO" resultType="int">
+		SELECT COUNT(*) AS count
+		FROM ent_like
+		WHERE ent_no = #{entNo}
+	</select>
+
+	<select id="entRecruitMiniCount" parameterType="int" resultType="int">
+		SELECT
+		count(*)
+		FROM
+		    recruit
+		where ent_no = #{entNo} 
+		AND TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI') > SYSTIMESTAMP 
+		<![CDATA[
+		AND TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI') < SYSTIMESTAMP
+		]]>
+	</select>
+
+
+	<select id="recruitMiniList" parameterType="recruitPagingVO" resultType="recruitVO">
+		select
+				b.*
+			from(
+				select
+					a.* , row_number() over(order by a.recruit_no desc) rnum
+			from(
+				SELECT
+				    recruit_no
+				  , recruit_ttl
+				  , substr(recruit_strt_dt,0,10) as recruit_strt_dt
+				  , substr(recruit_end_dt,0,10) as recruit_end_dt
+				  , recruit_yn
+				  , recruit_career_code_nm
+				  , recruit_career_dt
+				  , ent_url
+				  , recruit_hit
+				  , process_yn
+				  , process_amt
+				  , recruit_pay
+				  , recruit_enroll_ymd
+				  , cmmncd_grp_cd
+				  , cmmncd_nm1
+				  , recruit_cnt
+				  , pstn_cmmncd_nm
+				  , ent_postcode
+				  , ent_nm
+				  , ent_no
+				FROM
+				    recruit
+				where ent_no = #{entNo} 
+				AND TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI') > SYSTIMESTAMP
+				<![CDATA[
+				AND TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI') < SYSTIMESTAMP
+				]]>
+				order by recruit_end_dt asc
+					) a
+		) b	
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+
+	<select id="recruitTotalCount" parameterType="int" resultType="int">
+		select 
+	    count(*)
+	    from recruit
+	    where ent_no = #{entNo}
+	</select>
+
+	<select id="recruitList" parameterType="recruitListPagingVO" resultType="recruitVO">
+			SELECT
+	    r.RECRUIT_NO
+	    ,r.RECRUIT_TTL
+	    ,r.RECRUIT_STRT_DT
+	    ,r.RECRUIT_END_DT
+	    ,r.RECRUIT_YN
+	    ,r.RECRUIT_CAREER_CODE_NM
+	    ,r.RECRUIT_CAREER_DT
+	    ,r.ENT_URL
+	    ,r.RECRUIT_HIT
+	    ,r.PROCESS_YN
+	    ,r.PROCESS_AMT
+	    ,r.RECRUIT_PAY
+	    ,r.RECRUIT_ENROLL_YMD
+	    ,r.CMMNCD_GRP_CD
+	    ,r.CMMNCD_NM1
+	    ,r.RECRUIT_CNT
+	    ,r.PSTN_CMMNCD_NM
+	    ,r.ENT_POSTCODE
+	    ,r.ENT_NM
+	    ,r.ENT_NO
+	    ,inotices.account_id as account_id
+	    ,LISTAGG(hs.hire_cmmnd_nm, ',') WITHIN GROUP (ORDER BY hs.HIRE_CMMND_NM) AS hire_cmmncd_nm
+	    ,LISTAGG(pl.prefer_lang_cmmncd_nm, ',') WITHIN GROUP (ORDER BY pl.prefer_lang_cmmncd_nm) AS prefer_lang_cmmncd_nm
+	    ,LISTAGG(el.esntl_lang_cmmncd_nm, ',') WITHIN GROUP (ORDER BY el.esntl_lang_cmmncd_nm) AS esntl_lang_cmmncd_nm
+	FROM
+	    recruit r
+	LEFT JOIN INTERESTNOTICES inotices ON r.RECRUIT_NO = inotices.RECRUIT_NO AND r.PSTN_CMMNCD_NM = inotices.PSTN_CMMNCD_NM AND inotices.account_id = #{loginId}
+	LEFT JOIN
+	    (SELECT DISTINCT recruit_no, pstn_cmmncd_nm, hire_cmmnd_nm FROM hire_stts) hs
+	    ON r.recruit_no = hs.recruit_no AND r.pstn_cmmncd_nm = hs.pstn_cmmncd_nm
+	LEFT JOIN
+	    (SELECT DISTINCT recruit_no, pstn_cmmncd_nm, prefer_lang_cmmncd_nm FROM prefer_lang) pl
+	    ON r.recruit_no = pl.recruit_no AND r.pstn_cmmncd_nm = pl.pstn_cmmncd_nm
+	LEFT JOIN
+	    (SELECT DISTINCT recruit_no, pstn_cmmncd_nm, esntl_lang_cmmncd_nm FROM esntl_lang) el
+	    ON r.recruit_no = el.recruit_no AND r.pstn_cmmncd_nm = el.pstn_cmmncd_nm
+	WHERE
+	    r.ent_no = #{entNo}
+	GROUP BY
+	    r.RECRUIT_NO
+	    ,r.RECRUIT_TTL
+	    ,r.RECRUIT_STRT_DT
+	    ,r.RECRUIT_END_DT
+	    ,r.RECRUIT_YN
+	    ,r.RECRUIT_CAREER_CODE_NM
+	    ,r.RECRUIT_CAREER_DT
+	    ,r.ENT_URL
+	    ,r.RECRUIT_HIT
+	    ,r.PROCESS_YN
+	    ,r.PROCESS_AMT
+	    ,r.RECRUIT_PAY
+	    ,r.RECRUIT_ENROLL_YMD
+	    ,r.CMMNCD_GRP_CD
+	    ,r.CMMNCD_NM1
+	    ,r.RECRUIT_CNT
+	    ,r.PSTN_CMMNCD_NM
+	    ,r.ENT_POSTCODE
+	    ,r.ENT_NM
+	    ,r.ENT_NO
+	    ,inotices.account_id
+	    order by recruit_end_dt desc   
+	</select>
+
+	<delete id="likeRecruit" parameterType="string">
+		DELETE FROM interestnotices
+		WHERE
+		     account_id = #{accountId}
+		    AND recruit_no = #{recruitNo}
+		    AND pstn_cmmncd_nm = #{pstnNm}
+	</delete>
+	
+		<insert id="disLikeRecruit" parameterType="string">
+		 INSERT INTO interestnotices (
+		     account_id
+		    , recruit_no
+		    , pstn_cmmncd_nm
+		) VALUES (
+		    #{accountId}
+		  , #{recruitNo}
+		  , #{pstnNm}
+		)
+	</insert>
+
+
+	<select id="logodisplay" parameterType="int" resultType="enterpriseVO">
+		SELECT e.*, a.ACCOUNT_ADDR1, a.ACCOUNT_ADDR2
+		FROM enterprise e
+		JOIN ent_account ea ON e.ENT_NO = ea.ENT_NO
+		JOIN account a ON ea.ACCOUNT_ID = a.ACCOUNT_ID
+		WHERE e.ENT_NO = #{entNo}
+	</select>
+	
+	<select id="entBrnoCheck" parameterType="string" resultType="enterpriseVO">
+		SELECT
+		    ent_no, biz_type_nm, ksic_nm, brno,
+		    ent_nm, rprsv_nm, rprs_telno, ent_img,
+		    fndn_yr, emp_cnt, cptl, ent_sls_amt,
+		    ent_ebit, ent_url
+		FROM
+		    enterprise
+		WHERE brno = #{brno}
+	   
+	</select>
+
+
+	<update id="entScrLike" parameterType="int">
+		update ent_score
+		set 
+		    ENT_SCR_LIKE_COUNT  = ENT_SCR_LIKE_COUNT + 1
+		where ent_scr_no = #{entScrNo}
+	</update>
+	
+	<update id="entRvwLike" parameterType="int">
+	UPDATE interviewreview
+	SET
+	    rvw_like_count = rvw_like_count + 1
+	WHERE
+	    rvw_no = #{entRvwNo}
+	</update>
+
+
+</mapper>

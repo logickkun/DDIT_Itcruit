@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.ISearchTalentMapper">
+ 
+ 	<select id="getLangList" resultType="string">
+ 		select distinct cmmncd_nm1 from commoncode
+		where cmmncd_grp_cd between 'PSTN1' and 'PSTN14'
+ 	</select>
+ 	
+ 	<select id="getPstnList" resultType="string">
+ 		select distinct cmmncd_grp_nm from commoncode
+		where cmmncd_grp_cd like 'PSTN%'
+ 	</select>
+ 	
+ 	<select id="getLocalList" resultType="string">
+ 		select distinct cmmncd_grp_nm
+		from commoncode
+		where cmmncd_grp_cd like 'LCLTY%'
+ 	</select>
+ 	
+ 	
+ 	<select id="getTalentList" parameterType="searchTalentVO" resultType="searchTalentVO">
+		 SELECT 
+			    a.account_id,
+			    a.account_nm,
+			    a.ACCOUNT_ADDR1,
+			    r.RSM_NO,
+			    r.ACCOUNT_ID,
+			    r.RSM_CAREER_YEAR,
+			    al.avail_lang_seq,
+			    al.avail_lang_cmmncd_nm,
+			    p.pstn_cmmncd_nm
+			FROM 
+			    account a
+			LEFT JOIN 
+			    resume r ON a.account_id = r.ACCOUNT_ID
+			LEFT JOIN 
+			    avail_lang_list al ON r.RSM_NO = al.rsm_no
+			LEFT JOIN 
+			    position p ON al.rsm_no = p.rsm_no
+			WHERE 
+			    r.RSM_RLS_YN = 'Y'               
+                <if test="lcl != null and !lcl.isEmpty()">
+			        AND (a.ACCOUNT_ADDR1 LIKE '%'||#{lcl}||'%')
+			    </if>
+                <if test="lang != null and !lang.isEmpty()">
+		            and (al.avail_lang_cmmncd_nm = #{lang})
+		        </if>
+		        <if test="pstn != null and !pstn.isEmpty()">
+		            and (p.pstn_cmmncd_nm = #{pstn})
+		        </if>
+               <if test="carrer == 0">
+	          	 and r.RSM_CAREER_YEAR = 0 
+		       </if>
+		       <if test="carrer == 1">
+		          and r.RSM_CAREER_YEAR <![CDATA[ > ]]> 0 
+		       </if>
+ 	</select>
+ 	
+ 	
+ </mapper>

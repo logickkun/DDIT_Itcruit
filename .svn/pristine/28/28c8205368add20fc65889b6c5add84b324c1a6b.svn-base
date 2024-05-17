@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IBoardMapper">
+ 
+ <sql id="BBS201Search">
+ 	<if test="BBS201searchType != null and BBS201searchType == 'BBS201title'">
+ 		and(bbs_ttl like '%' || #{BBS201searchWord} || '%')
+ 	</if>
+ 	<if test="BBS201searchType != null and BBS201searchType == 'BBS201writer'">
+ 		and(bbs_writer like '%' || #{BBS201searchWord} || '%')
+ 	</if>
+ </sql>
+
+ <sql id="BBS202Search">
+ 	<if test="BBS202searchType != null and BBS202searchType == 'BBS202title'">
+ 		and(bbs_ttl like '%' || #{BBS202searchWord} || '%')
+ 	</if>
+ 	<if test="BBS202searchType != null and BBS202searchType == 'BBS202writer'">
+ 		and(bbs_writer like '%' || #{BBS202searchWord} || '%')
+ 	</if>
+ </sql>
+ 
+ 
+ 
+ 
+ <!-- 기업 공지 -->
+ <select id="entBoardCount" parameterType="miniPagingVO" resultType="int">
+ 	select count(*)
+ 	from board
+ 	where 1=1 and ent_no = #{entNo} and bbs_ctgry_cmmncd = 'BBS202'
+
+ </select>
+ 
+ <!-- 기업 공지 -->
+ <select id="entBoardList" parameterType="int" resultType="boardVO">
+	 select
+	 	b.*
+ 	from(
+ 		select
+ 			a.* , row_number() over(order by a.bbs_no desc) rnum
+ 		from(
+			select 	
+			   bbs_no
+	  , bbs_reg_dt
+	  , bbs_inq_cnt
+	  , bbs_ttl
+	  , bbs_cn
+	  , bbs_writer
+	  , bbs_ctgry_cmmncd
+	  , bbs_delyn
+	  , ent_no
+	FROM
+	    board
+	where
+	    1 = 1 and
+	    ent_no = #{entNo} and bbs_ctgry_cmmncd = 'BBS202' and bbs_delyn = 'N' 	
+	    <include refid="BBS202Search"/>
+ 		)a
+ 	)b		
+ 	<![CDATA[
+		where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+	]]>
+ 	</select>
+ 	
+ 	<!-- 기업 일반 -->
+	 <select id="entBBS201Count" parameterType="miniPagingVO" resultType="int">
+	 	select count(*)
+	 	from board
+	 	where 1=1 and ent_no = #{entNo} and bbs_ctgry_cmmncd = 'BBS201'
+	
+	 </select>
+	 
+	 <!-- 기업 일반 -->
+	 <select id="entBBS201List" parameterType="int" resultType="boardVO">
+		 select
+		 	b.*
+	 	from(
+	 		select
+	 			a.* , row_number() over(order by a.bbs_no desc) rnum
+	 		from(
+				select 	
+				   bbs_no
+		  , BBS_REG_DT
+		  , bbs_inq_cnt
+		  , bbs_ttl
+		  , bbs_cn
+		  , bbs_writer
+		  , bbs_ctgry_cmmncd
+		  , bbs_delyn
+		  , ent_no
+		FROM
+		    board
+		where
+		   1= 1 and ent_no = #{entNo} and bbs_ctgry_cmmncd = 'BBS201' and bbs_delyn = 'N' 	
+		    <include refid="BBS201Search"/>
+	 		)a
+	 	)b		
+	 	<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	 	</select>
+	 	
+	 	
+	 	<select id="selectEnterpriseNotice" parameterType="int" resultType="boardVO">
+	 		SELECT *
+			FROM (
+			    SELECT
+			        bbs_no,
+			        bbs_reg_dt,
+			        bbs_inq_cnt,
+			        bbs_ttl,
+			        bbs_cn,
+			        bbs_writer,
+			        bbs_ctgry_cmmncd,
+			        bbs_delyn,
+			        ent_no,
+			        ROW_NUMBER() OVER (ORDER BY bbs_reg_dt DESC) AS row_num
+			    FROM
+			        board
+			    WHERE
+			        bbs_ctgry_cmmncd = 'BBS202' and ent_no = #{entNo} and bbs_delyn = 'N'
+			)
+			WHERE
+			    row_num = 1
+	 	</select>
+	 	
+	 	<select id="selectEnterpriseFree" parameterType="int" resultType="boardVO">
+	 		SELECT *
+			FROM (
+			    SELECT
+			        bbs_no,
+			        bbs_reg_dt,
+			        bbs_inq_cnt,
+			        bbs_ttl,
+			        bbs_cn,
+			        bbs_writer,
+			        bbs_ctgry_cmmncd,
+			        bbs_delyn,
+			        ent_no,
+			        ROW_NUMBER() OVER (ORDER BY bbs_reg_dt DESC) AS row_num
+			    FROM
+			        board
+			    WHERE
+			        bbs_ctgry_cmmncd = 'BBS201' and ent_no = #{entNo} and bbs_delyn = 'N'
+			)
+			WHERE
+			    row_num = 1
+	 	</select>
+	 	
+	 	<select id="selectEntNoticeComment" parameterType="string" resultType="int">
+	 		SELECT COUNT(*) AS result_count
+			FROM board_comment
+			WHERE bbs_no = #{bbsNo}
+	 	</select>
+	 	
+<!-- 	 	<select id="selectEntFreeComment" parameterType="string" resultType="int"> -->
+<!-- 	 		SELECT COUNT(*) AS result_count -->
+<!-- 			FROM board_report		 -->
+<!-- 			WHERE bbs_no = #{bbsNo}; -->
+<!-- 	 	</select> -->
+	 
+ </mapper>

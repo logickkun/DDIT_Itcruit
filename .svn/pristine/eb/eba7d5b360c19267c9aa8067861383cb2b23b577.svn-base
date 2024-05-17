@@ -1,0 +1,15 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+
+import kr.co.itcruit.vo.BoardVO;
+import kr.co.itcruit.vo.MiniPaginationVO;
+
+public interface IBoardMapper {
+
+	public int entBoardCount(MiniPaginationVO<BoardVO> pagingVO);
+
+	public List<BoardVO> entBoardList(MiniPaginationVO<BoardVO> pagingVO);
+
+	
+}

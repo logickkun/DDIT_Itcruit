@@ -1,0 +1,270 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+
+<!-- Page main content START -->
+<div class="page-content-wrapper border">
+
+	<!-- Title -->
+	<div class="row">
+		<div class="col-12">
+			<h1 class="h3 mb-2 mb-sm-0">자유게시판</h1>
+		</div>
+	</div>
+
+	<!-- Card START -->
+	<div class="card bg-transparent">
+		<div class="row">
+
+			<!-- 첫 번째 카드 -->
+			<div class="col-md-6">
+				<div class="card bg-transparent">
+					<div class="card-body px-0" style="text-align: center;">
+						<div>
+							<h5 style="text-decoration: underline;;">게시글 신고</h5>
+						</div>
+						<div class="table-responsive border-0">
+							<table class="table align-middle p-4 mb-0 table-hover">
+								<thead>
+									<tr style="background-color: #DCD8FC;">
+										<th scope="col" class="border-0 rounded-start" style="color: black;">신고번호</th>
+										<th scope="col" class="border-0" style="color: black;">신고자</th>
+										<th scope="col" class="border-0" style="color: black;">신고사유</th>
+										<th scope="col" class="border-0" style="color: black;">페이지이동</th>
+										<th scope="col" class="border-0 rounded-end">삭제</th>
+									</tr>
+								</thead>
+
+								<tbody>
+									<tr>
+										<c:set value="${pagingVO.dataList}" var="list" />
+										<c:choose>
+											<c:when test="${empty list}">
+												<td colspan="5">없다</td>
+											</c:when>
+											<c:otherwise>
+												<c:forEach items="${list}" var="reportList">
+													<c:if test="${reportList.cmmtNo eq 0}">
+														<tr>
+															<td>${reportList.reportNo}</td>
+															<td>${reportList.bbsReportId}</td>
+															<td>${reportList.bbsReportCmmncd}</td>
+															<c:if test="${reportList.bbsNo eq '삭제'}">
+																<td colspan="2">처리됨</td>
+															</c:if>
+															<c:if test="${reportList.bbsNo ne '삭제'}">
+																<td><a href="/freeBoard/detail.do?bbsNo=${reportList.bbsNo}"><button type="button" class="btn btn-secondary-soft mb-0">페이지이동</button></a></td>
+																<td>
+																	<form id="boardDeleteBtn" action="/myPage/admin/freeBoardDelete.do" method="post">
+																		<input type="hidden" name="bbsNo" id="bbsNo" value="${reportList.bbsNo}" />
+																		<input type="button" id="BoDeleteBtn" class="BoDeleteBtn" data-bbsno="${reportList.bbsNo }"  value="삭제">
+																		<sec:csrfInput />
+																	</form>
+																</td>
+															</c:if>
+														</tr>
+													</c:if>
+												</c:forEach>
+											</c:otherwise>
+										</c:choose>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="card-footer bg-transparent p-0">
+						<!-- Pagination START -->
+						<div class="d-sm-flex justify-content-sm-between align-items-sm-center">
+							<!-- Content -->
+							<p class="mb-0 text-center text-sm-start"></p>
+							<!-- Pagination -->
+							<nav class="d-flex justify-content-center mb-0" aria-label="navigation">
+								<ul
+									class="pagination pagination-sm pagination-primary-soft d-inline-block d-md-flex rounded mb-0">
+									<li class="page-item mb-0"><a class="page-link" href="#" tabindex="-1"><i
+												class="fas fa-angle-left"></i></a></li>
+									<li class="page-item mb-0"><a class="page-link" href="#">1</a></li>
+									<li class="page-item mb-0 active"><a class="page-link" href="#">2</a></li>
+									<li class="page-item mb-0"><a class="page-link" href="#">3</a></li>
+									<li class="page-item mb-0"><a class="page-link" href="#"><i
+												class="fas fa-angle-right"></i></a></li>
+								</ul>
+							</nav>
+						</div>
+						<!-- Pagination END -->
+					</div>
+				</div>
+			</div>
+			
+			<!-- 두 번째 카드 -->
+			<div class="col-md-6">
+				<div class="card bg-transparent">
+					<div class="card-body px-0" style="text-align: center;">
+						<div>
+							<h5>댓글 신고</h5>
+						</div>
+						<div class="table-responsive border-0">
+							<table class="table align-middle p-4 mb-0 table-hover">
+								<thead>
+									<tr style="background-color: #DCD8FC;">
+										<th scope="col" class="border-0 rounded-start" style="color: black;">신고번호</th>
+										<th scope="col" class="border-0" style="color: black;">신고자</th>
+										<th scope="col" class="border-0" style="color: black;">신고사유</th>
+										<th scope="col" class="border-0" style="color: black;">상세보기</th>
+										<th scope="col" class="border-0 rounded-end">삭제</th>
+									</tr>
+								</thead>
+
+								<tbody>
+								<tr>
+								    <c:set value="${pagingVO.dataList}" var="list"/>
+								    <c:choose>
+								        <c:when test="${empty list}">
+								            <td colspan="5">없다</td>
+								        </c:when>
+								        <c:otherwise>
+								            <c:forEach items="${list}" var="reportList">
+								                <c:if test="${reportList.cmmtNo ne 0}">
+								                    <tr>
+								                        <td>${reportList.reportNo}</td>
+								                        <td>${reportList.bbsReportId}</td>
+								                        <td>${reportList.bbsReportCmmncd}</td>
+								                        <c:if test="${reportList.cmmtNo eq -1}">
+																<td colspan="2">처리됨</td>
+														</c:if>
+														<c:if test="${reportList.cmmtNo ne -1}">
+																<td>
+									                        	<a href="#" class="btn btn-secondary-soft mb-0 commentReport" 
+									                        		data-reportno="${reportList.reportNo}" 
+									                        		data-bbsreportid="${reportList.bbsReportId}" 
+									                        		data-bbsreportcmmncd="${reportList.bbsReportCmmncd}" 
+									                        		data-bsscmntno="${reportList.bssCmntNo}" 
+									                        		data-bsscmnttm="${reportList.bssCmntTm}" 
+									                        		data-bsscmntcn="${reportList.bssCmntCn}" 
+									                        		data-bsscmntwriter="${reportList.bssCmntWriter}"  
+									                        		data-bs-toggle="modal" data-bs-target="#viewReview">상세보기
+									                        	</a>
+							                        		</td>																
+							                        		<td>
+																<form id="commentDeleteBtn" action="/myPage/admin/freeBoardCommentDelete.do" method="post">
+																	<input type="hidden" name="cmmtNo" id="cmmtNo" value="${reportList.cmmtNo}" />
+																	<input type="button" id="CoDeleteBtn" class="CoDeleteBtn" data-bsscmntno="${reportList.bssCmntNo }" value="삭제">
+																	<sec:csrfInput />
+																</form>
+															</td>
+														</c:if>
+								                    </tr>
+								                </c:if>
+								            </c:forEach>
+								        </c:otherwise>
+								    </c:choose>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="card-footer bg-transparent p-0">
+						<!-- Pagination START -->
+						<div class="d-sm-flex justify-content-sm-between align-items-sm-center">
+							<!-- Content -->
+							<p class="mb-0 text-center text-sm-start"></p>
+							<!-- Pagination -->
+							<nav class="d-flex justify-content-center mb-0" aria-label="navigation">
+								<ul
+									class="pagination pagination-sm pagination-primary-soft d-inline-block d-md-flex rounded mb-0">
+									<li class="page-item mb-0"><a class="page-link" href="#" tabindex="-1"><i
+												class="fas fa-angle-left"></i></a></li>
+									<li class="page-item mb-0"><a class="page-link" href="#">1</a></li>
+									<li class="page-item mb-0 active"><a class="page-link" href="#">2</a></li>
+									<li class="page-item mb-0"><a class="page-link" href="#">3</a></li>
+									<li class="page-item mb-0"><a class="page-link" href="#"><i
+												class="fas fa-angle-right"></i></a></li>
+								</ul>
+							</nav>
+						</div>
+						<!-- Pagination END -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Card body END -->
+
+<!-- Popup modal for reviwe START -->
+<div class="modal fade" id="viewReview" tabindex="-1" aria-labelledby="viewReviewLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<!-- Modal header -->
+			<div class="modal-header bg-purple">
+				<h5 class="modal-title text-white" id="viewReviewLabel">댓글 신고</h5>
+				<button type="button" class="btn btn-sm btn-light mb-0" data-bs-dismiss="modal" aria-label="Close">
+					<i class="bi bi-x-lg"></i>
+				</button>
+			</div>
+			<!-- Modal body -->
+			<div class="modal-body">
+			   	 신고 번호 :  <span id="reportNo"></span> <br>
+			   	 신고자 :   <span id="bbsReportId"></span> <br>
+			   	 신고사유 : <span id="bbsReportCmmncd"></span> <br>
+			   	 <div style="border: 1px solid lightgray; padding: 5px; margin-top: 10px;">
+				   작성자 : <span id="bssCmntWriter" style="font-size: 20px; font-weight: bolder;"></span> <br>
+				    내용 : <p id="bssCmntCn"></p>
+			   	 </div>
+			</div>
+
+		</div>
+	</div>
+</div>
+<!-- Popup modal for reviwe END -->
+
+<script type="text/javascript">
+$(document).on("click", ".commentReport", function() {
+	// 클릭한 문의의 정보 가져오기
+		var reportNo = $(this).data("reportno");
+		var bbsReportId = $(this).data("bbsreportid");
+		var bbsReportCmmncd = $(this).data("bbsreportcmmncd");
+	    var bssCmntTm = $(this).data("bsscmnttm");
+	    var bssCmntCn = $(this).data("bsscmntcn");
+	    var bssCmntWriter = $(this).data("bsscmntwriter");
+	    
+	    $("#reportNo").text(reportNo);
+	    $("#bbsReportId").text(bbsReportId);
+	    $("#bbsReportCmmncd").text(bbsReportCmmncd);
+	    $("#bssCmntWriter").text(bssCmntWriter);
+	    $("#bssCmntCn").text(bssCmntCn);
+});
+
+
+
+$(function(){
+	var BoDeleteBtn = $(".BoDeleteBtn");
+	var CoDeleteBtn = $(".CoDeleteBtn");
+	
+	BoDeleteBtn.on("click", function(){
+		var bbsNo = $(this).data("bbsno");
+		if (confirm("정말로 삭제하시겠습니까?")) {
+            $("#bbsNo").val(bbsNo);
+            $("#boardDeleteBtn").submit(); // 폼 제출
+        }
+	});
+	
+	CoDeleteBtn.on("click", function(){
+// 		var cmmtNo = $(this).data("cmmtno");
+		var bssCmntNo = $(this).data("bsscmntno");
+		if (confirm"정말로 삭제하시겠습니까?")) {
+			alert(bssCmntNo);
+//             $("#cmmtNo").val(cmmtNo);
+            $("#bssCmntNo").val(bssCmntNo);
+            $("#commentDeleteBtn").submit(); // 폼 제출
+        }
+	});
+})
+
+
+
+
+
+</script>
+

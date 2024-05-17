@@ -1,0 +1,130 @@
+package kr.co.itcruit.mypage.enterprise.controller;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.atch.service.IAtchFileService;
+import kr.co.itcruit.common.CommoncodeService;
+import kr.co.itcruit.mypage.enterprise.service.IMyEnterpriseService;
+import kr.co.itcruit.vo.AtchFileVO;
+import kr.co.itcruit.vo.CommoncodeVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@RequestMapping("myPage/enterprise")
+@Slf4j
+public class EnterpriseAJAXController {
+	
+	@Autowired
+	private CommoncodeService ccService;
+	
+	@Autowired
+	private IAtchFileService atchFileService;
+	
+	@Autowired
+	private IMyEnterpriseService myEntService;
+	
+	
+	@RequestMapping(value = "/esntLangList")
+	public ResponseEntity<List<CommoncodeVO>> esntlLangList(@RequestParam("pstnCmmncdNm") String pstnCmmncdNm){
+		
+//		log.info("################모집분야 : "+ pstnCmmncdNm);
+		
+		String cmmncode = "PSTN%";
+		
+		List<CommoncodeVO> esntlLangList = ccService.commoncodeList(cmmncode, pstnCmmncdNm);
+		
+//		log.info("################모집분야리스트 : "+esntlLangList);
+		
+		return new ResponseEntity<List<CommoncodeVO>>(esntlLangList, HttpStatus.OK);
+		
+	}
+	
+	@RequestMapping(value = "/getRecruitImage", method = RequestMethod.GET)
+	public ResponseEntity<byte[]> sendImage(@RequestParam("recruitNo") String recruitNo){
+		
+		log.info("#################### recruitNo : "+recruitNo);
+		
+		String orgnCmmncd = "채용공고";
+		AtchFileVO afv = atchFileService.getFileInfo(recruitNo, orgnCmmncd);
+		
+		String filePath = afv.getFilePath();
+		
+		File file = new File(filePath);
+		
+		byte[] imegeByte = null;
+		try {
+			imegeByte = Files.readAllBytes(file.toPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return new ResponseEntity<byte[]>(imegeByte, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/qstnDSNCTInsert", method = RequestMethod.GET)
+	public ResponseEntity<String> qstnDSNCTInsert(@RequestParam("entIntroQstnNo") String entIntroQstnNo, @RequestParam("entIntroQstnCn") String entIntroQstnCn){
+		
+		log.info("######################## entIntroQstnNo : " + entIntroQstnNo );
+		log.info("######################## entIntroQstnCn : " + entIntroQstnCn );
+		
+		ServiceResult result = myEntService.qstnDSNCTInsert(entIntroQstnNo, entIntroQstnCn);
+		
+		
+		if(result.equals(ServiceResult.OK)) {
+			
+			return new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
+			
+		}else {
+			
+			return new ResponseEntity<String>("FAILURE", HttpStatus.OK);
+			
+		}
+		
+		
+	}
+	
+	
+	@RequestMapping(value = "/qstnDSNCTUpdate", method= RequestMethod.GET)
+	public ResponseEntity<String> qstnDSNCTUpdate(
+			@RequestParam("entIntroQstnNo") String entIntroQstnNo,
+			@RequestParam("entIntroQstnCn") String entIntroQstnCn,
+			@RequestParam("entIntroQstnUpdateCn") String entIntroQstnUpdateCn)
+	
+	{
+		
+		log.info("######################## entIntroQstnNo : " + entIntroQstnNo );
+		log.info("######################## entIntroQstnCn : " + entIntroQstnCn );
+		log.info("######################## entIntroQstnUpdateCn : " + entIntroQstnUpdateCn );
+		
+		
+		
+		ServiceResult result = myEntService.qstnDSNCTUpdate(entIntroQstnNo, entIntroQstnCn, entIntroQstnUpdateCn);
+		
+		if(result.equals(ServiceResult.OK)) {
+			
+			return new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
+//			return null;
+			
+		}else {
+			
+			return new ResponseEntity<String>("FAILURE", HttpStatus.OK);
+//			return null;
+			
+		}
+		
+		
+	}
+
+}

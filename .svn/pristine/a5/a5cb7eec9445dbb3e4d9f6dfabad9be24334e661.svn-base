@@ -1,0 +1,10 @@
+package kr.co.itcruit.mypage.enterprise.service;
+
+import kr.co.itcruit.vo.SearchTelentVO;
+
+public interface ISearchTelentService {
+
+	public SearchTelentVO getOptionInfo();
+
+	
+}

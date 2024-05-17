@@ -1,0 +1,195 @@
+package kr.co.itcruit.enterprise.info.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.enterprise.info.service.IEnterpriseInfoService;
+import kr.co.itcruit.vo.BoardVO;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.ListPaginationVO;
+import kr.co.itcruit.vo.MiniPaginationVO;
+import lombok.extern.slf4j.Slf4j;
+
+
+@Slf4j
+@Controller
+@RequestMapping("/ent")
+public class EntRetrieveController {
+
+	@Inject
+	private IEnterpriseInfoService entService; 
+	
+	/**
+	 * 김영상
+	 * 기업정보 목록 리스트
+	 * @param currentPage
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/list.do" , method = RequestMethod.GET)
+	public String entList(
+			@RequestParam(name="page", required = false, defaultValue = "1") int currentPage,
+			Model model,
+			HttpSession session,
+			HttpServletRequest req
+			) {
+		ListPaginationVO<EnterpriseVO> pagingVO = new ListPaginationVO<EnterpriseVO>();
+		
+		// 현재 페이지 전달 후, start/endRow, start/endPage 설정
+		pagingVO.setCurrentPage(currentPage);
+		
+		int totalRecord = entService.selectEntCount(pagingVO); // 총 기업 목록 수 가져오기
+		
+		//////// 로그 지우기
+		log.info(totalRecord + "<<<<<<<<< 총 기업수");
+		
+		pagingVO.setTotalRecord(totalRecord);	// 총 기업 목록 수 전달 후, 총 페이지 설정 
+		
+		////////
+		String memId = "a001";
+		// 나중에는 VO 형태로 
+		session.setAttribute("SessionInfo", memId);
+
+		HttpSession IdSession = req.getSession();
+		String accountId = (String) IdSession.getAttribute("SessionInfo");
+		
+		pagingVO.setAccountId(accountId);
+		
+		List<EnterpriseVO> dataList = entService.selectEntList(pagingVO);
+		pagingVO.setDataList(dataList);
+		
+
+		
+		model.addAttribute("pagingVO", pagingVO);
+		
+		return "ent/entList";
+	}
+	
+	/**
+	 * 관심등록 되있는 기업을 관심등록 삭제
+	 * @param entVO
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/likeEnt.do" , method = RequestMethod.POST)
+	public ResponseEntity<String> likeEnt(@RequestBody EnterpriseVO entVO , HttpServletRequest req){
+		
+		// accountId와 entNo를 사용하여 로직을 처리
+
+		HttpSession IdSession = req.getSession();
+		String accountId = (String) IdSession.getAttribute("SessionInfo");
+		entVO.setAccountId(accountId);
+		
+		log.info(accountId + "<<<<<<<<<<<<<<<<<<< 아이디");
+		
+		ServiceResult result = entService.likeEnt(entVO);	
+	    
+		String status = null;
+		
+		if(result.equals(ServiceResult.OK)) {
+			status = "SUCCESS";
+			return new ResponseEntity<String>(status,HttpStatus.OK);
+		}else {
+			status = "FAILED";
+			return new ResponseEntity<String>(status,HttpStatus.FAILED_DEPENDENCY);
+		}
+	    
+	}
+	
+	/**
+	 * 관심 기업 등록
+	 * @param entVO
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/disLikeEnt.do" ,  method = RequestMethod.POST)
+	public ResponseEntity<String> disLikeEnt(@RequestBody EnterpriseVO entVO, HttpServletRequest req){
+		
+		HttpSession IdSession = req.getSession();
+		String accountId = (String) IdSession.getAttribute("SessionInfo");
+		entVO.setAccountId(accountId);
+		
+		log.info(accountId + "<<<<<<<<<<<<<<<<<<< 아이디");
+		
+		
+		ServiceResult result = entService.disLikeEnt(entVO);
+		
+		String status = null;
+		
+		if(result.equals(ServiceResult.OK)) {
+			status = "SUCCESS";
+			return new ResponseEntity<String>(status,HttpStatus.OK);
+		}else {
+			
+			status = "FAILED";
+			return new ResponseEntity<String>(status,HttpStatus.FAILED_DEPENDENCY);
+		}
+		
+	}
+	
+	/** 모달에 띄울 기업 정보와 게시판 리스트 조회 메소드
+	 * @param entNO
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/modalDetail.do", method = RequestMethod.POST)
+	public ResponseEntity<Map<String, Object>> modalDetail(
+			@RequestParam(name="page", required = false, defaultValue = "1") int currentPage,
+			@RequestParam("entNo") int entNo){
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		EnterpriseVO entVO = entService.selectEnt(entNo);
+		
+		
+		MiniPaginationVO<BoardVO> pagingVO = new MiniPaginationVO<BoardVO>();
+		
+		pagingVO.setEntNo(entNo);
+		
+		pagingVO.setCurrentPage(currentPage);
+		
+		int totalRecord = entService.entBoardCount(pagingVO);
+		
+		pagingVO.setTotalRecord(totalRecord);
+		
+		List<BoardVO> dataList = entService.entBoardList(pagingVO); 
+		
+		pagingVO.setDataList(dataList);
+		
+		map.put("entVO", entVO);
+		map.put("pagingVO", pagingVO);
+		
+		return new ResponseEntity<Map<String, Object>>(map , HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/detail.do" , method = RequestMethod.GET)
+	public String entDetail(int entNo, Model model) {
+		System.out.println("디테일 들어오나?");
+		
+		EnterpriseVO entVO = entService.selectEnt(entNo);
+		
+		model.addAttribute("entVO", entVO);
+		
+		return "ent/entDetail";
+	}
+	
+	
+	
+}

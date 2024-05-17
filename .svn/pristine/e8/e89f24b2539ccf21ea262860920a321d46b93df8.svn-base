@@ -1,0 +1,35 @@
+var wsAlarmServer;
+
+function wsConnect() {
+    if (window.WebSocket) {
+        wsAlarmServer = new WebSocket("ws://" + window.location.hostname + "/alarm");
+
+        wsAlarmServer.onopen = function() {
+            console.log("열려라 참깨");
+        };
+
+        wsAlarmServer.onclose = function() {
+            console.log("닫혀라 참깨");
+        };
+
+        wsAlarmServer.onmessage = function(e) {
+            console.log("받아라 참깨: " + e.data);
+            
+            var alarmContainer = document.getElementById("alarm-container");
+            alarmContainer.innerHTML +=
+            '<p class="text-body small m-0">채용 결과가 나왔습니다.</b></p>' +
+    		'<u class="small">한화</u>';
+            
+        };
+    } else {
+        alert("이상한 참깨통");
+    }
+}
+
+window.addEventListener("beforeunload", function(event) {
+    wsAlarmServer.close();
+});
+
+window.addEventListener("unload", function(event) {
+    wsConnect();
+});

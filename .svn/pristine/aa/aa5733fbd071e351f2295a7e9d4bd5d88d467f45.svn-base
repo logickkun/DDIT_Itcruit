@@ -1,0 +1,515 @@
+package kr.co.itcruit.mypage.enterprise.controller;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletContext;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.google.common.util.concurrent.Service.State;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.atch.service.IAtchFileService;
+import kr.co.itcruit.common.CommoncodeService;
+import kr.co.itcruit.mypage.enterprise.service.IMyEnterpriseService;
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.ApplicantCareerStatVO;
+import kr.co.itcruit.vo.ApplicantEduStatVO;
+import kr.co.itcruit.vo.ApplicantGenderStatVO;
+import kr.co.itcruit.vo.ApplicantPassStatVO;
+import kr.co.itcruit.vo.ApplyProcessListVO;
+import kr.co.itcruit.vo.AtchFileVO;
+import kr.co.itcruit.vo.CommoncodeVO;
+import kr.co.itcruit.vo.CustomPaginationInfoVO;
+import kr.co.itcruit.vo.EntIntroQSTNDSNCTVO;
+import kr.co.itcruit.vo.LogRecruitTableVO;
+import kr.co.itcruit.vo.RecruitApplicantVO;
+import kr.co.itcruit.vo.ResumeVO;
+import kr.co.itcruit.vo.StatVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@RequestMapping("myPage/enterprise")
+@Slf4j
+public class EnterpriseAJAXController {
+	
+	@Autowired
+	private CommoncodeService ccService;
+	
+	@Autowired
+	private IAtchFileService atchFileService;
+	
+	@Autowired
+	private IMyEnterpriseService myEntService;
+	
+	@Autowired
+	private ServletContext servletContext;
+	
+	@RequestMapping(value = "/esntLangList")
+	public ResponseEntity<List<CommoncodeVO>> esntlLangList(@RequestParam("pstnCmmncdNm") String pstnCmmncdNm){
+		
+//		log.info("################모집분야 : "+ pstnCmmncdNm);
+		
+		String cmmncode = "PSTN%";
+		
+		List<CommoncodeVO> esntlLangList = ccService.commoncodeList(cmmncode, pstnCmmncdNm);
+		
+//		log.info("################모집분야리스트 : "+esntlLangList);
+		
+		return new ResponseEntity<List<CommoncodeVO>>(esntlLangList, HttpStatus.OK);
+		
+	}
+	
+	@RequestMapping(value = "/getRecruitImage", method = RequestMethod.GET)
+	public ResponseEntity<byte[]> sendImage(@RequestParam("recruitNo") String recruitNo){
+		
+		log.info("#################### recruitNo : "+recruitNo);
+		
+		String orgnCmmncd = "채용공고";
+		AtchFileVO afv = atchFileService.getFileInfo(recruitNo, orgnCmmncd);
+		
+		String filePath = afv.getFilePath();
+		
+		File file = new File(filePath);
+		
+		byte[] imegeByte = null;
+		try {
+			imegeByte = Files.readAllBytes(file.toPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return new ResponseEntity<byte[]>(imegeByte, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/qstnDSNCTInsert", method = RequestMethod.GET)
+	public ResponseEntity<String> qstnDSNCTInsert(
+			
+			@RequestParam("entIntroQstnNo") int entIntroQstnNo, 
+			@RequestParam("entIntroQstnInsertCn") String entIntroQstnInsertCn
+			)
+	{
+		
+		log.info("######################## entIntroQstnNo : " + entIntroQstnNo );
+		log.info("######################## entIntroQstnInsertCn : " + entIntroQstnInsertCn );
+		
+		ServiceResult result = myEntService.qstnDSNCTInsert(entIntroQstnNo, entIntroQstnInsertCn);
+		if(result.equals(ServiceResult.OK)) {
+			
+			return new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
+			
+		}else {
+			
+			return new ResponseEntity<String>("FAILURE", HttpStatus.OK);
+			
+		}
+		
+	}
+	
+	
+	@RequestMapping(value = "/qstnDSNCTUpdate", method= RequestMethod.GET)
+	public ResponseEntity<String> qstnDSNCTUpdate(
+			
+			@RequestParam("entIntroQstnSeqNo") int entIntroQstnSeqNo,
+			@RequestParam("entIntroQstnUpdateCn") String entIntroQstnUpdateCn)
+	
+	{
+		
+//		log.info("######################## entIntroQstnSeqNo : " + entIntroQstnSeqNo );
+//		log.info("######################## entIntroQstnCn : " + entIntroQstnUpdateCn );
+		
+		
+		ServiceResult result = myEntService.qstnDSNCTUpdate(entIntroQstnSeqNo, entIntroQstnUpdateCn);
+		
+		if(result.equals(ServiceResult.OK)) {
+			
+			return new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
+			
+		}else {
+			
+			return new ResponseEntity<String>("FAILURE", HttpStatus.OK);
+			
+		}
+	}
+	
+	@RequestMapping(value = "/getApplyProcessList", method = RequestMethod.GET)
+	public ResponseEntity<List<ApplyProcessListVO>> applyProcessList(@RequestParam("recruitNo")String recruitNo, @RequestParam("pstnCmmncdNm")String pstnCmmncdNm){
+		
+//		log.info("##################### recruitNo : " + recruitNo);
+//		log.info("##################### pstnCmmncdNm : " + pstnCmmncdNm);
+		
+		List<ApplyProcessListVO> selectApplyProcessList = myEntService.selectApplyProcessList(recruitNo, pstnCmmncdNm);
+		
+		return new ResponseEntity<List<ApplyProcessListVO>>(selectApplyProcessList, HttpStatus.OK);
+	}
+	
+	
+	@RequestMapping(value = "/getOrderList", method = RequestMethod.GET)
+	public ResponseEntity<CustomPaginationInfoVO<AccountVO>> orderList(
+			
+			@RequestParam("recruitNo")String recruitNo,
+			@RequestParam("pstnCmmncdNm")String pstnCmmncdNm,
+			@RequestParam("orderNumber")int orderNumber,
+			@RequestParam(name="page", required = false, defaultValue ="1") int currentPage,
+			@RequestParam(required = false, defaultValue = "defaultSort") String searchType,
+			@RequestParam(required = false) String searchWord
+			
+			){
+		
+		log.info("############################## recruitNo : " + recruitNo);
+		log.info("############################## pstnCmmcndNm : " + pstnCmmncdNm);
+		
+		
+		CustomPaginationInfoVO<AccountVO> accountList = new CustomPaginationInfoVO<AccountVO>();
+		accountList.setCurrentPage(currentPage);	
+		accountList.setOrderNumber(orderNumber);
+		accountList.setRecruitNo(recruitNo);
+		accountList.setPstnCmmncdNm(pstnCmmncdNm);
+		
+		int totalRecord = myEntService.selecetAccountListCount(accountList);
+		accountList.setTotalRecord(totalRecord);
+		
+		List<AccountVO> dataList = myEntService.selectOrderList(accountList);
+		accountList.setDataList(dataList);
+		
+		
+		return new ResponseEntity<CustomPaginationInfoVO<AccountVO>>(accountList, HttpStatus.OK);
+	}
+	
+	
+	
+	@RequestMapping(value = "/getQstnDSNCTList", method = RequestMethod.GET)
+	public ResponseEntity<List<EntIntroQSTNDSNCTVO>> getQstnDSNCTList(
+			@RequestParam("recruitNo") String recruitNo,
+			@RequestParam("pstnCmmncdNm") String pstnCmmncdNm,
+			@RequestParam("orderNumber") String orderNumber
+			
+			) {
+		
+		log.info("############################## recruitNo : " + recruitNo);
+		log.info("############################## pstnCmmcndNm : " + pstnCmmncdNm);
+		
+		List<EntIntroQSTNDSNCTVO>  eiqdList = null;
+		
+		if(StringUtils.isNotBlank(recruitNo) && StringUtils.isNotBlank(pstnCmmncdNm)) {
+			
+			eiqdList = myEntService.selectOrderDsnct(recruitNo, pstnCmmncdNm, orderNumber);
+			return new ResponseEntity<List<EntIntroQSTNDSNCTVO>>(eiqdList, HttpStatus.OK);
+			
+		}else {
+			
+			return new ResponseEntity<List<EntIntroQSTNDSNCTVO>>(eiqdList, HttpStatus.OK);
+			
+		}
+		
+	}
+	
+	
+	@RequestMapping(value = "/deleteQTSNDSNCT", method = RequestMethod.GET)
+	public ResponseEntity<String> deleteQTSNDSNCT(@RequestParam("entIntroQstnSeqNo") int entIntroQstnSeqNo){
+		
+		log.info("######################## entIntroQstnSeqNo : " + entIntroQstnSeqNo );
+		
+		ServiceResult result = myEntService.qstnDSNCTDelete(entIntroQstnSeqNo);
+		
+		
+		if(result.equals(ServiceResult.OK)) {
+			
+			return new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
+			
+		}else {
+			
+			return new ResponseEntity<String>("FAILURE", HttpStatus.OK);
+			
+		}
+		
+	}
+	
+	
+	@RequestMapping(value = "/updateApplicantPass", method = RequestMethod.POST)
+	public ResponseEntity<String> updateApplicantPass(@RequestBody Map<String, Object> updateInfo) {
+		
+		String recruitNo = (String) updateInfo.get("recruitNo");
+		String pstnCmmncdNm = (String) updateInfo.get("pstnCmmncdNm");
+		String applyNo = (String) updateInfo.get("applyNo");
+		int orderNumber = (int) updateInfo.get("orderNumber");
+		
+			
+		List<ApplyProcessListVO> selectApplyProcessList = myEntService.selectApplyProcessList(recruitNo, pstnCmmncdNm);
+		
+			
+		String updateClsNm = selectApplyProcessList.get(orderNumber).getClsNm();
+		int updateOrderNumber = orderNumber + 1;
+		
+		ServiceResult result = myEntService.updateApplicantPass(applyNo, updateClsNm, updateOrderNumber);
+		
+		if(result.equals(ServiceResult.OK)) {
+			
+			return new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
+			
+		}else {
+			
+			
+			return new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
+		}
+		
+	
+		
+		
+	}
+	
+	
+	
+	
+	@RequestMapping(value = "/getRecruitApply" , method = RequestMethod.GET)
+	public ResponseEntity<StatVO> getApplyNumber(String recruitNo, String pstnCmmncdNm){
+//		
+//		log.info("##### recruitNo : " + recruitNo);
+		
+		String applyNo = recruitNo + "_" + pstnCmmncdNm;
+		List<RecruitApplicantVO> applyDateStat = myEntService.getApplyNumber(applyNo);
+		List<LogRecruitTableVO> applyHitStat = myEntService.getApplyHit(recruitNo, pstnCmmncdNm);
+		List<ApplicantPassStatVO> applyPassStat = myEntService.getApplyPass(applyNo, "N");
+		List<ApplicantCareerStatVO> applyCareerStat = myEntService.getApplyCareer(applyNo);
+		List<ApplicantGenderStatVO> applyGenderStat = myEntService.getApplyGender(applyNo);
+		List<ApplicantEduStatVO> applyEduStat = myEntService.getApplyEdu(applyNo);
+		
+		log.info("############### applyDateStat : " + applyDateStat); 
+		log.info("############### applyHitStat : " + applyHitStat); 
+		log.info("############### applyPassStat : " + applyPassStat); 
+		log.info("############### applyCareerStat : " + applyCareerStat); 
+		log.info("############### applyGenderStat : " + applyGenderStat); 
+		log.info("############### applyEduStat : " + applyEduStat); 
+		
+		
+		
+		
+		StatVO stat = new StatVO();
+		stat.setApplyDateStat(applyDateStat);
+		stat.setApplyCareerStat(applyCareerStat);
+		stat.setApplyEduStat(applyEduStat);
+		stat.setApplyGenderStat(applyGenderStat);
+		stat.setApplyHitStat(applyHitStat);
+		stat.setApplyPassStat(applyPassStat);
+		
+		return new ResponseEntity<StatVO>(stat, HttpStatus.OK);
+		
+	}
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "/idCheck.do" , method = RequestMethod.POST)
+	public ResponseEntity<ServiceResult> idCheck(@RequestParam("id") String id){
+		
+		log.info(id);
+		ServiceResult result = myEntService.idCheck(id);
+		
+		if(result.equals(ServiceResult.EXIST)) {
+			return new ResponseEntity<ServiceResult>(result,HttpStatus.OK);
+		}else {
+			return new ResponseEntity<ServiceResult>(result,HttpStatus.OK);
+		}
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "/countId.do" , method = RequestMethod.POST)
+	public ResponseEntity<Integer> countId(@RequestParam("entNo") int entNo){
+		
+		int count = myEntService.countId(entNo);
+		
+		
+		
+		return new ResponseEntity<Integer>(count,HttpStatus.OK);
+		
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "/deleteId.do" , method = RequestMethod.POST)
+	public ResponseEntity<ServiceResult> deleteId(@RequestParam("accountId") String accountId ){
+		
+		ServiceResult result = myEntService.deleteId(accountId);
+		
+		log.info(result + "<<<<<<<<<<<<<<<<<");
+		
+		if(result.equals(ServiceResult.OK)) {
+			return new ResponseEntity<ServiceResult>(result,HttpStatus.OK);
+		}else {
+			return new ResponseEntity<ServiceResult>(result,HttpStatus.FAILED_DEPENDENCY);
+		}
+		
+	}
+	
+	
+	
+	
+	
+	@RequestMapping(value = "/getQstnAnswer", method = RequestMethod.POST)
+	public ResponseEntity<List<Map<String, String>>> getQstnAnswer(@RequestBody Map<String, String> qstnAnswer){
+		
+		log.info("######### qstnAnswer : " + qstnAnswer);
+		
+		List<Map<String, String>> answer = myEntService.getQstnAnswer(qstnAnswer);
+		
+		log.info("######## answer :" + answer);
+		
+		return new ResponseEntity<List<Map<String, String>>>(answer, HttpStatus.OK);
+		
+	} 
+	
+	
+	@RequestMapping(value = "/getResumePdf", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, String>> getResumePdf(String id) throws IOException{
+		
+		log.info("########### id : " + id);
+		
+		
+		
+        URL url = servletContext.getResource("/resources/malgun.ttf");
+        InputStream is = url.openStream(); 
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream(); 
+        int nRead;
+        byte[] data = new byte[1024];
+        while ((nRead = is.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        buffer.flush();
+        byte[] fileData = buffer.toByteArray();
+        String base64Font = Base64.getEncoder().encodeToString(fileData);
+        
+        
+        URL urlBold = servletContext.getResource("/resources/malgunbd.ttf");
+        InputStream isBold = urlBold.openStream(); 
+        ByteArrayOutputStream bufferBold = new ByteArrayOutputStream(); 
+        int nReadBold;
+        byte[] dataBold = new byte[1024];
+        while ((nReadBold = isBold.read(dataBold, 0, dataBold.length)) != -1) {
+        	bufferBold.write(dataBold, 0, nReadBold);
+        }
+        bufferBold.flush();
+        byte[] fileDataBold = bufferBold.toByteArray();
+        String base64FontBold = Base64.getEncoder().encodeToString(fileDataBold);
+        
+        
+        Map<String, String> font = new HashMap<String, String>();
+        
+        font.put("font", base64Font);
+        font.put("fontBold", base64FontBold);
+        
+        return new ResponseEntity<Map<String, String>>(font, HttpStatus.OK);
+	            
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}

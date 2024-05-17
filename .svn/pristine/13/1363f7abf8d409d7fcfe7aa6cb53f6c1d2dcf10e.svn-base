@@ -1,0 +1,175 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+    
+	<style>
+
+		.table > :not(caption) > * > * {
+	    	padding: 1rem 4rem;
+		}
+
+		.login-wrapper{
+			width: 400px;
+			height: 350px;
+			padding: 40px;
+			box-sizing: border-box;
+		}
+
+		.login-wrapper > h2{
+			font-size: 24px;
+			color: #000;
+			margin-bottom: 20px;
+		}
+		#login-form > input{
+			width: 100%;
+			height: 48px;
+			padding: 0 10px;
+			box-sizing: border-box;
+			margin-bottom: 16px;
+			border-radius: 6px;
+			background-color: #F8F8F8;
+		}
+		#login-form > input::placeholder{
+			color: #D2D2D2;
+		}
+		#login-form > input[type="submit"]{
+			color: #fff;
+			font-size: 16px;
+			background-color: #000;
+			margin-top: 20px;
+		}
+		
+		#login-form > input[type="checkbox"]{
+			display: none;
+		}
+		#login-form > label{
+			color: #999999;
+		}
+		#login-form input[type="checkbox"] + label{
+			cursor: pointer;
+			padding-left: 26px;
+			background-image: url("checkbox.png");
+			background-repeat: no-repeat;
+			background-size: contain;
+		}
+		#login-form input[type="checkbox"]:checked + label{
+			background-image: url("checkbox-active.png");
+			background-repeat: no-repeat;
+			background-size: contain;
+		}
+
+
+	</style>
+<div class="page-content-wrapper border">
+
+		<!-- Title -->
+		<div class="row">
+			<div class="col-12 mb-3">
+				<h1 class="h3 mb-2 mb-sm-0">계정 추가</h1>
+			</div>
+		</div>
+
+		<hr>
+
+		<ul class="nav nav-tabs nav-tabs-line mb-3">
+			<li class="nav-item"> <a class="nav-link active" data-bs-toggle="tab" href="#tab-3-1"> 계정 추가 </a> </li>
+			<li class="nav-item"> <a class="nav-link" data-bs-toggle="tab" href="#tab-3-2"> 계정 정보 </a> </li>
+		</ul>
+		<div class="tab-content d-flex justify-content-center">
+			<div class="tab-pane show active" id="tab-3-1">
+				<div class="login-wrapper border border-2 rounded-2">
+					<h2>계정 생성</h2>
+					<form method="post" action="서버의url" id="login-form">
+						<input type="text" name="userName" placeholder="id" class="border-0">
+						<input type="password" name="userPassword" placeholder="Password" class="border-0">
+						<label for="remember-check">
+						</label>
+						<input type="submit" value="신청" class="border-0">
+					</form>
+				</div>
+			</div>
+			<div class="tab-pane" id="tab-3-2">
+				<div class="card bg-transparent border">
+
+							<!-- Card header START -->
+							<div class="card-header bg-light border-bottom">
+								<h5 class="mb-0">계정 목록</h5>
+								
+							</div>
+							<!-- Card header END -->
+
+							<!-- Card body START -->
+							<div class="card-body pb-0">
+								<!-- Table START -->
+								<div class="table-responsive border-0">
+									<table class="table table-dark-gray align-middle p-4 mb-0 table-hover">
+										<!-- Table head -->
+										<thead>
+											<tr>
+												<th scope="col" class="col-4 rounded-start">번호</th> <!-- 폭 줄임 -->
+												<th scope="col" class="col-4">아이디</th> <!-- 폭 넓게 설정 -->
+												<th scope="col" class="col-4 rounded-end">삭제</th> <!-- 폭 줄임 -->
+											</tr>
+										</thead>
+
+										<!-- Table body START -->
+										<tbody>
+										
+											<!-- Table row -->
+											<tr>
+
+
+												<!-- Table data -->
+												<td>1</td>
+												
+												<!-- Table data -->
+												<td>
+													<h6 class="table-responsive-title mb-0"><a href="#">sam1234</a></h6>
+												</td>
+												
+												
+												<td>
+													<button class="btn btn-sm btn-danger mb-0">삭제</button>
+												</td>
+												
+
+
+
+											</tr>
+
+
+										</tbody>
+										<!-- Table body END -->
+									</table>
+								</div>
+								<!-- Table END -->
+							</div>
+							<!-- Card body END -->
+
+							<!-- Card footer START -->
+							<div class="card-footer bg-transparent">
+								<!-- Pagination START -->
+								<div class="d-sm-flex justify-content-sm-between align-items-sm-center">
+									<!-- Content -->
+									<p class="mb-0 text-center text-sm-start">Showing 1 to 8 of 20 entries</p>
+									<!-- Pagination -->
+									<nav class="d-flex justify-content-center mb-0" aria-label="navigation">
+										<ul class="pagination pagination-sm pagination-primary-soft d-inline-block d-md-flex rounded mb-0">
+											<li class="page-item mb-0"><a class="page-link" href="#" tabindex="-1"><i class="fas fa-angle-left"></i></a></li>
+											<li class="page-item mb-0"><a class="page-link" href="#">1</a></li>
+											<li class="page-item mb-0 active"><a class="page-link" href="#">2</a></li>
+											<li class="page-item mb-0"><a class="page-link" href="#">3</a></li>
+											<li class="page-item mb-0"><a class="page-link" href="#"><i class="fas fa-angle-right"></i></a></li>
+										</ul>
+									</nav>
+								</div>
+								<!-- Pagination END -->
+							</div>
+							<!-- Card footer END -->
+						</div>
+			</div>
+		</div>
+
+
+		
+
+	</div>

@@ -1,0 +1,1220 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec"%>
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<div class="page-content-wrapper border">
+
+				<form class="row g-3" id="recruitRegiForm" action="/myPage/enterprise/recruitInsertProcess" method="post" enctype="multipart/form-data">
+					<h5 class="mb-0">채용 등록</h5>
+					
+
+					<hr class="my-4">
+
+					<!-- First name -->
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">공고 제목 <span class="text-danger">*</span></h6>
+							</div>
+							<div class="col-lg-6">
+								<input type="text" class="form-control" id="hireTitle" name="recruitTitle" style="width: 95%;">
+							</div>
+							<div class="col-lg-2">
+								<input type="file" class="form-control" id="recruitFile" name="recruitFile">
+							</div>
+						</div>
+					</div>
+					
+
+					<!-- Gender -->
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">고용 형태 <span class="text-danger">*</span></h6>
+							</div>
+							<div class="col-lg-8">
+								<div class="d-flex">
+								    <div class="form-check me-4">
+								        <input class="form-check-input" type="checkbox" value="정규직" name="hireCmmncdNm" id="flexCheckDefault1">
+								        <label class="form-check-label" for="flexCheckDefault1">
+								           	 정규직
+								        </label>
+								    </div>
+								    <div class="form-check me-4">
+								        <input class="form-check-input" type="checkbox" value="계약직" name="hireCmmncdNm" id="flexCheckDefault2">
+								        <label class="form-check-label" for="flexCheckDefault2">
+								            	계약직
+								        </label>
+								    </div>
+								    <div class="form-check me-4">
+								        <input class="form-check-input" type="checkbox" value="무기계약직" name="hireCmmncdNm" id="flexCheckDefault3">
+								        <label class="form-check-label" for="flexCheckDefault3">
+								            	무기 계약직
+								        </label>
+								    </div>
+								    <div class="form-check me-4">
+								        <input class="form-check-input" type="checkbox" value="인턴" name="hireCmmncdNm" id="flexCheckDefault4">
+								        <label class="form-check-label" for="flexCheckDefault4">
+								            	인턴
+								        </label>
+								    </div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+			
+
+					<!-- Date of birth -->
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">접수 기간</h6>
+							</div>
+
+							<div class="col-lg-8">
+							
+									<style>
+									/* Custom styling for the date range selector */
+									/* Custom styling for the date range selector */
+										.flatpickr-wrapper {
+											display: flex;
+											align-items: center;
+										}
+
+										.input-group-prepend {
+											flex: 0 0 auto; /* 자동으로 크기를 조절하지 않음 */
+										}
+
+										.input-group-text {
+											background-color: #f8f9fa;
+											border: 1.5px solid #ced4da;
+											height: 40px;
+											width: 45px;
+										
+										}
+
+										#startAndEnd {
+											width: 35%;
+										}
+									</style>
+
+
+									<div class="flatpickr-wrapper">
+										<input type="text" id="startAndEnd" placeholder="날짜 선택" data-input class="form-control">
+
+										<input type="hidden" id="startDate" name="recruitStartDt" value="">
+										<input type="hidden" id="endDate" name="recruitEndDt" value="">
+
+										<div class="input-group-prepend">
+											<span class="input-group-text d-flex justify-content-center" title="toggle" id="calendarToggle" data-toggle>
+												<i class="fas fa-calendar-alt"></i>
+											</span>
+										</div>
+
+										<div class="input-group-append">
+											<span class="input-group-text d-flex justify-content-center" title="clear" id="clearDates" data-clear>
+												<i class="fas fa-times"></i>
+											</span>
+										</div>
+									</div>
+
+									
+
+								<script>
+
+									document.addEventListener("DOMContentLoaded", function(){
+
+
+										var calendarToggle = document.getElementById("calendarToggle");
+										var clearDates = document.getElementById("clearDates");
+										var startAndEndInput = document.getElementById("startAndEnd");
+										var startDate = document.getElementById("startDate");
+    									var endDate = document.getElementById("endDate");
+
+
+
+										// 클릭 이벤트를 추가하여 캘린더를 토글합니다.
+										calendarToggle.addEventListener('click', function() {
+
+											startAndEndInput._flatpickr.toggle(); 
+										});
+
+										clearDates.addEventListener('click', function() {
+											startAndEndInput._flatpickr.clear(); 
+											startDate.value = "";
+        									endDate.value = "";
+										});
+
+
+										flatpickr("#startAndEnd", {
+
+											mode: "range",
+											minDate: "today",
+											dateFormat: "Y-m-d H:i",
+											enableTime: true,
+											time_24hr: true,
+											onClose: function(selectedDates, dateStr, instance) {
+												
+// 												console.log(dateStr.split("to")[0].split(" ")[0] + "T" + dateStr.split("to")[0].split(" ")[1]);
+// 												console.log(dateStr.split("to")[1].split(" ")[1] + "T" + dateStr.split("to")[1].split(" ")[2]);
+
+
+												startDateValue = dateStr.split("to")[0].split(" ")[0] + "T" + dateStr.split("to")[0].split(" ")[1].trim();
+												endDateValue = dateStr.split("to")[1].split(" ")[1] + "T" + dateStr.split("to")[1].split(" ")[2].trim();
+
+
+												startDate.value = startDateValue;
+												endDate.value = endDateValue;
+
+											}
+											
+										});
+									});
+									
+								</script>
+					
+							</div>
+						</div>
+					</div>
+
+					<!-- Email -->
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">급여 <span class="text-danger">*</span></h6>
+							</div>
+							<div class="col-lg-8">
+								<input type="text" class="form-control" id="hireSal" name="recruitPay">
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">채용 URL <span class="text-danger">*</span></h6>
+							</div>
+							<div class="col-lg-8">
+								<input type="text" class="form-control" id="entUrl" name="entUrl">
+							</div>
+						</div>
+					</div>
+					
+					<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+					<script>
+						function DaumPostcode() {
+							new daum.Postcode({
+								oncomplete : function(data) {
+									// 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+									// 각 주소의 노출 규칙에 따라 주소를 조합한다.
+									// 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+									var addr = ''; // 주소 변수
+									var extraAddr = ''; // 참고항목 변수
+
+									//사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+									if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+										addr = data.roadAddress;
+									} else { // 사용자가 지번 주소를 선택했을 경우(J)
+										addr = data.jibunAddress;
+									}
+
+									// 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+									if (data.userSelectedType === 'R') {
+										// 법정동명이 있을 경우 추가한다. (법정리는 제외)
+										// 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+										if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+											extraAddr += data.bname;
+										}
+										// 건물명이 있고, 공동주택일 경우 추가한다.
+										if (data.buildingName !== '' && data.apartment === 'Y') {
+											extraAddr += (extraAddr !== '' ? ', '
+													+ data.buildingName : data.buildingName);
+										}
+									}
+
+									// 우편번호와 주소 정보를 해당 필드에 넣는다.
+									document.getElementById('memPostCode').value = data.zonecode;
+									document.getElementById("memAddress1").value = addr;
+									document.getElementById("cmmncdGrpCd").value= addr.split(" ")[0].trim();
+									document.getElementById("cmmncdNm1").value= addr.split(" ")[1].trim();
+									
+// 									console.log(addr.split(" ")[0]);
+// 									console.log(addr.split(" ")[1]);
+								}
+							}).open();
+						}
+
+
+					</script>
+
+					<!-- City -->
+					<div class="col-12">
+					
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">우편번호 <span class="text-danger">*</span></h6>
+							</div>
+
+							<div class="col-lg-6">
+								<span class="d-flex justify-content-between">
+									<input type="text" class="form-control" id="memPostCode" name="entPostcode"> 
+									<button type="button" class="input-group-text" style="margin-bottom: 1px; width: 120px;" onclick="DaumPostcode()">우편번호 찾기</button>
+								</span>
+								
+							</div>
+							
+						</div>
+					</div>
+					
+					<!-- State -->
+					<div class="col-12">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">근무지 주소 <span class="text-danger">*</span></h6>
+							</div>
+							<div class="col-lg-6">
+								<input type="text" class="form-control" id="memAddress1" placeholder="주소를 입력해주세요">
+								<input type="hidden" id="cmmncdGrpCd" name="cmmncdGrpCd"/>
+								<input type="hidden" id="cmmncdNm1" name="cmmncdNm1"/>
+							</div>
+						</div>
+					</div>
+					
+					<script>
+					
+						document.addEventListener("DOMContentLoaded", function(){
+
+							var careerlist = document.querySelector(".careerlist");
+							var career = document.querySelector(".career")
+							var checkbox3 = document.getElementById("checkbox3");
+							
+
+
+							careerlist.querySelectorAll("input").forEach(function(check){
+								
+								check.addEventListener("change", function(){
+
+									// console.log(this.checked);
+
+									if(checkbox3.checked === true){
+
+
+										careerlist.insertAdjacentHTML('beforeend', `
+											<div class="form-group d-flex justify-content-between" id="careerDt">
+												<label for="careerDuration" style="width: 200px;">경력 기간 선택:</label>
+												<select class="form-control" id="careerDuration" name="recruitCareerDt">
+													<option value="1">1년 이상</option>
+													<option value="2">2년 이상</option>
+													<option value="3">3년 이상</option>
+													<option value="4">4년 이상</option>
+													<option value="5">5년 이상</option>
+												</select>
+											</div>
+										`);
+
+
+									}else{
+
+
+
+											var careerRemove = document.getElementById("careerDt");
+	
+											careerRemove.remove();
+
+
+									}
+
+
+								});
+
+							});
+
+
+
+						});
+
+					</script>
+
+		
+	
+					<!-- Salutation -->
+					<div class="col-12 mt-4">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">지원 자격 <span class="text-danger">*</span></h6>
+							</div>
+							<div class="career col-lg-8">
+								<div class="careerlist d-flex">
+									<div class="form-check me-4">
+										<input class="form-check-input" type="radio" name="recruitCareerCode" value="신입" id="checkbox1">
+										<label class="form-check-label" for="checkbox1">
+											신입
+										</label>
+									</div>
+									<div class="form-check-box me-4">
+										<input class="form-check-input" type="radio" name="recruitCareerCode" value="경력무관" id="checkbox2">
+										<label class="form-check-label" for="checkbox2">
+											경력무관
+										</label>
+									</div>
+									<div class="form-check-box me-4">
+										<input class="form-check-input" type="radio" name="recruitCareerCode" value="경력" id="checkbox3" />
+										<label class="form-check-label" for="checkbox3">
+											경력
+										</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Salutation -->
+					<div class="col-12 mt-4">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">수시 채용 여부 <span class="text-danger">*</span></h6>
+							</div>
+							<div class="career col-lg-8">
+								<div class="careerlist d-flex">
+									<div class="form-check me-4">
+										<input class="form-check-input" type="radio" name="recruitYn" value="Y" id="checkbox1">
+										<label class="form-check-label" for="checkbox1">
+											예
+										</label>
+									</div>
+									<div class="form-check-box me-4">
+										<input class="form-check-input" type="radio" name="recruitYn" value="N" id="checkbox2">
+										<label class="form-check-label" for="checkbox2">
+											아니오
+										</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					
+					<!-- 라디오 버튼 스크립트. -->
+					<script>
+
+						document.addEventListener("DOMContentLoaded", function(){
+
+
+							var radiolist = document.querySelectorAll(".checkboxlist");
+
+
+							radiolist.forEach(function(radioGroup){
+
+								radioGroup.addEventListener("change" , function(){
+
+
+									var selectedRadio = radioGroup.querySelector("input[type='checkbox']:checked");
+									var checkboxContainer = document.querySelector(".checkbox-container");
+
+
+									checkboxContainer.innerHTML = "";
+
+
+									if(selectedRadio.id === "checkbox71"){
+
+										var checkbox = createCheckbox("linux", "Linux");
+										checkboxContainer.appendChild(checkbox);
+
+										var checkbox1 = createCheckbox("rust", "Rust");
+										checkboxContainer.appendChild(checkbox1);
+
+									}
+									
+
+
+
+								});
+
+
+							});
+
+						});
+
+
+						function createCheckbox(id, label){
+
+							var checkbox = document.createElement("div");
+							checkbox.classList.add("form-check", "me-4");
+							checkbox.innerHTML = 
+								
+								'<input class="form-check-input" type="checkbox" name="esntlLangCmmncd" value="'+ id +'" id="checkbox' + id + '">' +
+						        '<label class="form-check-label" for="checkbox' + id + '">' + label + '</label>';
+
+							return checkbox;
+						}
+
+					</script>
+					<!-- 라디오 버튼 스크립트 끝 -->
+					
+					<div class="col-12 mt-4">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">모집 분야 <span class="text-danger">*</span></h6>
+							</div>
+							<!-- 라디오 버튼에 따라 필수조건 요소들이 동적으로 변하게 하기 -->
+							<div class="col-lg-4 border p-2" style="height: 100px; overflow-y: auto; overflow-x: hidden;">
+								<div class="row checkboxlist">
+
+									<div class="col-lg-6">
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox71" value="서버">
+											<label class="form-check-label" for="checkbox71">서버</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox72" value="백엔드 개발자">
+											<label class="form-check-label" for="checkbox72">백엔드 개발자</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox73" value="프론트엔드 개발자">
+											<label class="form-check-label" for="checkbox73">프론트엔드 개발자</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox74" value="응용소프트웨어">
+											<label class="form-check-label" for="checkbox74">응용소프트웨어</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox75" value="시스템소프트웨어">
+											<label class="form-check-label" for="checkbox75">시스템소프트웨어</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox76" value="앱개발자">
+											<label class="form-check-label" for="checkbox76">앱개발자</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox77" value="크로스플랫폼 앱개발자"> 
+											<label class="form-check-label" for="checkbox77">크로스플랫폼 앱개발자</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox78" value="게임 개발자">
+											<label class="form-check-label" for="checkbox78">게임 개발자</label>
+										  </div>
+									</div>
+									
+									<div class="col-lg-6">
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox79" value="DBA">
+											<label class="form-check-label" for="checkbox79">DBA</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox80" value="빅데이터 엔지니어">
+											<label class="form-check-label" for="checkbox80">빅데이터 엔지니어</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox81" value="인공지능/머신러닝">
+											<label class="form-check-label" for="checkbox81">인공지능/머신러닝</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox82" value="devops/시스템 엔지니어">
+											<label class="form-check-label" for="checkbox82">devops/시스템 엔지니어</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox83" value="HW/임베디드">
+											<label class="form-check-label" for="checkbox83">HW/임베디드</label>
+										  </div>
+										  <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="pstnCmmncd" id="checkbox84" value="블록체인">
+											<label class="form-check-label" for="checkbox84">블록체인</label>
+										  </div>
+									</div>
+									
+
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 mt-4">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">필수 조건 <span class="text-danger">*</span></h6>
+							</div>
+
+							<div class="col-lg-4 border p-2">
+								<div class="row">
+
+									<div class="col-lg-6 checkbox-container">
+										<!-- <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" id="checkbox11">
+											<label class="form-check-label" for="checkbox11">JAVA</label>
+										</div>
+										
+									</div>
+
+									<div class="col-lg-6">
+										<!-- <div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" id="checkbox14">
+											<label class="form-check-label" for="checkbox14">C++</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" id="checkbox15">
+											<label class="form-check-label" for="checkbox15">파이썬</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" id="checkbox16">
+											<label class="form-check-label" for="checkbox16">JAVASCRIPT</label>
+										</div> -->
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 mt-4">
+						<div class="row g-xl-0 align-items-center">
+							<div class="col-lg-4">
+								<h6 class="mb-lg-0">우대 언어 <span class="text-danger">*</span></h6>
+							</div>
+
+							<div class="col-lg-4 border p-2" style="height: 100px; overflow-y: auto; overflow-x: hidden;">
+								<div class="row">
+
+									<div class="col-lg-6">
+
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox33" value="SwiftUI">
+											<label class="form-check-label" for="checkbox33">SwiftUI</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox34" value="Xcode">
+											<label class="form-check-label" for="checkbox34">Xcode</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox35">
+											<label class="form-check-label" for="checkbox35">Flutter</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox36">
+											<label class="form-check-label" for="checkbox36">React Native</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox37">
+											<label class="form-check-label" for="checkbox37">Unity</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox38">
+											<label class="form-check-label" for="checkbox38">Unreal Engine</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox39">
+											<label class="form-check-label" for="checkbox39">MSSQL</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox40">
+											<label class="form-check-label" for="checkbox40">PostgreSQL</label>
+										</div>
+
+										
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox41">
+											<label class="form-check-label" for="checkbox41">NoSql</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox42">
+											<label class="form-check-label" for="checkbox42">MariaDB</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox43">
+											<label class="form-check-label" for="checkbox43">MongoDB</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox44">
+											<label class="form-check-label" for="checkbox44">SQL</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox45">
+											<label class="form-check-label" for="checkbox45">R</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox46">
+											<label class="form-check-label" for="checkbox46">Hadoop</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox47">
+											<label class="form-check-label" for="checkbox47">Spark</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox48">
+											<label class="form-check-label" for="checkbox48">Kafka</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox49">
+											<label class="form-check-label" for="checkbox49">TensorFlow</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox50">
+											<label class="form-check-label" for="checkbox50">PyTorch</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox51">
+											<label class="form-check-label" for="checkbox51">Elasticsearch</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox52">
+											<label class="form-check-label" for="checkbox52">OpenCV</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox53">
+											<label class="form-check-label" for="checkbox53">Kubernetes</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox54">
+											<label class="form-check-label" for="checkbox54">Docker</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox55">
+											<label class="form-check-label" for="checkbox55">Network</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox56">
+											<label class="form-check-label" for="checkbox56">GCP</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox57">
+											<label class="form-check-label" for="checkbox57">Windows</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox58">
+											<label class="form-check-label" for="checkbox58">AZURE</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox59">
+											<label class="form-check-label" for="checkbox59">Terraform</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox60">
+											<label class="form-check-label" for="checkbox60">FW</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox61">
+											<label class="form-check-label" for="checkbox61">Embedded</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox62">
+											<label class="form-check-label" for="checkbox62">Pads</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox63">
+											<label class="form-check-label" for="checkbox63">FPGA</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox64">
+											<label class="form-check-label" for="checkbox64">PCB</label>
+										</div>
+													<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox66">
+											<label class="form-check-label" for="checkbox66">MATLAB</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox67">
+											<label class="form-check-label" for="checkbox67">Blockchain</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox70">
+											<label class="form-check-label" for="checkbox70">Golang</label>
+										</div>
+										  
+										  
+									</div>
+
+									<div class="col-lg-6">
+
+
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox1">
+											<label class="form-check-label" for="checkbox1">Linux</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox2">
+											<label class="form-check-label" for="checkbox2">Rust</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox3">
+											<label class="form-check-label" for="checkbox3">Java</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox4">
+											<label class="form-check-label" for="checkbox4">Spring</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox5">
+											<label class="form-check-label" for="checkbox5">Node.js</label>
+										</div>
+
+
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox6">
+											<label class="form-check-label" for="checkbox6">Python</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox7">
+											<label class="form-check-label" for="checkbox7">Django</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox8">
+											<label class="form-check-label" for="checkbox8">PHP</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox9">
+											<label class="form-check-label" for="checkbox9">JSP</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox10">
+											<label class="form-check-label" for="checkbox10">ASP</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox11">
+											<label class="form-check-label" for="checkbox11">C++</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox12">
+											<label class="form-check-label" for="checkbox12">C#</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox13">
+											<label class="form-check-label" for="checkbox13">MySQL</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox14">
+											<label class="form-check-label" for="checkbox14">Oracle</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox15">
+											<label class="form-check-label" for="checkbox15">React</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox16">
+											<label class="form-check-label" for="checkbox16">Vue.js</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox17">
+											<label class="form-check-label" for="checkbox17">JavaScript</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox18">
+											<label class="form-check-label" for="checkbox18">TypeScript</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox19">
+											<label class="form-check-label" for="checkbox19">Svelte</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox20">
+											<label class="form-check-label" for="checkbox20">HTML5</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox21">
+											<label class="form-check-label" for="checkbox21">CSS3</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox22">
+											<label class="form-check-label" for="checkbox22">AngularJS</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox23">
+											<label class="form-check-label" for="checkbox23">jQuery</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox24">
+											<label class="form-check-label" for="checkbox24">GO</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox25">
+											<label class="form-check-label" for="checkbox25">Fortran</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox26">
+											<label class="form-check-label" for="checkbox26">Ada</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox27">
+											<label class="form-check-label" for="checkbox27">C</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox28">
+											<label class="form-check-label" for="checkbox28">COBOL</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox29">
+											<label class="form-check-label" for="checkbox29">Kotlin</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox30">
+											<label class="form-check-label" for="checkbox30">RxJava</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox31">
+											<label class="form-check-label" for="checkbox31">Swift</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox32">
+											<label class="form-check-label" for="checkbox32">Rxswift</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox65">
+											<label class="form-check-label" for="checkbox65">RF</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox68">
+											<label class="form-check-label" for="checkbox68">Solidity</label>
+										</div>
+										<div class="form-check me-4">
+											<input class="form-check-input" type="checkbox" name="preferLangCmmncd" id="checkbox69">
+											<label class="form-check-label" for="checkbox69">Nft</label>
+										</div>
+										
+								
+										  
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+					<!-- Divider -->
+					<!-- <hr class="my-5"> -->
+
+					<!-- Education -->
+					<h6 class="text-center mt-5" style="margin-left: -40px;">채용프로세스 사용여부</h6>
+					<div class="row justify-content-center mt-3">
+						<div class="col-lg-2">
+							<div class="form-check me-4">
+								<input class="form-check-input" type="radio" name="processYn" id="radioYes" value="Y">
+								<label class="form-check-label" for="radioYes">네</label>
+							</div>
+						</div>
+						<div class="col-lg-1">
+							<div class="form-check me-4">
+								<input class="form-check-input" type="radio" name="processYn" id="radioNo" value="N">
+								<label class="form-check-label" for="radioNo">아니오</label>
+							</div>
+						</div>
+					</div>
+
+					<input type="hidden" name="processAmt" id="processAmt" value=""/>
+					<!-- Button trigger modal -->
+					<div class="col-12 text-sm-end">
+						<button class="btn btn-primary mb-0" type="button" id="submitBtn">제출</button>
+					</div>
+					<sec:csrfInput/>
+				</form>
+
+</div>
+
+		<!-- Modal Script-->
+		<script>
+
+			var number = 1;
+
+			document.addEventListener("DOMContentLoaded", function() {
+
+				var products = document.querySelector("#payment-products");
+
+				var recruitmentProcess = document.querySelector(".recruitment-process");
+
+				var totalPrice = document.querySelector(".total-price span");
+
+
+				products.querySelectorAll("a").forEach(function(product){
+
+					product.addEventListener("click", function(){
+						
+						addProduct(this);
+
+					});
+
+				});
+	
+			
+
+			function addProduct(product) {
+
+
+				var isFirstProduct = recruitmentProcess.children.length === 0;
+    
+				// 첫 번째 상품이 아닐 경우, '>' 문자를 추가
+				if (!isFirstProduct) {
+					var separator = document.createElement("div");
+					separator.classList.add("separator");
+					separator.textContent = ">";
+					recruitmentProcess.appendChild(separator);
+				}
+
+
+				var containerDiv = document.createElement("div");
+				containerDiv.classList.add("d-flex", "flex-column", "align-items-center");
+				containerDiv.setAttribute("data-order-number", number);
+
+				var orderSpan = document.createElement("span");
+				orderSpan.classList.add("order-number");
+				orderSpan.style.marginRight = "65px";
+				orderSpan.textContent = number + "차";
+				
+
+				containerDiv.append(orderSpan);
+
+
+				var productClone = product.cloneNode(true);
+				containerDiv.appendChild(productClone);
+
+
+				recruitmentProcess.appendChild(containerDiv);
+
+
+				number += 1;
+
+
+				var productValue = parseInt(product.getAttribute("value"), 10);
+				var currentValue = parseInt(totalPrice.textContent, 10);
+				totalPrice.textContent = currentValue + productValue;
+
+
+
+				containerDiv.addEventListener("click", function(){
+
+					removeProduct(this);
+
+				});
+
+				
+
+			}
+
+			function removeProduct(element) {
+
+				var productValue = parseInt(element.querySelector("a").getAttribute("value"), 10);
+				var currentTotal = parseInt(totalPrice.textContent, 10);
+				totalPrice.textContent = currentTotal - productValue;
+
+				
+				var isFirstChild = element.previousElementSibling === null;
+				
+				if (isFirstChild) {
+					// element가 첫 번째 요소이면 다음 '>' 문자 제거
+					if (element.nextElementSibling && element.nextElementSibling.classList.contains("separator")) {
+						recruitmentProcess.removeChild(element.nextElementSibling);
+					}
+				} else {
+					// element가 첫 번째 요소가 아니면 이전 '>' 문자 제거
+					if (element.previousElementSibling && element.previousElementSibling.classList.contains("separator")) {
+						recruitmentProcess.removeChild(element.previousElementSibling);
+					}
+				}
+				
+				element.remove();
+
+				updateOrderNumbers();
+
+
+			};
+
+
+			function updateOrderNumbers(){
+
+				var currentOrder = 1;
+
+				recruitmentProcess.querySelectorAll("div[data-order-number]").forEach(function(element){
+
+					element.querySelector("span").textContent = currentOrder + "차";
+					element.setAttribute("data-order-number", currentOrder);
+					currentOrder += 1;
+
+
+				});
+
+
+				number = currentOrder;
+
+
+
+			};
+
+
+			var termsAndConditions = document.getElementById('terms-and-conditions');
+			var payButton = document.getElementById('pay-button');
+
+			termsAndConditions.addEventListener('scroll', function() {
+				var element = this;
+
+				// 맨 아래까지 스크롤되었는지 확인
+				if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+					payButton.disabled = false; // 결제 버튼 활성화
+				}
+			});
+
+
+			var radioYes = document.getElementById('radioYes');
+    		var submitButton = document.getElementById('submitBtn');
+    		var recruitRegiForm = document.getElementById("recruitRegiForm");
+    		var payTotalPrice = document.getElementById("payTotalPrice");
+    		var processAmt = document.getElementById("processAmt");
+
+			var confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+			var paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+			var checkModal = new bootstrap.Modal(document.getElementById('checkModal'));
+
+
+			submitButton.addEventListener("click", function(){
+
+				if(radioYes.checked){
+
+					paymentModal.show();
+
+
+				}else if(radioNo.checked){
+
+					confirmModal.show();
+
+				}else{
+
+
+					checkModal.show();
+
+				}
+
+			});
+			
+			payButton.addEventListener("click", function(){
+				
+// 				console.log(payTotalPrice.innerText);
+				processAmt.value = payTotalPrice.innerText;
+				
+				
+				recruitRegiForm.submit();
+				
+				
+			})
+			
+			
+
+		});
+
+		</script>
+		
+			
+		
+		<!-- ***** MODAL *******-->
+		<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-scrollable">
+			  <div class="modal-content">
+				<div class="modal-header">
+				  <h5 class="modal-title" id="exampleModalLabel">결제</h5>
+
+				  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="modal-close-button"></button>
+
+				</div>
+				<div class="modal-body">
+					<legend>결제 상품</legend>
+
+					<div class="justify-content-center" id="payment-products">
+						<a class="btn btn-primary-soft" value="10000">지원 접수</a>
+						<a class="btn btn-primary-soft" value="20000">Coding text</a>
+						<a class="btn btn-primary-soft" value="30000">화상 면접</a>
+					</div>	
+
+					
+					<div class="recruitment-process d-flex flex-row gap-2">
+					</div>
+
+					<legend>이용 약관</legend>
+					<div id="terms-and-conditions" style="height: 200px; overflow-y: scroll; overflow-x: 10px;">
+						
+<pre>
+본 이용 약관(이하 "약관")은 사용자(이하 "회원")가 [서비스명] (이하 "서비스")를 이용함에 있어 회원과 [회사명] (이하 "회사") 사이의 권리, 의무 및 책임사항, 이용 조건 및 절차, 기타 필요한 사항을 규정함을 목적으로 합니다.
+
+1. 약관의 동의
+1.1 회원가입 시 본 약관의 내용에 대해 "동의합니다" 버튼을 클릭할 경우, 본 약관의 내용에 동의한 것으로 간주합니다.
+
+1.2 회사는 필요한 경우 약관을 수정할 수 있으며, 약관이 변경될 경우 최소 7일 전에 서비스 내에 공지합니다. 변경된 약관은 공지된 날로부터 효력이 발생합니다.
+
+2. 회원 가입 및 관리
+2.1 회원 가입은 서비스의 회원가입 양식에 따라 회원 정보를 정확하게 입력하고, 본 약관에 동의함으로써 가입이 완료됩니다.
+
+2.2 회원은 가입 시 등록한 정보에 변경이 있는 경우, 즉시 해당 정보를 수정해야 합니다.
+
+2.3 회사는 회원이 약관에 위배되는 행위를 할 경우, 회원에 대해 서비스 이용 제한, 계약 해지 등의 조치를 취할 수 있습니다.
+
+3. 서비스 이용
+3.1 회사는 회원에게 아래와 같은 서비스를 제공합니다.
+
+지원 접수 서비스
+코딩 테스트 서비스
+화상 면접 서비스
+3.2 서비스 이용 시간은 회사의 업무 상황 또는 기술적 문제에 따라 달라질 수 있으며, 이로 인해 서비스 제공에 차질이 생길 경우 사전에 공지합니다.
+
+4. 개인정보 보호
+4.1 회사는 회원의 개인정보를 보호하기 위해 최선을 다합니다. 회원의 개인정보 처리 및 보호에 관한 사항은 관련 법령 및 회사의 개인정보처리방침에 따릅니다.
+
+5. 면책사항
+5.1 회사는 천재지변, 전쟁, 테러 공격 등 불가항력적인 사유로 인한 서비스의 중단에 대하여 책임을 지지 않습니다.
+
+5.2 회사는 회원이 서비스를 이용하여 기대하는 수익을 얻지 못하거나 서비스 자료에 대한 손실이 발생하였을 경우, 그 책임을 지지 않습니다.
+
+6. 약관의 적용
+6.1 본 약관에 명시되지 않은 사항에 대해서는 관련 법령 또는 상관례에 따릅니다.
+</pre>
+
+					</div>
+				</div>
+			
+				<div class="modal-footer">
+					<div class="total-price">
+	
+						<h4>총 금액:<span id="payTotalPrice">0</span></h4>
+	
+					</div>
+					<button type="button" class="btn btn-primary" id="pay-button" disabled>결제</button>
+				</div>
+			  </div>
+			</div>
+		</div>
+
+
+		<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+			  <div class="modal-content">
+				<div class="modal-header">
+				  <h5 class="modal-title" id="confirmModalLabel">진행 확인</h5>
+				  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+				  진행하시겠습니까?
+				</div>
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+				  <button type="button" class="btn btn-primary">진행</button>
+				</div>
+			  </div>
+			</div>
+		</div>
+		
+		
+		
+		<div class="modal fade" id="checkModal" tabindex="-1" aria-labelledby="checkModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+			  <div class="modal-content">
+				<div class="modal-header">
+				  <h5 class="modal-title" id="confirmModalLabel">진행 확인</h5>
+				  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+				  채용 프로세스 사용 여부를 체크해주세요
+				</div>
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+				</div>
+			  </div>
+			</div>
+		</div>

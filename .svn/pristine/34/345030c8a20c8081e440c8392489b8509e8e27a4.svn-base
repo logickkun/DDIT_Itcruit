@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IBoardMapper">
+ 
+ <select id="entBoardCount" parameterType="miniPagingVO" resultType="int">
+ 	select count(*)
+ 	from board
+ 	where 1=1 and ent_no = #{entNo} and bbs_ctgry_cmmncd = 'BBS202'
+
+ </select>
+ 
+ <select id="entBoardList" parameterType="int" resultType="boardVO">
+	 select
+	 	b.*
+ 	from(
+ 		select
+ 			a.* , row_number() over(order by a.bbs_no desc) rnum
+ 		from(
+			select 	
+			   bbs_no
+	  , substr(BBS_REG_DT, 0, 10) BBS_REG_DT
+	  , bbs_inq_cnt
+	  , bbs_ttl
+	  , bbs_cn
+	  , bbs_writer
+	  , bbs_ctgry_cmmncd
+	  , bbs_delyn
+	  , ent_no
+	FROM
+	    board
+	where
+	    ent_no = #{entNo} and bbs_ctgry_cmmncd = 'BBS202' and bbs_delyn = 'N' 	
+ 		)a
+ 	)b		
+ 	<![CDATA[
+		where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+	]]>
+ 	</select>
+ 
+ </mapper>

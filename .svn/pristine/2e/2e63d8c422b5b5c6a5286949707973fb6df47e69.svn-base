@@ -1,0 +1,36 @@
+package kr.co.itcruit.mypage.enterprise.service;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.vo.ApplyProcessListVO;
+import kr.co.itcruit.vo.CustomPaginationInfoVO;
+import kr.co.itcruit.vo.RecruitVO;
+
+public interface IMyEnterpriseService {
+
+	public ServiceResult recruitRegisterInsert(RecruitVO recruitVO, HttpServletRequest req);
+
+	public ServiceResult recruitRegisterEdit(RecruitVO recruitVO, HttpServletRequest req);
+	
+	public ServiceResult recruitRegisterRemove(RecruitVO recruitVO, HttpServletRequest req);
+
+	public List<RecruitVO> recruitSelectList();
+
+	public List<RecruitVO> recruitSelectInfo(String recruitNo, String pstnCmmncdNm);
+
+	public List<RecruitVO> recruitSelectListByEntNo(int entNo);
+
+	public int selectRecruitCount(CustomPaginationInfoVO<RecruitVO> customPagingVO);
+
+	public List<RecruitVO> selectRecruitList(CustomPaginationInfoVO<RecruitVO> customPagingVO);
+
+	public List<ApplyProcessListVO> selectProcess(String recruitNo, String pstnCmmncdNm);
+
+
+
+
+
+}

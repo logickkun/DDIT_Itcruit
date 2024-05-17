@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IAccountMapper">
+ 
+	<insert id="signup" parameterType="accountVO" >
+		insert into account(
+			account_id, account_nm, account_nick, account_mail,
+			account_tell, account_zip, account_addr1, account_addr2,
+			account_pswd, enabled, auth_cmmncd, join_ymd,
+			account_stts_cmmncd, gender, birth_ymd
+		) values (
+			#{accountId}, #{accountNm}, #{accountNick}, #{accountMail},
+			#{accountTell}, #{accountZip}, #{accountAddr1}, #{accountAddr2},
+			#{accountPswd}, '1', 'AUTH102', sysdate,
+			'STTS0101', #{gender}, #{birthYmd}
+		)
+	</insert>
+ 
+ 
+ 	<select id="searchId" parameterType="accountVO" resultType="accountVO">
+ 		select 
+ 			account_id
+ 		from account
+ 		where account_nm = #{accountNm}
+ 		and account_mail = #{accountMail}
+ 	</select>
+ 	
+ 	<select id="searchPw" parameterType="accountVO" resultType="string">
+ 		select 
+ 			account_pswd
+ 		from account
+ 		where account_id = #{accountId}
+ 		and account_nm = #{accountNm}
+ 		and account_mail = #{accountMail}
+ 	</select>
+ 	
+ 	<update id="updateTemppw" parameterType="accountVO">
+ 		update account 
+ 		set
+ 			account_pswd = #{accountPswd}
+ 		where account_id = #{accountId}
+ 		and account_nm = #{accountNm}
+ 		and account_mail = #{accountMail}
+ 	</update>
+ 	
+ 
+ 	<insert id="kakaoSignup" parameterType="accountVO" >
+		insert into account(
+			account_id, account_nm, account_nick, account_mail,
+			account_tell, account_zip, account_addr1, account_addr2,
+			account_pswd, enabled, auth_cmmncd, join_ymd,
+			account_stts_cmmncd, gender, birth_ymd, social_name
+		) values (
+			#{accountId}, #{accountNm}, '0', #{accountMail},
+			#{accountTell}, '0', '0', '0',
+			'0', '1', 'AUTH102', sysdate,
+			'STTS0101', #{gender}, #{birthYmd}, 'kakao'
+		)
+	</insert>
+	
+	<select id="idCheck" parameterType="accountVO" resultType="string">
+		select 
+ 			account_id
+ 		from account
+ 		where account_id = #{accountId}
+	</select>
+	
+	<select id="memberSignin" parameterType="accountVO" resultType="accountVO">
+		select
+			account_id, account_nm, account_nick, account_mail,
+			account_tell, account_zip, account_addr1, account_addr2,
+			account_pswd, enabled, auth_cmmncd, join_ymd,
+			account_stts_cmmncd, gender, birth_ymd
+		from account
+		where account_id = #{accountId}
+		and account_pswd = #{accountPswd}
+	</select>
+	
+	<update id="kakaoInfoUpdate" parameterType="accountVO">
+		update account 
+ 		set
+ 			account_id = #{accountId},
+ 			account_zip = #{accountZip},
+ 			account_nick = #{accountNick},
+ 			account_addr1 = #{accountAddr1},
+ 			account_addr2 = #{accountAddr2},
+ 			account_pswd = #{accountPswd}
+ 		where 
+ 			account_id = #{kakaoId}
+	</update>
+	
+	<insert id="insert" parameterType="accountVO">
+		insert into account(
+			account_id, account_nm, account_nick, account_mail,
+			account_tell, account_zip, account_addr1, account_addr2,
+			account_pswd, enabled, auth_cmmncd, join_ymd,
+			account_stts_cmmncd
+		) values (
+			#{accountId}, #{accountNm}, #{accountNick}, '1',
+			#{accountMail}, #{accountZip}, #{accountAddr1}, #{accountAddr2},
+			#{accountPswd}, '1', 'AUTH103', sysdate,
+			'STTS0101'
+		)
+	</insert>
+ 
+ 
+ </mapper>

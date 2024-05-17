@@ -1,0 +1,15 @@
+package kr.co.itcruit.vo;
+
+import lombok.Data;
+
+@Data
+/**
+ * 이력서-기술스택(내사용언어)
+ * @author 김나혜
+ *
+ */
+public class AvailLangListVO {
+	private int availLangSeq;		//내사용언어 시퀀스
+	private String availLangCmmncd;	//사용언어 코드
+	private int rsmNo;				//이력서번호(fk)
+}

@@ -1,0 +1,124 @@
+package kr.co.itcruit.mypage.enterprise.controller;
+
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("myPage/enterprise")
+public class EnterpriseController {
+
+	@RequestMapping(value = "/entInfo", method = RequestMethod.GET)
+	public String entInfo() {
+		
+		
+		return "entmypage/entInfo";
+		
+		
+	}
+	
+	@RequestMapping(value = "/recruitRegisterForm", method = RequestMethod.GET)
+	public String recruitRegisterForm(Model model) {
+		
+		
+		model.addAttribute("tOrf1", "true");
+		model.addAttribute("show1", "show");
+		model.addAttribute("active1", "active");
+		
+		return "entmypage/recruitRegister";
+		
+	}
+	
+	@RequestMapping(value = "/recruitProcessQuestion", method = RequestMethod.GET)
+	public String recruitProcessQuestion(Model model) {
+		
+		
+		
+		model.addAttribute("tOrf1", "true");
+		model.addAttribute("show1", "show");
+		model.addAttribute("active2", "active");
+		
+		return "entmypage/recruitProcessQuestion";
+		
+	}
+	
+	@RequestMapping(value = "/recruitContectList", method = RequestMethod.GET)
+	public String recruitList(Model model) {
+		
+		
+		
+		model.addAttribute("tOrf2", "true");	
+		model.addAttribute("show2", "show");
+		model.addAttribute("active3", "active");
+		
+		return "entmypage/recruitContectList";
+		
+	}
+	
+	@RequestMapping(value = "/recruitStatistics", method = RequestMethod.GET)
+	public String recruitStatistics(Model model) {
+		
+		
+		
+		model.addAttribute("tOrf2", "true");	
+		model.addAttribute("show2", "show");
+		model.addAttribute("active4", "active");
+		
+		return "entmypage/recruitStatistics";
+		
+	}
+	
+	@RequestMapping(value = "/talentFind", method = RequestMethod.GET)
+	public String talentFind(Model model) {
+		
+		
+		
+		model.addAttribute("active5", "active");
+		
+		return "entmypage/talentFind";
+		
+	}
+	
+	@RequestMapping(value = "/entRating", method = RequestMethod.GET)
+	public String entRating(Model model) {
+		
+		
+		model.addAttribute("active6", "active");
+		
+		return "entmypage/entRating";
+		
+	}
+	
+	@RequestMapping(value = "/entAccountApplication", method = RequestMethod.GET)
+	public String entAccountApplication(Model model) {
+		
+		
+		model.addAttribute("active7", "active");
+		
+		return "entmypage/entAccountApplication";
+		
+	}
+	
+	@RequestMapping(value = "/entInquiryDetails", method = RequestMethod.GET)
+	public String entInquiryDetails(Model model) {
+		
+		
+		model.addAttribute("active8", "active");
+		
+		return "entmypage/entInquiryDetails";
+		
+	}
+	
+	@RequestMapping(value = "/entBoard", method = RequestMethod.GET)
+	public String entBoard(Model model) {
+		
+		
+		model.addAttribute("active9", "active");
+		
+		return "entmypage/entBoard";
+		
+	}
+	
+}

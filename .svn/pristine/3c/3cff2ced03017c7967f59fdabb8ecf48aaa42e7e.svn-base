@@ -1,0 +1,19 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+
+import kr.co.itcruit.vo.PaginationInfoVO;
+import kr.co.itcruit.vo.RecruitVO;
+
+public interface IRecruitMapper {
+
+
+	public List<RecruitVO> getRecruitList();
+
+	public RecruitVO applyCheck(RecruitVO recruitVO);
+
+	public List<RecruitVO> selectInitRecruitList(PaginationInfoVO<RecruitVO> pagingVO);
+
+	public RecruitVO recruitDetail(String recruitNo);
+	
+}

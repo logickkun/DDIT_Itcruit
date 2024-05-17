@@ -1,0 +1,12 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+
+import kr.co.itcruit.vo.CodingtestVO;
+
+public interface ICodingtestMapper {
+
+	public List<CodingtestVO> selectList();
+
+	
+}

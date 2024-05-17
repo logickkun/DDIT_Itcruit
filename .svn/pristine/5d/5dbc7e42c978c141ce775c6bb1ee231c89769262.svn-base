@@ -1,0 +1,11 @@
+package kr.co.itcruit.atch.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.atch.service.IAtchFileService;
+
+@Service
+public class AtchFileServiceImpl implements IAtchFileService {
+
+	//파일 첨부는 여기 서비스에서 진행(컨트롤러에서 진행x)
+}

@@ -1,0 +1,19 @@
+package kr.co.itcruit.recruit.controller;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+
+import kr.co.itcruit.recruit.service.IRecruitService;
+
+@Controller
+public class RecruitController {
+
+	@Inject
+	private IRecruitService recruitService;
+	
+	
+	//여기 컨트롤러는
+	//채용 리스트를 입력, 수정, 삭제하는 곳
+	
+}

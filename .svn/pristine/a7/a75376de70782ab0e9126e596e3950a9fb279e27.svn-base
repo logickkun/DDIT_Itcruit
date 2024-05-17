@@ -1,0 +1,28 @@
+package kr.co.itcruit.mapper;
+
+import kr.co.itcruit.vo.AccountVO;
+
+public interface IAccountMapper {
+
+	public int signup(AccountVO accountVO);
+
+	public AccountVO searchId(AccountVO accountVO);
+
+	public String searchPw(AccountVO accountVO);
+
+	public void updateTemppw(AccountVO accountVO);
+
+	public int kakaoSignup(AccountVO accountVO);
+
+	public String idCheck(AccountVO accountVO);
+
+	public AccountVO memberSignin(AccountVO accountVO);
+
+	public int kakaoInfoUpdate(AccountVO accountVO);
+
+	public int insert(AccountVO accountVO);
+
+
+
+
+}

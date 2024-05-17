@@ -1,0 +1,27 @@
+package kr.co.itcruit.enterprise.info.service;
+
+import java.util.List;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.vo.BoardVO;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.ListPaginationVO;
+import kr.co.itcruit.vo.MiniPaginationVO;
+
+public interface IEnterpriseInfoService {
+
+	public int selectEntCount(ListPaginationVO<EnterpriseVO> pagingVO);
+
+	public List<EnterpriseVO> selectEntList(ListPaginationVO<EnterpriseVO> pagingVO);
+
+	public ServiceResult likeEnt(EnterpriseVO entVO);
+
+	public ServiceResult disLikeEnt(EnterpriseVO entVO);
+
+	public EnterpriseVO selectEnt(int entNo);
+
+	public int entBoardCount(MiniPaginationVO<BoardVO> pagingVO);
+
+	public List<BoardVO> entBoardList(MiniPaginationVO<BoardVO> pagingVO);
+
+}

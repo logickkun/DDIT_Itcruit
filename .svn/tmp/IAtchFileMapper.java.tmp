@@ -1,0 +1,21 @@
+package kr.co.itcruit.mapper;
+
+import org.apache.ibatis.annotations.Param;
+
+import kr.co.itcruit.vo.AtchFileVO;
+
+public interface IAtchFileMapper {
+
+	public void atchFileInsert(AtchFileVO afv);
+
+	public AtchFileVO getFileInfo(@Param("fileSrcNo") String fileSrcNo, @Param("orgnCmmncd") String orgnCmmncd);
+
+<<<<<<< .mine
+	public void atchFileDelete(AtchFileVO afv);
+
+||||||| .r408601
+=======
+	public AtchFileVO selectFile(int entNo);
+
+>>>>>>> .r408898
+}

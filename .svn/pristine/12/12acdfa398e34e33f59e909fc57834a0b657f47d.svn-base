@@ -1,0 +1,44 @@
+package kr.co.itcruit.vo;
+
+import lombok.Data;
+
+@Data
+public class CodingtestVO {
+	
+	//테스트인지 제출인지 판단위한 flag
+	private boolean flag;
+	//코딩테스트 문제 관련
+	private int qstnNo;
+	private int pastQstnCtgryNo;
+	private String qstnTtl;
+	private String qstnCn;
+	private int qstnGrd;
+	private int qstnScr;
+	private String qstnExmpl;
+	private String qstnRlsYn;
+	private String restriction;
+	private String qstnMcode;
+	
+	private String input;
+	private String output;
+	
+	//언어별로 가져올 입력폼
+	private String c;
+	private String cpp;
+	//C#
+	private String cs;
+	private String java;
+	private String javascript;
+	private String python;
+	
+	private String lang;
+	private String code;
+	
+	
+	//테스트케이스 input, output
+//	private String qstnInput;
+//	private String qstnOutput;
+	
+	private String loginUser;
+	
+}

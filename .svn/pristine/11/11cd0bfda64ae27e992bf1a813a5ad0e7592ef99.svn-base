@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IRecruitMapper">
+ 
+ 	<!-- 회원 채용프로세스 진행 확인  매퍼 시작  -->
+ 	
+ 	<resultMap type="memberProcessCheckVO" id="checkProcessMap">
+ 		<result property="entNm" column="ent_nm"/>
+		<result property="accountId" column="account_id" />
+		<result property="applyNo" column="apply_no" />
+		<result property="applyDt" column="apply_dt" />
+		<result property="recruitNo" column="recruit_No" />
+		<result property="pstnCmmncdNm" column="pstn_cmmncd_nm" />
+		<result property="recruitStrtDt" column="recruit_strt_dt" />
+		<result property="recruitEndDt" column="recruit_end_dt" />
+		<result property="entNo" column="ent_no" />
+		<result property="recruitTtl" column="recruit_ttl" />
+		
+		<collection property="memberProcessStatList" resultMap="processMap"/>
+ 	</resultMap>
+ 	
+ 	<resultMap type="memberProcessStatVO" id="processMap">
+ 		<result property="eachOrder" column="each_order"/>
+ 		<result property="passYn" column="pass_yn"/>
+ 		<result property="processSeq" column="process_seq" />
+ 		<result property="entCodingtestNo" column="ent_codingtest_no" />
+ 		<result property="endDt" column="end_dt" />
+ 		<result property="strtDt" column="strt_dt" />
+ 		<result property="clsNm" column="cls_nm"/>
+ 	</resultMap>
+ 	<!-- 회원 채용프로세스 진행 확인  매퍼 끝  -->
+ 
+	<!-- 채용 달력출력용 -->
+ 	<resultMap type="calendarVO" id="recruitListMap">
+<!--  		<id property="recruitNo" column="recruit_no"/> -->
+<!--  		<id property="pstnCmmncdNm" column="PSTN_CMMNCD_NM"/> -->
+ 		<result property="title" column="ent_nm"/>
+		<result property="start" column="recruit_strt_dt" />
+		<result property="start" column="recruit_end_dt" />
+		<collection property="extendedProps" resultMap="extendMap"/>
+ 	</resultMap>
+ 	
+ 	<resultMap type="extendVO" id="extendMap">
+ 		<result property="recruitNo" column="recruit_no"/>
+ 		<result property="entNo" column="ent_no"/>
+<!--  		<collection property="esntlLangCmmncdNms" column="esntl_Lang_Cmmncd_Nm" /> -->
+<!--  		<collection property="preferLangCmmncdNms" column="prefer_Lang_Cmmncd_Nm" /> -->
+ 	</resultMap>
+ 	
+ 	<resultMap type="alarmVO" id="alarmMap">
+ 		<id property="alarmNo" column="ALARM_NO"/>
+	    <result property="alarmRcvr" column="ALARM_RCVR"/>
+	    <result property="alarmSndr" column="ALARM_SNDR"/>
+	    <result property="readYn" column="READ_YN"/>
+	    <result property="alarmCn" column="ALARM_CN"/>
+	    <result property="alarmUrl" column="ALARM_URL"/>
+	    <result property="alarmTime" column="ALARM_TIME"/>
+	    <result property="alarmCtgry" column="ALARM_CTGRY"/>
+	    <result property="alarmTtl" column="ALARM_TTL"/>
+	    <result property="entNo" column="ENT_NO"/>
+	    <result property="rprsTelno" column="RPRS_TELNO"/>
+	    <result property="accountNm" column="ACCOUNT_NM"/>
+ 	</resultMap>
+ 	
+<!--  // entNm pstnCmmncdNm lang cmmncdGrpCd cmmncdNm1 -->
+ 	<sql id="calSearch">
+		<if test="entNm != null and entNm != '' ">
+			and (ent_nm like '%' || #{entNm} || '%')
+		</if>
+		<if test="pstnCmmncdNm != null and pstnCmmncdNm !='' ">
+			and (pstn_cmmncd_nm = #{pstnCmmncdNm})
+		</if>
+		<if test="lang != null and lang !='' ">
+			and (prefer_lang_cmmncd_nm = #{lang} or esntl_lang_cmmncd_nm = #{lang} )
+		</if>
+		<if test="cmmncdGrpCd != null and cmmncdGrpCd !='' ">
+			and (cmmncd_Grp_Cd = #{cmmncdGrpCd} )
+		</if>
+		<if test="cmmncdNm1 != null and cmmncdNm1 !='' ">
+			and (cmmncd_nm1 = #{cmmncdNm1} )
+		</if>
+	</sql>
+	
+	<sql id="wordSearch">
+	    <choose>
+	        <when test="words == null or words.size() == 0">
+	            AND 1 = 0
+	        </when>
+	        <when test="words.size() == 1">
+	            AND r.pstn_cmmncd_nm = #{words[0]}
+	        </when>
+	        <otherwise>
+	            AND r.pstn_cmmncd_nm IN
+	            <foreach collection="words" item="word" open="(" close=")" separator=",">
+	                #{word}
+	            </foreach>
+	        </otherwise>
+	    </choose>
+	</sql>
+	
+	
+ 
+ 	<select id="recruitDetail" parameterType="string" resultType="recruitVO">
+ 		select 
+ 			r.recruit_no, r.ent_no, r.recruit_ttl, 
+ 			r.recruit_strt_dt, r.recruit_end_dt, r.recruit_yn,
+ 			r.recruit_career_code_nm, r.recruit_career_dt, r.ent_url,
+ 			r.recruit_hit, r.process_yn, r.process_amt,
+ 			r.recruit_pay, r.recruit_enroll_ymd, r.cmmncd_grp_cd,
+ 			r.cmmncd_nm1, r.recruit_cnt, r.pstn_cmmncd_nm,
+ 			r.ent_postcode, r.ent_apply, e.ent_nm
+ 		from recruit r left join enterprise e on r.ent_no = e.ent_no
+ 		where r.recruit_no = #{recruitNo} and r.pstn_cmmncd_nm = #{pstnCmmncdNm}
+ 	</select>
+ 	
+ 	<select id="applyCheck" parameterType="recruitVO" resultType="recruitVO">
+ 		select 
+ 			process_yn, ent_url
+ 		from recruit
+ 		where recruit_no = #{recruitNo} and pstn_cmmncd_nm = #{pstnCmmncdNm}
+ 	</select>
+ 	
+ 	<select id="selectInitRecruitList" parameterType="pagingVO" resultType="recruitVO">
+ 		<![CDATA[
+ 		SELECT *
+			FROM (
+			    SELECT
+			        a.*,
+			        ROW_NUMBER() OVER (
+			            ORDER BY CASE
+			                         WHEN TO_DATE(SUBSTR(a.recruit_end_dt, 1, 10), 'YYYY-MM-DD') < TRUNC(SYSDATE) THEN 1 
+			                         WHEN TO_DATE(SUBSTR(a.recruit_end_dt, 1, 10), 'YYYY-MM-DD') = TRUNC(SYSDATE) THEN 0
+			                         ELSE 0 
+			                     END ASC,  
+			                     a.recruit_enroll_ymd DESC
+			        ) AS rnum 
+			    FROM (
+			        SELECT
+			            r.recruit_no, r.ent_no, r.recruit_ttl, r.recruit_strt_dt, r.recruit_end_dt,
+			            r.recruit_yn, r.recruit_career_code_nm, r.recruit_career_dt, r.ent_url,
+			            r.recruit_hit, r.process_yn, r.process_amt, r.recruit_pay, r.recruit_enroll_ymd,
+			            r.cmmncd_grp_cd, r.cmmncd_nm1, r.recruit_cnt, r.pstn_cmmncd_nm, e.ent_nm
+			        FROM
+			            recruit r
+			        LEFT JOIN
+			            enterprise e ON r.ent_no = e.ent_no  
+			        WHERE
+			            r.recruit_enroll_ymd IS NOT NULL
+			    ) a
+			) b
+			WHERE
+			    b.rnum >= #{startRow} AND b.rnum <= #{endRow}
+			]]>
+			
+<!--  		<![CDATA[ -->
+<!--  		SELECT * -->
+<!-- 			FROM ( -->
+<!-- 			    SELECT -->
+<!-- 			        a.*, -->
+<!-- 			        ROW_NUMBER() OVER (ORDER BY CASE WHEN TO_DATE(a.recruit_end_dt, 'YYYY-MM-DD"T"HH24:MI') < SYSDATE THEN 2 ELSE 1 END ASC, a.recruit_enroll_ymd DESC) AS rnum -->
+<!-- 			    FROM ( -->
+<!-- 			        SELECT -->
+<!-- 			            r.recruit_no, r.ent_no, r.recruit_ttl, r.recruit_enroll_ymd, r.recruit_strt_dt, r.recruit_end_dt, -->
+<!-- 			            r.recruit_yn, r.recruit_career_code_nm, r.recruit_career_dt, r.ent_url, -->
+<!-- 			            r.recruit_hit, r.process_yn, r.process_amt, r.recruit_pay,  -->
+<!-- 			            r.cmmncd_grp_cd, r.cmmncd_nm1, r.recruit_cnt, r.pstn_cmmncd_nm, e.ent_nm -->
+<!-- 			        FROM -->
+<!-- 			            recruit r -->
+<!-- 			        LEFT JOIN -->
+<!-- 			            enterprise e ON r.ent_no = e.ent_no  -->
+<!-- 			        WHERE -->
+<!-- 			            r.recruit_enroll_ymd IS NOT NULL -->
+<!-- 			    ) a -->
+<!-- 			) b -->
+<!-- 			WHERE -->
+<!-- 			    b.rnum >= #{startRow} AND b.rnum <= #{endRow} -->
+<!--  		]]> -->
+ 		
+ 		
+ 	</select>
+ 	
+ 	
+ 	<select id="selectrecommendRecruitList" parameterType="pagingVO" resultType="recruitVO">
+ 		
+ 		SELECT *
+		FROM (
+		    SELECT
+		        a.*,
+		        <![CDATA[
+		        ROW_NUMBER() OVER (
+		            ORDER BY 
+		                CASE
+		                    WHEN TO_DATE(SUBSTR(a.recruit_end_dt, 1, 10), 'YYYY-MM-DD') < TRUNC(SYSDATE) THEN 1 
+		                    WHEN TO_DATE(SUBSTR(a.recruit_end_dt, 1, 10), 'YYYY-MM-DD') = TRUNC(SYSDATE) THEN 0
+		                    ELSE 0 
+		                END ASC,  
+		                a.recruit_enroll_ymd DESC
+		        ) AS rnum 
+		        ]]>
+		    FROM (
+		        SELECT
+		            r.recruit_no, r.ent_no, r.recruit_ttl, r.recruit_strt_dt, r.recruit_end_dt,
+		            r.recruit_yn, r.recruit_career_code_nm, r.recruit_career_dt, r.ent_url,
+		            r.recruit_hit, r.process_yn, r.process_amt, r.recruit_pay, r.recruit_enroll_ymd,
+		            r.cmmncd_grp_cd, r.cmmncd_nm1, r.recruit_cnt, r.pstn_cmmncd_nm, e.ent_nm
+		        FROM
+		            recruit r
+		        LEFT JOIN
+		            enterprise e ON r.ent_no = e.ent_no  
+		        WHERE
+		            r.recruit_enroll_ymd IS NOT NULL
+	            AND (TO_DATE(SUBSTR(r.recruit_end_dt, 1, 10), 'YYYY-MM-DD') > TRUNC(SYSDATE)
+	                 OR TO_DATE(SUBSTR(r.recruit_end_dt, 1, 10), 'YYYY-MM-DD') = TRUNC(SYSDATE))
+	            <include refid="wordSearch" />
+		    ) a
+		) b
+		WHERE
+		<![CDATA[
+		    b.rnum >= #{startRow} AND b.rnum <= #{endRow}
+    	]]>
+ 	</select>
+ 	
+ 	<select id="hireCmmnd" parameterType="string" resultType="string">
+ 		select HIRE_CMMND_NM
+			from hire_stts
+		where recruit_no = #{recruitNo}
+ 	</select>
+ 	
+ 	<select id="selectLikeEnt" parameterType="enterpriseVO" resultType="enterpriseVO">
+ 		SELECT
+		    ent_no,
+		    account_id
+		FROM
+		    ent_like
+		where ent_no = #{entNo}
+		and account_id = #{loginId}
+ 	</select>
+ 	
+ 	
+ 	<insert id="loveRecruit" parameterType="recruitVO">
+ 		INSERT INTO interestnotices (
+		    recruit_no,
+		    account_id,
+		    pstn_cmmncd_nm
+		) VALUES (
+		   #{recruitNo},
+		   #{accountId},
+		   #{pstnCmmncdNm}
+		)
+ 	</insert>
+ 	
+ 	<delete id="hateRecruit" parameterType="recruitVO">
+ 		DELETE FROM interestnotices
+		WHERE
+        	recruit_no = #{recruitNo}
+		    and account_id = #{accountId}
+		    and pstn_cmmncd_nm = #{pstnCmmncdNm}
+ 	</delete>
+ 	
+ 	<insert id="insertApplicant" parameterType="recruitApplicantVO">
+ 		insert into RECRUIT_APPLICANT (
+ 			apply_no, apply_dt, recruit_no, account_id, rsm_no, pstn_cmmncd_nm
+ 		) values (
+ 			#{applyNo}, sysdate, #{recruitNo}, #{accountId}, #{rsmNo}, #{pstnCmmncdNm}
+ 		)
+ 	</insert>
+ 	
+ 	<update id="incrementEntApply" parameterType="recruitVO">
+ 		update recruit
+ 		set
+ 			ent_apply = ent_apply + 1
+ 		where
+ 			recruit_no = #{recruitNo} 
+ 			and pstn_cmmncd_nm = #{pstnCmmncdNm}
+ 	</update>
+ 	
+ 	<update id="incrementRecruitHit" parameterType="string">
+ 		update recruit
+ 		set
+ 			recruit_hit = recruit_hit + 1
+ 		where
+ 			recruit_no = #{recruitNo} 
+ 			and pstn_cmmncd_nm = #{pstnCmmncdNm}
+ 	</update>
+ 	
+ 	<select id="applicantCheck" parameterType="recruitVO" resultType="recruitApplicantVO">
+ 		select
+ 			apply_no, apply_dt, recruit_no, account_id
+ 		from recruit_applicant
+ 		where recruit_no = #{recruitNo} and account_id = #{accountId}
+ 	</select>
+ 	
+ 	
+ 	<select id="selectApplyNo" parameterType="recruitVO" resultType="recruitApplicantVO">
+ 		select
+ 			apply_no, apply_dt, recruit_no, account_id
+ 		from recruit_applicant
+ 		where recruit_no = #{recruitNo}
+ 	</select>
+ 	
+ 	
+ 	<select id="selectLikeRecruit" parameterType="recruitVO" resultType="recruitVO">
+ 		SELECT
+		    recruit_no,
+		    account_id,
+		    pstn_cmmncd_nm
+		FROM
+		    interestnotices
+		WHERE
+        	recruit_no = #{recruitNo}
+		    and account_id = #{accountId}
+		    and pstn_cmmncd_nm = #{pstnCmmncdNm} 
+ 	</select>
+ 	
+ 	<select id="checkApplyNo" parameterType="recruitVO" resultType="recruitApplicantVO">
+ 		SELECT
+	        apply_no,
+	        apply_dt,
+	        recruit_no,
+	        account_id
+	    FROM
+	        recruit_applicant
+	    WHERE
+	        recruit_no = #{recruitNo}
+	        and account_id = #{accountId}
+ 	</select>
+ 	
+ 	
+ 	<select id="selectListApplicant" parameterType="string" resultType="resumeVO">
+ 		SELECT
+		    ra.apply_no,
+		    ra.recruit_no,
+		    ra.account_id,
+		    ra.rsm_no,
+		    rs.rsm_gender,
+		    rs.edu_nm, 
+		    rs.rsm_mjr_nm,
+		    rs.edu_acdmcr
+		FROM
+		    recruit_applicant ra
+		INNER JOIN
+		    resume rs ON ra.rsm_no = rs.rsm_no
+		WHERE
+		    ra.recruit_no = #{recruitNo}
+		    AND ra.apply_no LIKE '%' || #{pstnCmmncdNm} || '%'
+ 	</select>
+ 	
+ 	<select id="checkRecruit" parameterType="string" resultType="interestNoticesVO">
+ 		SELECT
+		    recruit_no,
+		    account_id,
+		    pstn_cmmncd_nm
+		FROM
+		    interestnotices
+		WHERE account_id = #{accountId}
+ 	</select>
+ 	
+ 	
+ 	<select id="getRecruitEndList" parameterType="recruitVO" resultMap="recruitListMap">
+		select distinct recruit_no,
+		    recruit_end_dt,
+		    ent_nm,
+		    ent_no
+		from (
+		    SELECT 
+		    r.recruit_no,
+		    r.pstn_cmmncd_nm,
+		    r.CMMNCD_GRP_CD,
+		    r.cmmncd_nm1,
+		    r.recruit_end_dt,
+		    r.ent_nm,
+		    r.ent_no,
+		    p.prefer_lang_no,
+		    p.prefer_lang_cmmncd_nm,
+		    e.esntl_lang_no,
+		    e.esntl_lang_cmmncd_nm
+		FROM 
+		    recruit r
+		LEFT OUTER JOIN 
+		    prefer_lang p ON r.recruit_no = p.recruit_no AND r.pstn_cmmncd_nm = p.pstn_cmmncd_nm
+		LEFT OUTER JOIN
+		    esntl_lang e ON r.recruit_no = e.recruit_no AND r.pstn_cmmncd_nm = e.pstn_cmmncd_nm
+		) l
+ 		where recruit_end_dt like '%' || #{time} || '%'
+ 		<include refid="calSearch" />
+ 	</select>
+ 	
+ 	<select id="getRecruitStartList" parameterType="recruitVO" resultMap="recruitListMap">
+		select distinct recruit_no,
+		    recruit_strt_dt,
+		    ent_nm,
+		    ent_no
+		from (
+		    SELECT 
+		    r.recruit_no,
+		    r.CMMNCD_GRP_CD,
+		    r.pstn_cmmncd_nm,
+		    r.cmmncd_nm1,
+		    r.recruit_strt_dt,
+		    r.ent_nm,
+		    r.ent_no,
+		    p.prefer_lang_no,
+		    p.prefer_lang_cmmncd_nm,
+		    e.esntl_lang_no,
+		    e.esntl_lang_cmmncd_nm
+		FROM 
+		    recruit r
+		LEFT OUTER JOIN 
+		    prefer_lang p ON r.recruit_no = p.recruit_no AND r.pstn_cmmncd_nm = p.pstn_cmmncd_nm
+		LEFT OUTER JOIN
+		    esntl_lang e ON r.recruit_no = e.recruit_no AND r.pstn_cmmncd_nm = e.pstn_cmmncd_nm
+		)
+		where recruit_strt_dt like '%' || #{time} || '%'
+		<include refid="calSearch" />		
+ 	</select>
+ 	
+ 	
+  	<select id="selectListByRecruitNo" parameterType="string" resultType="recruitVO">
+		SELECT
+		    recruit_no,
+		    recruit_ttl,
+		    recruit_strt_dt,
+		    recruit_end_dt,
+		    recruit_yn,
+		    recruit_career_code_nm,
+		    recruit_career_dt,
+		    ent_url,
+		    recruit_hit,
+		    process_yn,
+		    process_amt,
+		    recruit_pay,
+		    recruit_enroll_ymd,
+		    cmmncd_grp_cd,
+		    cmmncd_nm1,
+		    recruit_cnt,
+		    pstn_cmmncd_nm,
+		    ent_postcode,
+		    ent_nm,
+		    ent_no
+		FROM
+		    recruit
+		where recruit_no = #{recruit_no}
+ 	</select>
+ 	
+ 	
+ 	
+ 	<select id="getPstnList" resultType="string">
+ 		select distinct cmmncd_grp_nm from commoncode
+		where cmmncd_grp_cd like 'PSTN%'
+ 	</select>
+ 	
+ 	<select id="getLangList" resultType="string">
+ 		select distinct cmmncd_nm1 from commoncode
+		where cmmncd_grp_cd between 'PSTN1' and 'PSTN14'
+ 	</select>
+ 	
+ 	<select id="getGrpList" resultType="string">
+ 		select distinct cmmncd_grp_nm from commoncode
+		where cmmncd_grp_cd like 'LCL%'
+ 	</select>
+ 	
+ 	
+ 	
+ 	<select id="selectRecruit" parameterType="string" resultType="recruitVO">
+ 		select 
+ 			r.recruit_no, r.ent_no, r.recruit_ttl, 
+ 			r.recruit_strt_dt, r.recruit_end_dt, r.recruit_yn,
+ 			r.recruit_career_code_nm, r.recruit_career_dt, r.ent_url,
+ 			r.recruit_hit, r.process_yn, r.process_amt,
+ 			r.recruit_pay, r.recruit_enroll_ymd, r.cmmncd_grp_cd,
+ 			r.cmmncd_nm1, r.recruit_cnt, r.pstn_cmmncd_nm,
+ 			e.ent_nm
+ 		from recruit r left join enterprise e on r.ent_no = e.ent_no
+ 		where r.recruit_no = #{recruitNo} and r.pstn_cmmncd_nm = #{pstnCmmncdNm}
+ 	</select>
+ 	
+ 	
+ 	<select id="getSpecLocalList" parameterType="string" resultType="string">
+ 		select cmmncd_nm1 
+ 		from commoncode
+        where cmmncd_grp_nm = #{cmmncdGrpCd}
+        order by cmmncd_nm1
+ 	</select>
+ 	
+ 	
+ 	
+
+ 	<insert id="saveAnswer" parameterType="entIntroQSTNANSRVO">
+ 		INSERT INTO ent_intro_qstn_ansr (
+		    ent_intro_qstn_cn,
+		    ent_intro_qstn_dsnct_no,
+		    ent_intro_qstn_ansr,
+		  	account_id
+		) VALUES (
+		    #{entIntroQstnCn},
+		    #{entIntroQstnDsnctNo},
+		    #{entIntroQstnAnsr},
+		    #{accountId}
+		)
+ 	</insert>
+ 	
+ 	<select id="selectQstnAnsr" parameterType="entIntroQSTNANSRVO" resultType="entIntroQSTNANSRVO">
+ 		select
+ 			ent_intro_qstn_cn,
+		    ent_intro_qstn_dsnct_no,
+		    ent_intro_qstn_ansr,
+		  	account_id
+		from ent_intro_qstn_ansr
+		where ent_intro_qstn_cn = #{entIntroQstnCn}
+	    and ent_intro_qstn_dsnct_no = #{entIntroQstnDsnctNo}
+	    and account_id = #{accountId}
+ 	</select>
+ 	
+ 	<update id="updateAnswer" parameterType="entIntroQSTNANSRVO">
+ 		UPDATE ent_intro_qstn_ansr
+		SET
+		    ent_intro_qstn_ansr = #{entIntroQstnAnsr}
+		WHERE
+		ent_intro_qstn_cn = #{entIntroQstnCn}
+	    AND ent_intro_qstn_dsnct_no = #{entIntroQstnDsnctNo}
+	    AND account_id = #{accountId}
+ 	</update>
+ 	
+ 	<select id="setQstnAnsr" parameterType="entIntroQSTNANSRVO" resultType="entIntroQSTNANSRVO">
+ 		select
+ 			ent_intro_qstn_cn,
+		    ent_intro_qstn_dsnct_no,
+		    ent_intro_qstn_ansr,
+		    account_id
+		from ent_intro_qstn_ansr
+		where ent_intro_qstn_cn = #{entIntroQstnCn}
+	    and ent_intro_qstn_dsnct_no = #{entIntroQstnDsnctNo}
+	    and account_id = #{accountId}
+ 	</select>
+ 	
+ 	<select id="recruitHire" parameterType="string" resultType="hireSttsVO">
+ 		SELECT
+		    hire_stts_no,
+		    recruit_no,
+		    hire_cmmnd_nm,
+		    pstn_cmmncd_nm
+		FROM
+		    hire_stts
+		WHERE
+			recruit_no = #{recruitNo} and pstn_cmmncd_nm = #{pstnCmmncdNm}
+ 	</select>
+ 	
+ 	
+ 	
+ 	<select id="getRecruitCard" parameterType="recruitCardVO" resultType="recruitCardVO">
+		SELECT ent_no, ent_img, recruit_no, recruit_ttl
+		FROM (
+		    SELECT e.ent_no, ent_img, recruit_no, recruit_ttl,
+		           ROW_NUMBER() OVER(PARTITION BY r.recruit_no ORDER BY e.ent_no) as rn
+		    FROM enterprise e
+		    JOIN recruit r ON e.ent_no = r.ent_no
+		    WHERE e.ent_no = #{entNo} 
+		    and recruit_no = #{recruitNo}
+		) t
+		WHERE rn = 1;
+ 	</select>
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	<select id="getProcessListById" parameterType="string" resultMap="checkProcessMap">
+		SELECT
+		    ra.apply_no,
+		    ra.recruit_no,
+		    ra.pstn_cmmncd_nm,
+		    ra.account_id,
+		    TO_CHAR(ra.apply_dt, 'YYYY-MM-DD HH24:MI') apply_dt,
+		    pro.recruit_strt_dt,
+		    pro.recruit_end_dt,
+		    pro.recruit_ttl,
+		    pro.ent_nm,
+		    pro.ent_no,
+		    pro.cls_nm,
+		    epap.process_seq,
+		    pro.apply_process_order each_order,
+		    epap.pass_yn,
+		    (select ent_codingtest_no
+                from ent_codingtest_no ecn
+                where ecn.process_no = pro.process_seq
+                and ecn.process_no_order = pro.apply_process_order
+            ) as ent_codingtest_no,
+             TO_CHAR( (select strt_dt
+                from ent_codingtest_no ecn
+                where ecn.process_no = pro.process_seq
+                and ecn.process_no_order = pro.apply_process_order
+            ) ,  'YYYY-MM-DD HH24:MI') as strt_dt,          
+            TO_CHAR((select end_dt
+                from ent_codingtest_no ecn
+                where ecn.process_no = pro.process_seq
+                and ecn.process_no_order = pro.apply_process_order
+            ) ,  'YYYY-MM-DD HH24:MI') as end_dt
+		    
+		FROM 
+		    recruit_applicant ra
+		LEFT OUTER JOIN    
+		    (
+		        SELECT	        	
+		            r.recruit_no recruit_no,
+		            r.pstn_cmmncd_nm pstn_cmmncd_nm,
+		            r.recruit_ttl recruit_ttl,
+		            r.ent_nm ent_nm,
+		            r.ent_no ent_no,
+		            replace(r.recruit_strt_dt, 'T', ' ') as recruit_strt_dt,
+                    replace(r.recruit_end_dt, 'T', ' ') as recruit_end_dt,
+		            apl.cls_nm cls_nm,
+		            apl.process_seq,
+		            apl.apply_process_order apply_process_order
+		        FROM
+		            recruit r
+		        INNER JOIN
+		            apply_process_list apl ON r.recruit_no = apl.recruit_no 
+		            AND r.pstn_cmmncd_nm = apl.pstn_cmmncd_nm
+		    ) pro ON ra.recruit_no = pro.recruit_no AND ra.pstn_cmmncd_nm = pro.pstn_cmmncd_nm
+		LEFT OUTER JOIN
+		    each_process_apply_pass epap ON ra.apply_no = epap.apply_no AND pro.apply_process_order = epap.each_order
+		WHERE ra.account_id = #{accountId}
+		order by pro.apply_process_order
+ 			
+ 	</select>
+ 	
+ 	
+ 	
+ 	
+ 	<select id="getTalentList" parameterType="String" resultMap="alarmMap">
+ 	
+ 		select
+		    ala.ALARM_NO
+		    , ala.ALARM_SNDR
+		    , ala.READ_YN
+		    , ala.ALARM_CN
+		    , ala.ALARM_TIME
+		    , ala.ALARM_TTL
+		    , ent.ent_no
+		    , ent.RPRS_TELNO
+		from
+		    alarm ala
+		join
+		    enterprise ent
+		    
+		on (ala.alarm_sndr = ent.ent_nm)
+		where
+		    ala.alarm_rcvr = #{accountId}
+		and
+		    ala.ALARM_CTGRY = '인재제안'
+		order by
+		    ala.alarm_no
+ 	
+ 	</select>
+ 	
+ 	
+ </mapper>

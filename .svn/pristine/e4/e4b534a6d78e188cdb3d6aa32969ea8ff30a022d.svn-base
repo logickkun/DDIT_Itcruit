@@ -1,0 +1,59 @@
+package kr.co.itcruit.recruit.service.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.mapper.IRecruitMapper;
+import kr.co.itcruit.recruit.service.IRecruitService;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.PaginationInfoVO;
+import kr.co.itcruit.vo.RecruitVO;
+
+
+@Service
+public class RecruitServiceImpl implements IRecruitService {
+
+	@Inject
+	private IRecruitMapper recruitMapper;
+	
+	
+	@Override
+	public List<RecruitVO> selectInitRecruitList(PaginationInfoVO<RecruitVO> pagingVO) {
+		
+		return recruitMapper.selectInitRecruitList(pagingVO);
+	}
+
+
+	@Override
+	public RecruitVO recruitDetail(String recruitNo, String pstnCmmncdNm) {
+		System.out.println("recruitNorecruitNorecruitNo  " + recruitNo);
+		System.out.println("pstnCmmncdNmpstnCmmncdNmpstnCmmncdNm  " + pstnCmmncdNm);
+		return recruitMapper.recruitDetail(recruitNo, pstnCmmncdNm);
+		
+	}
+
+
+	@Override
+	public List<String> hireCmmnd(String recruitNo) {
+		
+		return recruitMapper.hireCmmnd(recruitNo);
+	}
+
+
+	@Override
+	public EnterpriseVO selectLikeEnt(EnterpriseVO enterpriseVO) {
+		
+		return recruitMapper.selectLikeEnt(enterpriseVO);
+	}
+
+
+	@Override
+	public RecruitVO selectLikeRecruit(RecruitVO recruitVO) {
+		return recruitMapper.selectLikeRecruit(recruitVO);
+	}
+
+
+}

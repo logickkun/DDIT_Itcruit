@@ -1,0 +1,15 @@
+package kr.co.itcruit.resume.service;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.ResumeVO;
+
+public interface IResumeService {
+
+	public AccountVO selectMember(String accountId);
+
+	public List<Map<String, Object>> langList(Map<String, Object> paramMap);
+
+}

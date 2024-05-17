@@ -1,0 +1,23 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import kr.co.itcruit.vo.RecruitVO;
+
+public interface IMyEnterpriseMapper {
+
+	public int recruitRegisterinsert(RecruitVO recruitVO);
+
+	public int hireSttsInsert(RecruitVO recruitVO);
+
+	public int esntlLangInsert(RecruitVO recruitVO);
+
+	public int preferLangInsert(RecruitVO recruitVO);
+
+	public List<RecruitVO> recruitSelectList();
+
+	public List<RecruitVO> recruitSelectInfo(@Param("recruitNo") String recruitNo,@Param("pstnCmmncdNm") String pstnCmmncdNm);
+
+}

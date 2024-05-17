@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IEntCodingtestMapper">
+ 
+ 
+ 	<resultMap type="entCodingtestVO" id="entCodingtestMap">
+ 		<result property="entCodingtestNo" column="ent_codingtest_no"/>
+		<result property="processNo" column="process_No" />
+		<result property="processNoOrder" column="process_No_Order" />
+		<result property="recruitNo" column="recruit_No" />
+		<result property="pstnCmmncdNm" column="pstn_Cmmncd_Nm" />
+		<result property="strtDt" column="strt_Dt" />
+		<result property="endDt" column="end_Dt" />
+		<result property="entNm" column="ent_nm" />
+		<result property="entNo" column="ent_no" />
+		<collection property="entCodingtestList" resultMap="codingtestMap"/>
+ 	</resultMap>
+ 
+ 	<resultMap type="codingtestVO" id="codingtestMap">
+ 		<result property="qstnNo" column="qstn_No"/>
+ 		<result property="qstnTtl" column="qstn_ttl"/>
+ 		<result property="qstnCn" column="qstn_cn" />
+ 		<result property="orderNo" column="order_No" />
+ 		<result property="restriction" column="restriction" />
+ 		<result property="c" column="c" />
+ 		<result property="cpp" column="cpp" />
+ 		<result property="cs" column="cs" />
+ 		<result property="java" column="java" />
+ 		<result property="python" column="python" />
+ 		<result property="javascript" column="javascript" />
+ 	</resultMap>
+ 	
+ 	
+ 	<select id="getEntCodingtestByNo" parameterType="int" resultMap="entCodingtestMap">
+ 		SELECT
+ 			ecn.ent_Nm,
+ 			ecn.ent_No,
+		    ecn.ent_codingtest_no,
+		    ecn.recruit_no,
+		    ecn.pstn_cmmncd_nm,
+		    ecn.process_no,
+		    ecn.process_no_order,
+		    ecn.strt_dt,
+		    ecn.end_dt,
+		    ecqd.qstn_no,
+		    ecqd.ent_codingtest_no_order as order_No,
+		    cq.qstn_ttl,
+		    cq.qstn_cn,
+		    cq.RESTRICTION,
+		    cq.C,
+			cq.CPP,
+			cq.CS,
+			cq.JAVA,
+			cq.JAVASCRIPT,
+			cq.PYTHON
+		FROM
+		    ent_codingtest_no ecn 
+		INNER JOIN
+		    ent_codingtest_qstn_dsnct ecqd ON
+		    ecqd.ent_codingtest_no = ecn.ent_codingtest_no
+		INNER JOIN
+		     codingtest_question cq ON
+		     cq.qstn_no = ecqd.qstn_no
+		where ecn.ent_codingtest_no = #{entCodingtestNo}
+ 	
+ 	</select>
+ 
+ 
+ 	<select id="checkNormalTester" resultType="string" parameterType="eachProcessApplyPassVO">
+ 		select apply_no from
+	    each_process_apply_pass
+	    where apply_no in (select apply_no from recruit_applicant where account_Id = #{accountId})
+	    and process_seq = #{processSeq}
+	    and each_order = #{eachOrder}
+	    and pass_yn != 'D'
+ 	</select>
+ 
+ 
+ 
+ 	<select id="checkSubmitEntCodingtest" resultType="int" parameterType="eachProcessApplyPassVO">
+ 		select count(*) 
+ 		from ent_codingtest_qstn_ansr
+ 		where ACCOUNT_ID = #{accountId}
+ 		and ENT_CODINGTEST_NO = #{entCodingtestNo}
+ 		and ENT_CODINGTEST_NO_ORDER = #{entCodingtestNoOrder}
+ 	</select>
+ 	
+ 	
+ 	
+ 	<insert id="insertEntCodingtest" parameterType="entCodingtestVO">
+ 		insert into ent_codingtest_qstn_ansr(
+ 			ACCOUNT_ID,
+			APPLY_NO,
+			ENT_CODINGTEST_NO,
+			ENT_CODINGTEST_NO_ORDER,
+			QSTN_ANSR
+ 		) values (
+ 			#{accountId},
+ 			#{applyNo},
+ 			#{entCodingtestNo},
+ 			#{entCodingtestNoOrder},
+ 			#{qstnAnsr} 		
+ 		)
+ 	</insert>
+ 	
+ 	
+ 	<update id="updateEntCodingtest" parameterType="entCodingtestVO">
+		UPDATE ent_codingtest_qstn_ansr
+		SET
+		    QSTN_ANSR = #{qstnAnsr} 
+		WHERE
+		    account_id = #{accountId}
+		    AND ent_codingtest_no = #{entCodingtestNo}
+		    AND ent_codingtest_no_order = #{entCodingtestNoOrder}
+ 	</update>
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ </mapper>

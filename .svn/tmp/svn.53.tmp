@@ -1,0 +1,18 @@
+package kr.co.itcruit.vo;
+
+import java.util.Date;
+
+import lombok.Data;
+
+@Data
+public class AlarmVO {
+	
+	private int alarmNo;
+	private String alarmRcvr;
+	private String alarmSndr;
+	private String readYn;
+	private String alarmCn;
+	private String alarmUrl;
+	private Date alarmTime;
+
+}

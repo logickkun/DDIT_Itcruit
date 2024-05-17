@@ -1,0 +1,11 @@
+package kr.co.itcruit.account.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.account.service.IEnterpriseAccountService;
+
+@Service
+public class IEnterpriseAccountServiceImpl implements IEnterpriseAccountService {
+
+	
+}

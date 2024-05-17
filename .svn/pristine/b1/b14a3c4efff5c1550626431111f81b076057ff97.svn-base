@@ -1,0 +1,13 @@
+package kr.co.itcruit.vo;
+
+import lombok.Data;
+
+@Data
+public class ResumeCombineVO {
+	
+//	CertificateVO
+	
+	
+	
+	private String[] codeArr;
+}

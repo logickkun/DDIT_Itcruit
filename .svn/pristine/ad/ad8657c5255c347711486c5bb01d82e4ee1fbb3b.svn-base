@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IMyMemberMapper">
+ 
+ 	<resultMap type="resumeVO" id="resumeMap">
+	    <id property="rsmNo" column="rsm_no"/>
+	    <result property="accountId" column="account_id"/>
+	    <result property="rsmGender" column="rsm_gender"/>
+	    <result property="rsmTtl" column="rsm_ttl"/>
+	    <result property="rsmNewCareer" column="rsm_new_career"/>
+	    <result property="rsmCareerYear" column="rsm_career_year"/>
+	    <result property="rsmRlsYn" column="rsm_rls_yn"/>
+	    <result property="rsmIntroduction" column="rsm_introduction"/>
+	    <result property="eduEnd" column="edu_end"/>
+	    <result property="eduAcdmcr" column="edu_acdmcr"/>
+	    <result property="eduNm" column="edu_nm"/>
+	    <result property="grade" column="grade"/>
+	    <result property="full" column="full"/>
+	    <result property="rsmMjrNm" column="rsm_mjr_nm"/>
+	    <result property="rsmMjrCd" column="rsm_mjr_cd"/>
+	    <collection property="availLangVOList" resultMap="availLangListMap"/>
+	</resultMap>
+ 	
+ 	<resultMap type="availLangVO" id="availLangListMap">
+	    <id property="availLangSeq" column="avail_lang_seq"/>
+	    <result property="availLangCmmncdNm" column="avail_lang_cmmncd_nm"/>
+	    <result property="rsmNo" column="rsm_no"/>
+	</resultMap>
+	
+	<resultMap type="positionVO" id="positionMap">
+	    <id property="pstnSeq" column="pstn_seq"/>
+	    <result property="rsmNo" column="rsm_no"/>
+	    <result property="pstnCmmncdNm" column="pstn_cmmncd_nm"/>
+	    <result property="pstnCate" column="pstn_cate"/>
+	</resultMap>
+ 
+ 	<resultMap type="careerVO" id="careerMap">
+ 		<id property="careerNo" column="career_no"/>
+	  	<result property="rsmNo" column="rsm_no"/>
+	  	<result property="careerCoNm" column="career_co_nm"/>
+	  	<result property="careerDeptNm" column="career_dept_nm"/>
+	  	<result property="careerJbgdNm" column="career_jbgd_nm"/>
+	  	<result property="careerTkcgTaskNm" column="career_tkcg_task_nm"/>
+	  	<result property="careerJncmpYm" column="career_jncmp_ym"/>
+	  	<result property="careerRsgntnYm" column="career_rsgntn_ym"/>
+	  	<result property="careerHdofYn" column="career_hdof_yn"/>
+	  	<collection property="projectData" resultMap="projectCareerMap"/>
+	</resultMap>
+	
+	<resultMap type="projectVO" id="projectCareerMap">
+		<id property="projNo" column="proj_no"/>
+	    <result property="careerNo" column="career_no"/>
+	    <result property="projNm" column="proj_nm"/>
+	    <result property="projDtlCn" column="proj_dtl_cn"/>
+	</resultMap>
+ 
+	<select id="selectResumeList" parameterType="pagingVO" resultMap="resumeMap">
+		SELECT
+		    b.rsm_no
+		    , b.rsm_ttl
+		    , b.rsm_new_career
+		    , b.rsm_career_year
+		    , b.rsm_rls_yn
+		    , lang.avail_lang_seq
+		    , lang.avail_lang_cmmncd_nm
+		FROM(
+		    SELECT
+		        a.*
+		        , row_number() OVER(ORDER BY a.rsm_no DESC) rnum
+		    FROM(
+		        SELECT
+		            rsm.rsm_no
+		            , rsm.rsm_ttl
+		            , rsm.rsm_new_career
+		            , rsm.rsm_career_year
+		            , rsm.rsm_rls_yn
+		        FROM
+		            resume rsm
+		        WHERE
+		            rsm.account_id = #{accountId}
+		        ORDER BY 
+		            rsm.rsm_no DESC
+		    ) a
+		)b
+		LEFT OUTER JOIN
+		    avail_lang_list lang ON(b.rsm_no = lang.rsm_no)
+		<![CDATA[
+		WHERE 
+			b.rnum >= #{startRow}
+		AND 
+			b.rnum <= #{endRow}
+		]]>
+		ORDER BY
+			b.rsm_no DESC
+	</select>
+ 
+	<select id="selectResumeCount" resultType="int">
+		SELECT 
+			count(rsm_no)
+		FROM 
+			resume
+		WHERE
+			account_id = #{accountId}
+	</select>
+ 
+	<select id="selectResume" parameterType="string" resultMap="resumeMap">
+		SELECT
+		    rsm.*
+		    , lang.*
+		FROM 
+		    resume rsm
+		LEFT OUTER JOIN
+			avail_lang_list lang ON (rsm.rsm_no = lang.rsm_no)
+		WHERE
+		    rsm.account_id = #{accountId}
+		ORDER BY
+		    rsm.rsm_no desc
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<select id="likeEntCount" parameterType="recruitPagingVO" resultType="int">
+		SELECT count(*)
+		FROM enterprise e
+		INNER JOIN ent_like el ON e.ENT_NO = el.ENT_NO
+		WHERE el.ACCOUNT_ID = #{accountId}
+	</select>
+	
+	
+	<select id="likeEntList" parameterType="recruitPagingVO" resultType="enterpriseVO">
+		SELECT b.*
+		FROM (
+		    SELECT a.*, ROW_NUMBER() OVER (ORDER BY a.ent_no DESC) AS rnum
+		    FROM (
+		        SELECT 
+		            e.ent_no,  -- 'e' 별칭 명확히 사용
+		            e.biz_type_nm,
+		            e.ksic_nm,
+		            e.brno,
+		            e.ent_nm,
+		            e.rprsv_nm,
+		            e.rprs_telno,
+		            e.ent_img,
+		            e.fndn_yr,
+		            e.emp_cnt,
+		            e.cptl,
+		            e.ent_sls_amt,
+		            e.ent_ebit,
+		            e.ent_url
+		        FROM enterprise e
+		        INNER JOIN ent_like el ON e.ENT_NO = el.ENT_NO  -- 조인 조건에서도 'e'와 'el' 명확히 사용
+		        WHERE el.ACCOUNT_ID = #{accountId}
+		    ) a
+		) b
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	
+	<delete id="deleteEnt" parameterType="string">
+		delete
+		from ent_like
+		where account_id = #{accountId} and ent_no = #{entNo}
+	</delete>
+	
+	
+	<select id="selectCount" parameterType="midPaginationVO" resultType="int">
+		 SELECT
+		    count(*)
+		FROM
+		    board
+		where bbs_ctgry_cmmncd = #{bbsCtgryCmmncd} and bbs_writer = #{accountId}       
+	</select>
+	
+	<select id="selectBoardList" parameterType="midPaginationVO" resultType="boardVO">
+		 SELECT b.*
+		FROM (
+		    SELECT a.*, ROW_NUMBER() OVER (ORDER BY a.bbs_no DESC) AS rnum
+		    FROM (
+		 SELECT
+		    bbs_no
+		  , bbs_reg_dt
+		  , bbs_inq_cnt
+		  , bbs_ttl
+		  , bbs_cn
+		  , bbs_writer
+		  , bbs_ctgry_cmmncd
+		  , bbs_delyn
+		  , ent_no
+		  , reply_yn
+		FROM
+		    board
+		where bbs_ctgry_cmmncd = #{bbsCtgryCmmncd} and bbs_writer = #{accountId}
+		 ) a
+		) b
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<resultMap type="calendarVO" id="likeRecruitMap">
+ 		<result property="title" column="ent_nm"/>
+		<result property="start" column="recruit_strt_dt" />
+		<result property="start" column="recruit_end_dt" />
+		<collection property="extendedProps" resultMap="extendMap"/>
+ 	</resultMap>
+	
+	
+	<resultMap type="myscheduleVO" id="scheduleMap">
+	    <result property="title" column="sked_Nm"/>
+	    <result property="start" column="sked_strt_ymd"/>
+	    <result property="end" column="sked_end_ymd"/>
+	    <result property="color" column="sked_color"/>
+	    <result property="textColor" column="sked_txt_color"/>
+	    <collection property="extendedProps" resultMap="extendMap"/>
+	</resultMap>
+ 	
+ 	
+ 	<resultMap type="extendVO" id="extendMap">
+ 		<result property="recruitNo" column="recruit_no"/>
+ 		<result property="skedCn" column="sked_cn"/>
+ 		<result property="skedNo" column="sked_no"/>
+ 		<result property="accountId" column="account_id"/>
+<!--  		<collection property="esntlLangCmmncdNms" column="esntl_Lang_Cmmncd_Nm" /> -->
+<!--  		<collection property="preferLangCmmncdNms" column="prefer_Lang_Cmmncd_Nm" /> -->
+ 	</resultMap>
+	
+	
+	
+	
+<!-- 	//myscheduleVO -->
+	<select id="getMyScheduleById" parameterType="string" resultMap="scheduleMap">
+		SELECT
+		    sked_nm,
+		    sked_strt_ymd,
+		    sked_end_ymd,   
+		    sked_color,
+		    sked_txt_color,
+		    sked_cn,
+		    sked_no
+		FROM
+		    myschedule
+		where account_id = #{accountId}
+	</select>
+	
+	<select id="getRecruitLikeEndListById" parameterType="string" resultMap="likeRecruitMap">
+	    SELECT
+	    recruit_no,
+	    recruit_end_dt,
+	    ent_nm,
+	    ent_no
+	    FROM (
+	        SELECT
+	            r.recruit_no,
+	            MAX(r.pstn_cmmncd_nm) AS pstn_cmmncd_nm,
+	            MAX(r.recruit_strt_dt) AS recruit_strt_dt,
+	            MAX(r.recruit_end_dt) AS recruit_end_dt,
+	            MAX(r.ent_nm) AS ent_nm,
+	            MAX(r.ent_no) AS ent_no
+	        FROM
+	            recruit r
+	        JOIN
+	            interestnotices i ON r.recruit_no = i.recruit_no
+	                              AND r.pstn_cmmncd_nm = i.pstn_cmmncd_nm
+	        WHERE
+	            i.account_id = #{accountId}
+	        GROUP BY
+	            r.recruit_no
+	    ) 
+	</select>
+	
+	
+	<select id="getRecruitLikeStrtListById" parameterType="string" resultMap="likeRecruitMap">
+	    SELECT
+	    recruit_no,
+	    recruit_strt_dt,
+	    ent_nm,
+	    ent_no
+	    FROM (
+	        SELECT
+	            r.recruit_no,
+	            MAX(r.pstn_cmmncd_nm) AS pstn_cmmncd_nm,
+	            MAX(r.recruit_strt_dt) AS recruit_strt_dt,
+	            MAX(r.recruit_end_dt) AS recruit_end_dt,
+	            MAX(r.ent_nm) AS ent_nm,
+	            MAX(r.ent_no) AS ent_no
+	        FROM
+	            recruit r
+	        JOIN
+	            interestnotices i ON r.recruit_no = i.recruit_no
+	                              AND r.pstn_cmmncd_nm = i.pstn_cmmncd_nm
+	        WHERE
+	            i.account_id = #{accountId}
+	        GROUP BY
+	            r.recruit_no
+	    ) 
+	</select>
+	
+	
+<!-- 	    <selectKey keyProperty="extendedProps.skedNo" resultType="java.lang.Long" order="BEFORE"> -->
+<!-- 	        SELECT SEQ_SCHEDULE.NEXTVAL AS skedNo FROM DUAL -->
+<!-- 	    </selectKey> -->
+	
+	<insert id="addScheduleByVO" parameterType="addScheduleVO" useGeneratedKeys="true">
+		<selectKey keyProperty="skedNo" resultType="int" order="BEFORE">
+ 			select SEQ_SCHEDULE.nextval from dual
+ 		</selectKey>
+
+	    insert into myschedule
+	    		(sked_Nm, 
+	    		 sked_strt_ymd, 
+	    		 sked_end_ymd, 
+	    		 sked_color, 
+	    		 sked_txt_color, 
+	    		 sked_cn, 
+	    		 account_id, 
+	    		 sked_no)
+	    VALUES (
+	    		#{skedNm}, 
+	    		#{skedStrtYmd}, 
+	    		#{skedEndYmd}, 
+	    		#{skedColor}, 
+	    		#{skedTxtColor}, 
+	    		#{skedCn}, 
+	    		#{accountId}, 
+	    		#{skedNo}
+	    )
+	</insert>
+	
+	<select id="likeEntRecruit" parameterType="int" resultType="recruitVO">
+		    SELECT
+    recruit_no
+  , recruit_ttl
+  , recruit_strt_dt
+  , recruit_end_dt
+  , recruit_yn
+  , recruit_career_code_nm
+  , recruit_career_dt
+  , ent_url
+  , recruit_hit
+  , process_yn
+  , process_amt
+  , recruit_pay
+  , recruit_enroll_ymd
+  , cmmncd_grp_cd
+  , cmmncd_nm1
+  , recruit_cnt
+  , pstn_cmmncd_nm
+  , ent_postcode
+  , ent_nm
+  , ent_no
+  , ent_apply
+FROM
+    recruit
+    where ent_no = #{entNo} and TO_TIMESTAMP(RECRUIT_END_DT, 'YYYY-MM-DD"T"HH24:MI') > SYSDATE	
+    <![CDATA[
+    AND TO_TIMESTAMP(RECRUIT_STRT_DT, 'YYYY-MM-DD"T"HH24:MI') < SYSTIMESTAMP
+    ]]>
+	</select>
+	
+	
+	<delete id="deleteMySchedule" parameterType="addScheduleVO">
+		delete from myschedule
+		where 
+			account_id = #{accountId}
+			AND sked_no = #{skedNo}
+	</delete>
+	
+	
+	<delete id="deleteLikeRecruit" parameterType="recruitVO">
+	 	delete from interestnotices
+		where
+	      recruit_no = #{recruitNo}
+		  and account_id = #{accountId}
+	</delete>
+	
+	
+	
+	
+	<update id="updateSchedule">
+		update myschedule
+	    set sked_strt_ymd = #{skedStrtYmd}, sked_end_ymd = #{skedEndYmd}
+	    where sked_no = #{skedNo}
+	</update>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+ </mapper>

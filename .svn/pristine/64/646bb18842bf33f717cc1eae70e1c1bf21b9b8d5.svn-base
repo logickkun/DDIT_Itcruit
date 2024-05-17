@@ -1,0 +1,16 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Repository;
+
+import kr.co.itcruit.vo.BoardVO;
+
+
+public interface IFreeBoardMapper {
+
+	public List<BoardVO> list();
+
+}

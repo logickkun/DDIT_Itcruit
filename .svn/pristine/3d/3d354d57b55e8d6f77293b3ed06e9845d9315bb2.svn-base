@@ -1,0 +1,16 @@
+package kr.co.itcruit.account.service;
+
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.vo.AccountVO;
+
+public interface IEnterpriseAccountService {
+
+	public ServiceResult signup(HttpServletRequest req, Map<String, Object> map);
+
+	public AccountVO searchId(AccountVO accountVO);
+
+}

@@ -1,0 +1,130 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<div class="page-content-wrapper border">
+	<!-- Title -->
+	<div class="row mb-5">
+		<div class="col-12 d-sm-flex justify-content-between align-items-center">
+			<h1 class="h3 mb-2 mb-sm-0">${recruitTtl}</h1>
+		</div>
+	</div>
+
+
+	<ul class="nav nav-tabs nav-justified mb-3">
+		<c:forEach items="${apList}" var="ap" varStatus="index">
+			<li class="nav-item"><a class="nav-link <c:if test="${index.index + 1 == 1 }">active</c:if>" data-bs-toggle="tab" href="#tab-2-${index.index + 1}">${ap.clsNm }</a></li>
+		</c:forEach>
+	</ul>
+
+	<div class="tab-content">
+
+		<c:forEach items="${apList}" var="ap" varStatus="apIndex">
+			<div class="tab-pane <c:if test="${apIndex.index == 0}">show active</c:if>" id="tab-2-${apIndex.index + 1}">
+				<div class="row">
+
+					<div class="col-4 col-sm-3">
+
+						<div class="nav flex-column nav-pills addQuestion" id="v-pills-tab-${apIndex.index}" role="tablist" aria-orientation="vertical">
+							<c:forEach items="${eiqdList}" var="eiqd" varStatus="eiqdIndex">
+								<a class="nav-link <c:if test="${eiqdIndex.index == 0}">active</c:if>" id="v-pills-${apIndex.index}-${eiqdIndex.index}-tab" data-bs-toggle="pill" href="#v-${apIndex.index}-${eiqdIndex.index}" role="tab" aria-controls="v-${apIndex.index}-${eiqdIndex.index}" aria-selected="true"> ${eiqdIndex.index + 1} 문항 </a>
+							</c:forEach>
+							
+						</div>
+
+						<button class="btn btn-primary w-40" type="button" onclick="addQuestion(this)" id="addBtn-${apIndex.index}">문항 추가</button>
+
+					</div>
+
+					<!-- 코테 부분 문제 가져오기 -->
+					<div class="col-8 col-sm-9 ">
+						<div class="tab-content pt-0" id="v-pills-tabContent-${apIndex.index}">
+							<c:forEach items="${eiqdList}" var="eiqd" varStatus="eiqdIndex">
+									<div class="tab-pane fade <c:if test="${eiqdIndex.index == 0}">show active</c:if> border-1" id="v-${apIndex.index}-${eiqdIndex.index}" role="tabpanel" aria-labelledby="v-pills-${apIndex.index}-${eiqdIndex.index}-tab">
+									<h4>자기소개서 질문 ${eiqdIndex.index + 1}</h4>
+									<hr>
+										<div class="" style="border: 1px solid; withd: 200vh; height: 25vh; padding: 20px; margin: 20px;">
+											${eiqd.entIntroQstnCn}
+										</div>
+										 <div class="d-flex justify-content-end" style="padding-right: 15px">
+										<button class="btn btn-primary w-40" type="button" onclick="editQuestion(this)" id="editBtn-${apIndex.index}">내용 수정</button>
+										</div>
+									</div>
+							</c:forEach>
+							
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			<script>
+			
+			function addQuestion(button) {
+
+			    var tabPane = button.closest(".tab-pane");
+			    var tabContent = tabPane.querySelector(".tab-content");
+			    // 모든 기존 탭에서 'active'와 'show' 클래스 제거
+			    var allTabs = tabContent.querySelectorAll(".tab-pane");
+			    allTabs.forEach(function(tab) {
+			        tab.classList.remove("show");
+			        tab.classList.remove("active");
+			    });
+				
+// 			    var addQuestion = document.getElementsByClassName("addQuestion")[0];
+// 			    var text = addQuestion.innerText.trim();
+// 			    var splitText = text.split("문항");
+			    
+// 			    var lastNumber = splitText[splitText.length - 2].trim();
+// 			    console.log(lastNumber);
+
+			    
+			    // 새로운 문항의 인덱스 계산
+			    var newQuestionIndex = tabContent.querySelectorAll(".tab-pane").length + 1;
+
+			    // 새로운 문항 HTML 생성
+			    var newQuestionHTML = `
+			        <div class="tab-pane fade" id="v-${newQuestionIndex}" role="tabpanel">
+			            <div class="row">
+			                <div class="col-12">
+			                <h4>자기소개서 질문 ${newQuestionIndex + 3}</h4>
+							<hr>
+								<input type="text" class="form-control"  placeholder="문항 내용을 입력하세요."  style="width: 50vh;">
+								<div class="d-flex justify-content-end" style="padding-right: 15px">
+								<button class="btn btn-primary w-40" type="button" onclick="editQuestion(this)" id="editBtn-${apIndex.index}">내용 등록</button>
+								</div>
+			                </div>
+			            </div>
+			        </div>`;
+
+			    // 새로운 문항을 tab-content에 추가
+			    tabContent.insertAdjacentHTML('beforeend', newQuestionHTML);
+
+			    // 새로운 nav-link 추가
+			    var navPills = tabPane.querySelector(".nav.flex-column.nav-pills");
+			    var newNavLink = `
+			        <a class="nav-link" id="v-pills-${newQuestionIndex}-tab" data-bs-toggle="pill" href="#v-${newQuestionIndex}" role="tab" aria-controls="v-${newQuestionIndex}" aria-selected="true">
+			            ${newQuestionIndex + 3} 문항
+			        </a>`;
+			    
+			    navPills.insertAdjacentHTML('beforeend', newNavLink);
+			    
+			    // 모든 nav-link에서 'active' 클래스 제거하고 새로운 링크에만 'active' 추가
+			    var allNavLinks = navPills.querySelectorAll(".nav-link");
+			    allNavLinks.forEach(link => link.classList.remove("active"));
+			    allNavLinks[allNavLinks.length - 1].classList.add("active");
+			}
+			
+			
+			function editQuestion(button) {
+				
+				
+				
+			}
+				
+			</script>
+
+		</c:forEach>
+
+
+	</div>
+
+</div>

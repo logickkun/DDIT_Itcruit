@@ -1,0 +1,91 @@
+package kr.co.itcruit.board.service.impl;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.board.service.IEnterpriseFreeBoardService;
+import kr.co.itcruit.mapper.IEnterpriseBoardMapper;
+import kr.co.itcruit.vo.AtchVO;
+import kr.co.itcruit.vo.BoardVO;
+import kr.co.itcruit.vo.MidPaginationVO;
+
+@Service
+public class EnterpriseFreeBoardImpl implements IEnterpriseFreeBoardService {
+	
+	@Inject
+	private IEnterpriseBoardMapper enterpriseBoardMapper;
+
+	@Override
+	public int selectEntBoardCount(MidPaginationVO<BoardVO> pagingVO) {
+		return enterpriseBoardMapper.selectEntBoardCount(pagingVO);
+	}
+
+	@Override
+	public List<BoardVO> selectEntBoardList(MidPaginationVO<BoardVO> pagingVO) {
+		return enterpriseBoardMapper.selectEntBoardList(pagingVO);
+	}
+
+	@Override
+	public ServiceResult insert(HttpServletRequest req, BoardVO boardVO) {
+		ServiceResult result = null;
+		int status = enterpriseBoardMapper.insert(boardVO);
+		if(status > 0) {
+			List<AtchVO> authFileList = boardVO.getAtchFileList();
+
+			try {
+				authFileUpload(authFileList, boardVO.getBbsNo(), req);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			result = ServiceResult.OK;
+		}else {
+			result = ServiceResult.FAILED;
+		}
+		return result;
+	}
+
+	private void authFileUpload(List<AtchVO> authFileList, String bbsNo, HttpServletRequest req) throws Exception {
+		String savePath = "/resources/freeBoard/";
+		
+		if(authFileList != null) {
+			if(authFileList.size() > 0) {
+				for(AtchVO atchVO : authFileList) {
+					String saveName = UUID.randomUUID().toString();
+					saveName += "_" + atchVO.getFileName();
+					String saveLocate = req.getServletContext().getRealPath(savePath + bbsNo);
+					File file = new File(saveLocate);
+					if(!file.exists()) {
+						file.mkdirs();
+					}
+					
+					saveLocate += "/" + saveName;
+					
+					atchVO.setFileSrcNo(bbsNo);
+					atchVO.setOrgnCmmncd("BBS202");
+					atchVO.setFilePath(saveLocate);
+					enterpriseBoardMapper.insertFile(atchVO);
+					
+					File saveFile = new File(saveLocate);
+					atchVO.getItem().transferTo(saveFile);
+				}
+			}
+		}
+	}
+
+	@Override
+	public BoardVO detail(BoardVO bvo) {
+		BoardVO boardVO = new BoardVO();
+		enterpriseBoardMapper.incrementHit(bvo);
+		boardVO = enterpriseBoardMapper.detail(bvo);
+		return boardVO;
+	}
+
+}

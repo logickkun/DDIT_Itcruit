@@ -1,0 +1,13 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+//"searchTelentVO"
+public interface ISearchTelentMapper {
+	
+	public List<String> getLangList();
+
+	public List<String> getPstnList();
+
+	public Object getLocalList();
+
+}

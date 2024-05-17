@@ -1,0 +1,105 @@
+package kr.co.itcruit.codingtest.service.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.codingtest.service.ICodingTestService;
+import kr.co.itcruit.codingtest.utils.CompileUtils;
+import kr.co.itcruit.mapper.ICodingtestMapper;
+import kr.co.itcruit.vo.CodingtestVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class CodingTestImpl implements ICodingTestService{
+
+	@Inject
+	private ICodingtestMapper codingtestMapper;
+	
+	
+	/**
+	 *	문제 전체 리스트 출력(아직 페이징 미처리)
+	 */
+	@Override
+	public List<CodingtestVO> selectList() {
+		return codingtestMapper.selectList();
+	}
+
+	
+	/**
+	 * 문제 번호로 상세페이지 가져오기
+	 * @param qstnNo
+	 * @return
+	 */
+	@Override
+	public CodingtestVO getQstnByNo(int qstnNo) {
+		return codingtestMapper.selectQstnByNo(qstnNo);
+	}
+
+	
+	@Override
+	public String doCompile(CodingtestVO codingtestVO) {
+		
+		String loginUser = "a001";
+		
+		CodingtestVO vo = null;
+		//
+		//추후 세션에서 받아올 아이디 setLoginuser
+		
+		CompileUtils compileUtils = new CompileUtils();
+		
+		//참이면 제출 -> 이 때 유저들의 제출기록이 테이블에 저장됨
+		if(codingtestVO.isFlag()) {
+			//CodingtestVO vo = codingtestMapper.doSubmit(codingtestVO);
+		}
+		
+		//거짓이면 테스트
+		else {
+			//db에서 테스트 케이스에 사용할 input, output 가져옴
+			vo = codingtestMapper.doTest(codingtestVO);			
+		}
+		
+		//사용자로 부터 입력받은 값을 저장
+		vo.setCode(codingtestVO.getCode());
+		//vo에 flag값을 담아서 전달
+		vo.setFlag(codingtestVO.isFlag());
+		//vo에 유저아이디값을 담아서 전달
+		vo.setLoginUser(loginUser);
+		
+		//dynamic에 전달할 매개변수
+		//flag - 테스트인지, 제출인지 판단용
+		//maincode, input, output		
+		//vo.setQstnMcode(getRealCode(codingtestVO.getQstnMcode(), vo.getInput(), vo.getOutput()));
+		
+		vo.setQstnMcode(getRealCode(vo.getQstnMcode(), vo.getInput(), vo.getOutput()));
+		
+		try {
+			compileUtils.doTest(vo);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public String getRealCode(String mainCode, String input, String output) {
+		
+		String realCode = "";
+		
+		realCode = mainCode.replace("String inputfilePath", 
+				"String inputfilePath =" + input +";");
+		
+		realCode = realCode.replace("String outputfilePath", 
+				"String outputfilePath =" + output +";");
+		
+		log.info("realCode>>>>>>>>>>>>>>>" + realCode);
+		return realCode;
+		
+	}
+	
+
+}

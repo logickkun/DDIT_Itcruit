@@ -1,0 +1,109 @@
+package kr.co.itcruit.codingtest.controller;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.sun.xml.internal.ws.encoding.policy.EncodingPolicyValidator;
+
+import kr.co.itcruit.codingtest.service.ICodingTestService;
+import kr.co.itcruit.codingtest.utils.CompileUtils;
+import kr.co.itcruit.vo.CodingtestVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@RequestMapping("/codingtest")
+@Slf4j
+public class CodingTestController {
+
+	@Inject
+	private ICodingTestService codingtestService;
+	
+	
+	/**
+	 * 코딩테스트 리스트페이지로 이동
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/list.do")
+	public String getTestList(
+			Model model, 
+			@RequestBody (required = false) CodingtestVO codingtestVO
+			) {
+		//private int qstnGrd;			난이도
+		//private String qstnSubject;	문제유형
+		//private String qstnTtl;		제목
+		//private int pastQstnCtgryNm;	문제 카테고리 (기출인지 아닌지)
+		
+		List<CodingtestVO> codeList = codingtestService.selectList();
+		log.info("codingtestController>>>>>>>>>>>>" + codeList);
+		model.addAttribute("codeList", codeList);
+		return "main/testList";			
+		
+	}
+	
+	
+	/**
+	 * 코딩테스트 문제페이지로 이동
+	 * @param model
+	 * @param qstnNo
+	 * @return
+	 */
+	@RequestMapping(value="/detail.do", method=RequestMethod.GET)
+	public String getTestDetailByQstnNo(
+			Model model,
+			@RequestParam int qstnNo
+			) {
+		log.info("getTestDetailByQstnNo >>>>>" + qstnNo);
+		
+		CodingtestVO codingtestVO = codingtestService.getQstnByNo(qstnNo);
+		model.addAttribute("codingtestVO", codingtestVO);
+		
+		log.info("getTestDetailByQstnNo>>>>>>>>>>>>" + codingtestVO);
+		
+		return "codingtest/detail";			
+	}
+	
+	
+	
+	/**
+	 * @param codingtestVO
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/solve.do", method=RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	public ResponseEntity<String> solve(
+			@RequestBody CodingtestVO codingtestVO
+			) {
+		
+		//DynamicCompileUtils dynamic = new DynamicCompileUtils();
+		
+//		추후 세션에서 아이디 받아올 것
+//		String loginUser = "a001";
+//		codingtestVO.setLoginUser(loginUser);
+		if(codingtestVO.isFlag()) {
+			log.info("제출 옴???????????????????" + codingtestVO.getCode());
+		} else {
+			log.info("테스트 옴???????????????????" + codingtestVO.isFlag());
+		}
+		
+		log.info("CodingtestController.solve >>>>>>>>>>>>>>>>>>>" + codingtestVO);
+		
+		
+        String result = codingtestService.doCompile(codingtestVO);
+		
+        log.info(result);
+        return new ResponseEntity<String>(result, HttpStatus.OK);
+    }
+
+}

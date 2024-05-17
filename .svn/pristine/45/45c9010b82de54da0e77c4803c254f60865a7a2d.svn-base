@@ -1,0 +1,57 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import kr.co.itcruit.vo.ApplyProcessListPayVO;
+import kr.co.itcruit.vo.ApplyProcessListVO;
+import kr.co.itcruit.vo.CustomPaginationInfoVO;
+import kr.co.itcruit.vo.EntIntroQSTNDSNCTVO;
+import kr.co.itcruit.vo.EntIntroQSTNVO;
+import kr.co.itcruit.vo.RecruitVO;
+
+public interface IMyEnterpriseMapper {
+
+	public int recruitRegisterInsert(RecruitVO recruitVO);
+
+	public int recruitRegisterEdit(RecruitVO recruitVO);
+	
+	public int recruitRegisterRemove(RecruitVO recruitVO);
+	
+	public void recruitHireSttsInsert(RecruitVO recruitVO);
+
+	public void recruitEsntlLangInsert(RecruitVO recruitVO);
+	
+	public void recruitPreferLangInsert(RecruitVO recruitVO);
+	
+	public int recruitHireSttsRemove(RecruitVO recruitVO);
+
+	public int recruitEsntlLangRemove(RecruitVO recruitVO);
+
+	public int recruitPreferLangRemove(RecruitVO recruitVO);
+
+	public List<RecruitVO> recruitSelectList();
+	
+	public List<RecruitVO> recruitSelectInfo(@Param("recruitNo") String recruitNo,@Param("pstnCmmncdNm") String pstnCmmncdNm);
+
+	public List<RecruitVO> recruitSelectListByEntNo(@Param("entNo") int entNo);
+
+	public int selectRecruitCount(CustomPaginationInfoVO<RecruitVO> customPagingVO);
+
+	public List<RecruitVO> selectRecruitList(CustomPaginationInfoVO<RecruitVO> customPagingVO);
+
+	public void applyProcessListInsert(ApplyProcessListVO aplv);
+
+	public void applyProcessListPayInsert(ApplyProcessListPayVO aplpv);
+
+	public List<ApplyProcessListVO> selectProcess(@Param("recruitNo") String recruitNo,@Param("pstnCmmncdNm") String pstnCmmncdNm);
+
+	public void entIntroQSTNInsert(EntIntroQSTNVO qstn);
+
+	public List<EntIntroQSTNDSNCTVO> selectDsnct(@Param("recruitNo") String recruitNo,@Param("pstnCmmncdNm") String pstnCmmncdNm);
+
+
+
+
+}

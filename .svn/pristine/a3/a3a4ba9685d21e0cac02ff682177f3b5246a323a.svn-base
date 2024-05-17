@@ -1,0 +1,24 @@
+package kr.co.itcruit.main.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.co.itcruit.main.service.IRecruitListService;
+
+@Controller
+@RequestMapping("/main/recruit")
+
+public class RecruitListController {
+	
+	private IRecruitListService recuritService;
+//	사이트에서 보여줄 전체 채용 리스트 달력 형식으로 보여주기(fullcalendar api)
+//	목록 클릭시 해당 채용 정보 띄우기
+//	각종 조건별로 검색 가능하도록
+//	좌측에 확인한 공고 목록 따라다니게
+//	우측에 채팅방 목록(후순위)
+//	
+//	2~3개 기업 비교해주는 페이지로 이동
+//	
+	
+
+}

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.itcruit.mapper.IEnterpriseMapper">
+
+
+
+
+	<select id="selectEntCount" parameterType="listPagingVO"
+		resultType="int">
+		select count(ent_no)
+		from enterprise
+		where 1=1
+	</select>
+	
+<!-- 	<resultMap type="enterpriseVO" id="enterpriseMap">
+		<id property="entNo" column="ENT_NO"/>
+		<result property="bizTypeNm" column="BIZ_TYPE_NM"/>
+		<result property="ksicNm" column="KSIC_NM"/>
+		<result property="brno" column="BRNO"/>
+		<result property="entNm" column="ENT_NM"/>
+		<result property="rprsvNm" column="RPRSV_NM"/>
+		<result property="rprsTelno" column="RPRS_TELNO"/>
+		<result property="entImg" column="ENT_IMG"/>
+		<result property="fndnYr" column="FNDN_YR"/>
+		<result property="empCnt" column="EMP_CNT"/>
+		<result property="cptl" column="CPTL"/>
+		<result property="entSlsAmt" column="ENT_SLS_AMT"/>
+		<result property="entEbit" column="ENT_EBIT"/>
+		<result property="entUrl" column="ENT_URL"/>
+	</resultMap> -->
+
+
+	
+	<select id="selectEntList" parameterType="listPagingVO"
+		resultType="enterpriseVO">
+		SELECT
+		    b.*
+		     <if test="accountId != null and accountId != ''">
+			    , EL.ACCOUNT_ID as accountId
+		    </if>
+			FROM (
+			    SELECT
+			        a.*,
+			        ROW_NUMBER() OVER (ORDER BY a.ent_no DESC) rnum
+		    FROM (
+		        SELECT
+		            ent_no,
+		            biz_type_nm,
+		            ksic_nm,
+		            brno,
+		            ent_nm,
+		            rprsv_nm,
+		            rprs_telno,
+		            fndn_yr,
+		            emp_cnt,
+		            cptl,
+		            ent_sls_amt,
+		            ent_ebit,
+		            ent_url
+		        FROM
+		            enterprise
+		        WHERE
+		            1=1
+		            order by ent_no desc
+		    ) a
+		) b
+	    <if test="accountId != null and accountId != ''">
+        LEFT JOIN ENT_LIKE EL ON b.ent_no = EL.ENT_NO AND EL.ACCOUNT_ID = #{accountId}
+    	</if> 
+		<![CDATA[
+		where b.rnum >= #{startRow} and b.rnum <= #{endRow} 
+		]]>
+	</select>
+
+	<delete id="deleteLikeEnt" parameterType="enterpriseVO">
+		DELETE FROM ent_like
+		WHERE
+        	ent_no = #{entNo} AND account_id = #{accountId}
+	</delete>
+	
+	<insert id="insertLikeEnt" parameterType="enterpriseVO">
+		INSERT INTO ent_like (
+		    ent_no , account_id
+		) VALUES (
+		    #{entNo} , #{accountId}
+		)
+	</insert>
+
+	<select id="selectEnt" parameterType="int" resultType="enterpriseVO" >
+	  select 
+	    ent_no
+	  , biz_type_nm
+	  , ksic_nm
+	  , brno
+	  , ent_nm
+	  , rprsv_nm
+	  , rprs_telno
+<!-- 	  , ent_img -->
+	  , fndn_yr
+	  , emp_cnt
+	  , cptl
+	  , ent_sls_amt
+	  , ent_ebit
+	  , ent_url
+	FROM
+	    enterprise
+	where
+	    ent_no = #{entNo}
+	</select>
+</mapper>

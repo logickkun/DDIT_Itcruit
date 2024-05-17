@@ -1,0 +1,1520 @@
+package kr.co.itcruit.mypage.enterprise.service.impl;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.mapper.IAtchFileMapper;
+import kr.co.itcruit.mapper.IMyEnterpriseMapper;
+import kr.co.itcruit.mapper.IResumeMapper;
+import kr.co.itcruit.mypage.enterprise.service.IMyEnterpriseService;
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.ApplicantCareerStatVO;
+import kr.co.itcruit.vo.ApplicantEduStatVO;
+import kr.co.itcruit.vo.ApplicantGenderStatVO;
+import kr.co.itcruit.vo.ApplicantPassStatVO;
+import kr.co.itcruit.vo.ApplyProcessListPayVO;
+import kr.co.itcruit.vo.ApplyProcessListVO;
+import kr.co.itcruit.vo.AtchFileVO;
+import kr.co.itcruit.vo.AtchVO;
+import kr.co.itcruit.vo.AvailLangListVO;
+import kr.co.itcruit.vo.BoardBBS201PaginationVO;
+import kr.co.itcruit.vo.BoardBBS202PaginationVO;
+import kr.co.itcruit.vo.BoardVO;
+import kr.co.itcruit.vo.CareerVO;
+import kr.co.itcruit.vo.CertificateVO;
+import kr.co.itcruit.vo.CustomPaginationInfoVO;
+import kr.co.itcruit.vo.CustomUser;
+import kr.co.itcruit.vo.EachProcessApplyPassVO;
+import kr.co.itcruit.vo.EntAccountVO;
+import kr.co.itcruit.vo.EntCodingTestQstnDsnctVO;
+import kr.co.itcruit.vo.EntCodingtestVO;
+import kr.co.itcruit.vo.EntInterviewVO;
+import kr.co.itcruit.vo.EntIntroQSTNDSNCTVO;
+import kr.co.itcruit.vo.EntIntroQSTNVO;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.ExperienceVO;
+import kr.co.itcruit.vo.LogRecruitTableVO;
+import kr.co.itcruit.vo.PortfolioVO;
+import kr.co.itcruit.vo.QstnDSNCTVO;
+import kr.co.itcruit.vo.RecruitApplicantVO;
+import kr.co.itcruit.vo.RecruitVO;
+import kr.co.itcruit.vo.ResumeVO;
+import kr.co.itcruit.vo.SearchTalentVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class EnterpriseServiceImpl implements IMyEnterpriseService {
+
+	@Autowired
+	private IMyEnterpriseMapper myEntMapper;
+	
+	@Autowired
+	private IAtchFileMapper atchFileMapper;
+
+	@Inject
+	private PasswordEncoder pe;
+	
+	@Autowired
+	private IResumeMapper resumeMapper;
+
+	
+	
+	//채용 공고 인서트
+	@Transactional
+	@Override
+	public ServiceResult recruitRegisterInsert(RecruitVO recruitVO, HttpServletRequest req) {
+		
+		ServiceResult result = null;
+		
+		try {
+			
+			//기업 로그인 세션에서 꺼내온다.
+			CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			AccountVO av = user.getAccount();
+			
+			int entNo = av.getEntNo();
+			
+			EnterpriseVO entInfo = myEntMapper.selectEntInfoByEntNo(entNo);
+			
+			String recruitNo = getRecruitNo(entNo, recruitVO.getPstnCmmncdNm());
+			recruitVO.setRecruitNo(recruitNo);
+			recruitVO.setEntNo(entNo);
+			recruitVO.setEntNm(entInfo.getEntNm());
+			
+			int pass = myEntMapper.recruitRegisterInsert(recruitVO);
+			recruitVO.setFlag(1);
+			
+			 if (pass > 0) {
+				 
+                pass = hireStts(recruitVO);
+                recruitVO.setFlag(1);
+                if (pass == 0) return ServiceResult.FAILED;
+
+                pass = preferlang(recruitVO);
+                recruitVO.setFlag(1);
+                if (pass == 0) return ServiceResult.FAILED;
+
+                pass = esntlLang(recruitVO);
+                recruitVO.setFlag(1);
+                if (pass == 0) return ServiceResult.FAILED;
+
+                pass = atchFile(recruitVO, req, entNo);
+                if (pass == 0) return ServiceResult.FAILED;
+                recruitVO.setFlag(1);
+                
+                
+            	if("Y".equals(recruitVO.getProcessYn())) {
+    				
+    				pass = applyProcessList(recruitVO, recruitNo, recruitVO.getPstnCmmncdNm());
+    				if(pass == 0) return ServiceResult.FAILED;
+    			}
+                
+                result = ServiceResult.OK;
+                
+            } else {
+            	
+                log.error("################## Recruit 테이블 삽입 중 에러 발생..!!");
+                result = ServiceResult.FAILED;
+            }
+			 
+			 
+		
+			
+		} catch (Exception e) {
+			
+            log.error("################## 삽입 트랜잭션 롤백 발생...!", e);
+            throw e; 
+            
+        }
+
+		return result;
+	}
+	
+	
+
+
+	//채용공고 업데이트
+	@Transactional
+	@Override
+	public ServiceResult recruitRegisterEdit(RecruitVO recruitVO, HttpServletRequest req) {
+		
+		ServiceResult result = null;
+		
+		//기업 로그인 세션에서 꺼낸다.
+		int entNo = 9999999;
+		
+		try {
+			
+			int pass = myEntMapper.recruitRegisterEdit(recruitVO);
+			recruitVO.setFlag(2);
+			
+			if (pass > 0) {
+				 
+				pass = hireStts(recruitVO);
+				recruitVO.setFlag(2);
+				if (pass == 0) return ServiceResult.FAILED;
+				
+				pass = preferlang(recruitVO);
+				recruitVO.setFlag(2);
+				if (pass == 0) return ServiceResult.FAILED;
+				
+				pass = esntlLang(recruitVO);
+				recruitVO.setFlag(2);
+				if (pass == 0) return ServiceResult.FAILED;
+				
+				pass = atchFile(recruitVO, req, entNo);
+				if (pass == 0) return ServiceResult.FAILED;
+				
+				result = ServiceResult.OK;
+				    
+			} else {
+				
+			    log.error("################## Recruit 테이블 수정 중 에러 발생..!!");
+			    result = ServiceResult.FAILED;
+			}
+			
+		}catch(Exception e) {
+			
+			log.error("################## 수정 트랜잭션 롤백 발생...!", e);
+            throw e;
+			
+		}
+		
+		return result;
+
+	}
+	
+	//채용공고 삭제
+	@Transactional
+	@Override
+	public ServiceResult recruitRegisterRemove(RecruitVO recruitVO, HttpServletRequest req) {
+		
+		ServiceResult result = null;
+		
+		log.info(">>>>>>>>>>>"  + recruitVO.getPstnCmmncdNm());
+		log.info(">>>>>>>>>>>"  + recruitVO.getRecruitNo());
+		//기업 로그인 세션에서 꺼낸다.
+		int entNo = 9999999; 
+		
+		try {
+			
+			int pass = myEntMapper.recruitRegisterRemove(recruitVO);
+			recruitVO.setFlag(3);
+			
+			if (pass > 0) {
+				 
+				pass = hireStts(recruitVO);
+				recruitVO.setFlag(3);
+				if (pass == 0) return ServiceResult.FAILED;
+				
+				pass = preferlang(recruitVO);
+				recruitVO.setFlag(3);
+				if (pass == 0) return ServiceResult.FAILED;
+				
+				pass = esntlLang(recruitVO);
+				recruitVO.setFlag(3);
+				if (pass == 0) return ServiceResult.FAILED;
+				
+				pass = atchFile(recruitVO, req, entNo);
+				if (pass == 0) return ServiceResult.FAILED;
+				
+				//apply_process_list 삭제 recruitVO에 있는 recruitNo pstnCmmncdNm 로
+				//RecruitVO recruitVO, String recruitNo, String pstnCmmncdNm
+				pass = applyProcessList(recruitVO, recruitVO.getRecruitNo(), recruitVO.getPstnCmmncdNm()); //(recruitVO, req, entNo);
+				if (pass == 0) return ServiceResult.FAILED;
+				result = ServiceResult.OK;
+				    
+			} else {
+				
+			    log.error("################## Recruit 테이블 삭제 중 에러 발생..!!");
+			    result = ServiceResult.FAILED;
+			}
+			
+		} catch (Exception e) {
+			
+			log.error("################## 삭제 트랜잭션 롤백 발생...!", e);
+			throw e;
+			
+		}
+		
+		return result;
+	}
+	
+	
+	
+	//채용공고 리스트
+	@Override
+	public List<RecruitVO> recruitSelectList() {
+
+		List<RecruitVO> questionList = myEntMapper.recruitSelectList();
+
+		return questionList;
+	}
+	
+	// 채용공고 기업번호 리스트
+	@Override
+	public List<RecruitVO> recruitSelectListByEntNo(int entNo) {
+		
+		List<RecruitVO> recruitVOList = myEntMapper.recruitSelectListByEntNo(entNo);
+		
+		return recruitVOList;
+	}
+
+	
+	//채용공고 디테일
+	@Override
+	public List<RecruitVO> recruitSelectInfo(String recruitNo, String pstnCmmncdNm) {
+
+		List<RecruitVO> recruitVO = myEntMapper.recruitSelectInfo(recruitNo, pstnCmmncdNm);
+
+		return recruitVO;
+	}
+	
+	
+	public int hireStts(RecruitVO recruitVO) {
+		
+		int pass  = 0;
+		
+		//인서트 1번
+		if(recruitVO.getFlag() == 1) {
+			
+			for (String hireCmmncdNm : recruitVO.getHireCmmncdNms()) {
+				
+				try {
+					
+					recruitVO.setHireCmmncdNm(hireCmmncdNm);
+					myEntMapper.recruitHireSttsInsert(recruitVO);
+					
+					pass = 1;
+					
+				}catch(Exception e) {
+					
+					log.error("################## hireStts 인서트 중 에러...!", e);
+					throw e;
+				}
+			}
+			
+		}
+		
+		//업데이트
+		if(recruitVO.getFlag() == 2) {
+			
+			//삭제 우선
+			int deletePass = 0;
+			
+			try {
+
+				deletePass = myEntMapper.recruitHireSttsRemove(recruitVO);
+				
+			}catch(Exception e) {
+				
+				log.error("################## hireStts 삭제 업데이트 중 에러...!", e);
+				
+				throw e;
+			}
+			
+			if(deletePass > 0) {
+				
+				for (String hireCmmncdNm : recruitVO.getHireCmmncdNms()) {
+					
+					try {
+						
+						recruitVO.setHireCmmncdNm(hireCmmncdNm);
+						myEntMapper.recruitHireSttsInsert(recruitVO);
+						
+						pass = 1;
+						
+					}catch(Exception e) {
+						
+						log.error("################## hireStts 업데이트 중 에러...!", e);
+						throw e;
+					}
+				}
+				
+			}
+			
+		}
+		
+		
+		//삭제
+		if(recruitVO.getFlag() == 3) {
+			
+			try {
+
+				myEntMapper.recruitHireSttsRemove(recruitVO);
+				pass = 1;
+				
+			}catch(Exception e) {
+				
+				log.error("################## hireStts 삭제 중 에러...!", e);
+				throw e;
+				
+			}
+			
+		}
+		
+		return pass;
+
+	}
+
+	public int esntlLang(RecruitVO recruitVO) {
+		
+		int pass  = 0;
+		
+		//인서트 1번
+		if(recruitVO.getFlag() == 1) {
+			
+			for (String esntlLangCmmncdNm : recruitVO.getEsntlLangCmmncdNms()) {
+				
+				try {
+					
+					recruitVO.setEsntlLangCmmncdNm(esntlLangCmmncdNm);
+					myEntMapper.recruitEsntlLangInsert(recruitVO);
+					
+					pass = 1;
+					
+				}catch(Exception e) {
+					
+					log.error("################## esntlLang 인서트 중 에러...!", e);
+					throw e;
+					
+				}
+			}
+			
+		}
+		
+		//업데이트
+		if(recruitVO.getFlag() == 2) {
+			
+			//삭제 우선.
+			int deletePass = 0;
+			
+			try {
+				
+				deletePass = myEntMapper.recruitEsntlLangRemove(recruitVO);
+				
+			} catch (Exception e) {
+				
+				log.info("################## esntlLang 삭제 업데이트 중 에러...!", e);
+				throw e;
+			}
+			
+			
+			if(deletePass > 0) {
+				
+				for (String esntlLangCmmncdNm : recruitVO.getEsntlLangCmmncdNms()) {
+					
+					try {
+						
+						recruitVO.setEsntlLangCmmncdNm(esntlLangCmmncdNm);
+						myEntMapper.recruitEsntlLangInsert(recruitVO);
+						
+						pass = 1;
+						
+					}catch(Exception e) {
+						
+						log.error("################## esntlLang 업데이트 중 에러...!", e);
+						throw e;
+						
+					}
+				}
+				
+			}
+			
+		}
+		
+		//삭제
+		if(recruitVO.getFlag() == 3) {
+			
+			try {
+
+				myEntMapper.recruitEsntlLangRemove(recruitVO);
+				pass = 1;
+				
+			}catch(Exception e) {
+				
+				log.error("################## esntlLang 삭제 중 에러...!", e);
+				throw e;
+				
+			}
+			
+		}
+		
+		return pass;
+
+	}
+
+	public int preferlang(RecruitVO recruitVO) {
+
+		int pass  = 0;
+		
+		// 인서트
+		if(recruitVO.getFlag() == 1) {
+			
+			if(recruitVO.getPreferLangCmmncdNms() != null && recruitVO.getPreferLangCmmncdNms().size() != 0) {
+			
+				for (String preferLangCmmncdNm : recruitVO.getPreferLangCmmncdNms()) {
+					
+					try {
+						
+						recruitVO.setPreferLangCmmncdNm(preferLangCmmncdNm);
+						myEntMapper.recruitPreferLangInsert(recruitVO);
+						
+						pass = 1;
+						
+					}catch(Exception e) {
+						
+						log.error("################## preferlang 인서트중 에러...!", e);
+						throw e;
+					}
+				}
+			}
+			pass = 1;
+		}
+		
+		//업데이트
+		if(recruitVO.getFlag() == 2) {
+			
+			//삭제 우선.
+			int deletePass = 0;
+			
+			try {
+				
+				deletePass = myEntMapper.recruitPreferLangRemove(recruitVO);
+				
+			} catch (Exception e) {
+				
+				log.info("################## preferlang 삭제 업데이트 중 에러...!", e);
+				throw e;
+				
+			}
+			
+			
+			if(deletePass > 0) {
+				
+				for (String preferLangCmmncdNm : recruitVO.getPreferLangCmmncdNms()) {
+					
+					try {
+						
+						recruitVO.setPreferLangCmmncdNm(preferLangCmmncdNm);
+						myEntMapper.recruitPreferLangInsert(recruitVO);
+						
+						pass = 1;
+						
+					}catch(Exception e) {
+						
+						log.error("################## preferlang 업데이트 중 에러...!", e);
+						throw e;
+						
+					}
+				}
+				
+			}
+			
+		}
+		
+		//삭제
+		if(recruitVO.getFlag() == 3) {
+			
+			try {
+
+				myEntMapper.recruitPreferLangRemove(recruitVO);
+				pass = 1;
+				
+			}catch(Exception e) {
+				
+				log.error("################## preferlang 삭제 중 에러...!", e);
+				throw e;
+				
+			}
+			
+		}
+		
+		return pass;
+
+	}
+
+	private int atchFile(RecruitVO recruitVO, HttpServletRequest req, int entNo) {
+
+		int pass  = 0;
+		// 기업 로그인 세션에서 기업번호 가져오기.
+		String fileSrcNo = getRecruitNo(entNo, recruitVO.getPstnCmmncdNm())+"_"+recruitVO.getPstnCmmncdNm();
+		String orgnCmmncd = "채용공고";
+		
+		if(recruitVO.getFlag() == 1) {
+			
+			try {
+
+				for(MultipartFile file : recruitVO.getRecruitFile()) {
+					
+					
+					AtchFileVO afv = new AtchFileVO(file, req, fileSrcNo, orgnCmmncd);
+					
+					atchFileMapper.atchFileInsert(afv);
+				
+				}
+				
+				pass = 1;
+				
+			}catch(Exception e) {
+				
+				log.error("################## 채용공고 파일 인서트중 에러...!", e);
+				throw e;
+			}
+			
+		}
+		
+		
+		//업데이트
+		if(recruitVO.getFlag() == 2) {
+			
+			//삭제부터
+			try {
+				
+				
+				
+				for(MultipartFile file : recruitVO.getRecruitFile()) {
+					
+					if(file.isEmpty()) {
+						
+						break;
+					}
+					
+					AtchFileVO afv = new AtchFileVO(file, req, fileSrcNo, orgnCmmncd);
+					
+					atchFileMapper.atchFileDelete(afv);
+					
+					break;
+				
+				}
+				
+			}catch(Exception e) {
+				
+				log.error("################## 채용공고 파일 삭제 업데이트 중 에러...!", e);
+				throw e;
+			}
+			
+			
+			try {
+				
+				if(recruitVO.getRecruitFile() != null || recruitVO.getRecruitFile().length != 0) {
+					
+					for(MultipartFile file : recruitVO.getRecruitFile()) {
+						
+						if(!file.isEmpty()) {
+							
+							AtchFileVO afv = new AtchFileVO(file, req, fileSrcNo, orgnCmmncd);
+							
+							atchFileMapper.atchFileInsert(afv);
+							
+							
+						}
+						
+					}
+					
+				}
+				
+				pass = 1;
+				
+			}catch(Exception e) {
+				
+				log.error("################## 채용공고 파일 업데이트 중 에러...!", e);
+				throw e;
+			}
+			
+		}
+		
+		//삭제
+		if(recruitVO.getFlag() == 3) {
+			
+			
+			try {
+				
+				AtchFileVO afv = new AtchFileVO();
+				afv.setFileSrcNo(fileSrcNo);
+				atchFileMapper.atchFileDelete(afv);
+				pass = 1;
+				
+				
+			}catch(Exception e) {
+				
+				log.error("################## 채용공고 파일 삭제 중 에러...!", e);
+				throw e;
+				
+			}
+			
+		}
+
+		return pass;
+	}
+	
+	
+	private int applyProcessList(RecruitVO recruitVO, String recruitNo, String pstnCmmncdNm) {
+		
+		int pass = 0;
+		
+		if(recruitVO.getFlag() == 1) {
+			
+			try {
+				
+				int totalPrice = 0;
+				
+				for(int i = 0; i < recruitVO.getOrder().length; i++) {
+					ApplyProcessListVO aplv = null;
+					
+					if(i == 0) {
+						
+						aplv = new ApplyProcessListVO();
+						aplv.setRecruitNo(recruitNo);
+						aplv.setPstnCmmncdNm(pstnCmmncdNm);
+						aplv.setApplyProcessOrder(recruitVO.getOrder()[i]);
+						aplv.setApplyProcessCost(recruitVO.getPrice()[i]);
+						aplv.setClsNm(recruitVO.getName()[i]);
+						
+						SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+						isoFormat.setLenient(false);
+						
+						String recruitStartStr = recruitVO.getRecruitStrtDt();
+						String recruitEndStr = recruitVO.getRecruitEndDt();
+						
+						Date strtYmd = isoFormat.parse(recruitStartStr);
+					    Date prsntnYmd = isoFormat.parse(recruitEndStr);
+						
+						aplv.setStrtYmd(strtYmd);
+						aplv.setPrsntnYmd(prsntnYmd);
+						
+						totalPrice += recruitVO.getPrice()[i];
+						
+						myEntMapper.applyProcessListInsert(aplv);
+					
+					}else {
+						
+						aplv = new ApplyProcessListVO();
+						aplv.setRecruitNo(recruitNo);
+						aplv.setPstnCmmncdNm(pstnCmmncdNm);
+						aplv.setApplyProcessOrder(recruitVO.getOrder()[i]);
+						aplv.setApplyProcessCost(recruitVO.getPrice()[i]);
+						aplv.setClsNm(recruitVO.getName()[i]);
+						totalPrice += recruitVO.getPrice()[i];
+						myEntMapper.applyProcessListInsert(aplv);
+					}
+					
+					
+					
+					if(recruitVO.getName()[i].equals("서류 전형")) {
+						
+						EntIntroQSTNVO qstn = new EntIntroQSTNVO();
+						
+						qstn.setRecruitNo(recruitNo);
+						qstn.setPstnCmmncdNm(pstnCmmncdNm);
+						qstn.setProcessSeq(aplv.getProcessSeq());
+						qstn.setQstnOrder(recruitVO.getOrder()[i]);
+						
+						myEntMapper.entIntroQSTNInsert(qstn);
+						
+					}
+					
+					if(recruitVO.getName()[i].equals("Coding test")) {
+						
+						EntCodingtestVO ecv = new EntCodingtestVO();
+						
+						ecv.setRecruitNo(recruitNo);
+						ecv.setPstnCmmncdNm(pstnCmmncdNm);
+						ecv.setProcessNo(aplv.getProcessSeq());
+						ecv.setProcessNoOrder(recruitVO.getOrder()[i]);
+						
+						myEntMapper.entCodingTestInsert(ecv);
+						
+					}
+					
+				}
+				
+				ApplyProcessListPayVO aplpv = new ApplyProcessListPayVO();
+				aplpv.setStlmAmt(totalPrice);
+				aplpv.setRecruitNo(recruitNo);
+				
+				myEntMapper.applyProcessListPayInsert(aplpv);
+				
+				pass = 1;
+				
+			}catch(Exception e) {
+				
+				log.error("################## 채용프로세스 삽입 중 에러...!", e);
+			}
+			
+		}
+		
+		
+		//수정
+		if(recruitVO.getFlag() == 2) {
+			
+		} 
+		
+		//삭제
+		if(recruitVO.getFlag() == 3) {
+			return myEntMapper.applyProcessListInsertDelete(recruitVO);
+		} 
+		
+		return pass;
+	}
+
+
+	
+	
+	
+	private String getRecruitNo(int entNo, String pstnCmmncdNm) {
+
+		Date now = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
+		String currentDate = sdf.format(now);
+		StringBuilder sb = new StringBuilder();
+		sb.append(currentDate);
+		sb.append("_");
+		sb.append(entNo);
+
+		return sb.toString();
+	}
+
+
+	@Override
+	public int selectRecruitCount(CustomPaginationInfoVO<RecruitVO> customPagingVO) {
+		
+		return myEntMapper.selectRecruitCount(customPagingVO);
+		
+	}
+
+
+	@Override
+	public List<RecruitVO> selectRecruitList(CustomPaginationInfoVO<RecruitVO> customPagingVO) {
+		return myEntMapper.selectRecruitList(customPagingVO);
+	}
+
+
+
+
+	@Override
+	public List<ApplyProcessListVO> selectProcess(String recruitNo, String pstnCmmncdNm) {
+		
+		return myEntMapper.selectProcess(recruitNo, pstnCmmncdNm);
+				
+	}
+
+
+
+
+	@Override
+	public List<EntIntroQSTNDSNCTVO> selectDsnct(String recruitNo, String pstnCmmncdNm) {
+		return myEntMapper.selectDsnct(recruitNo, pstnCmmncdNm);
+	}
+
+
+
+	@Override
+	public ServiceResult qstnDSNCTInsert(QstnDSNCTVO qdv) {
+		
+		ServiceResult result = null;
+		
+		int pass = myEntMapper.qstnDSNCTInsert(qdv);
+		
+		if(pass > 0) {
+			
+			
+			result = ServiceResult.OK;
+			
+			
+		}else {
+			
+			result = ServiceResult.FAILED;
+			
+			
+		}
+		
+		return result;
+	}
+
+
+
+
+	@Override
+	public ServiceResult qstnDSNCTUpdate(int entIntroQstnSeqNo, String entIntroQstnUpdateCn) {
+		
+		ServiceResult result = null;
+		
+		int pass = myEntMapper.qstnDSNCTUpdate(entIntroQstnSeqNo, entIntroQstnUpdateCn);
+		
+		if(pass > 0) {
+			
+			result = ServiceResult.OK;
+			
+		}else {
+			
+			result = ServiceResult.FAILED;
+		}
+		
+		
+		return result;
+	}
+
+
+
+
+	@Override
+	public List<EntIntroQSTNVO> getentIntroQstnNo(String recruitNo, String pstnCmmncdNm) {
+		return myEntMapper.getentIntroQstnNo(recruitNo, pstnCmmncdNm);
+	}
+	
+	
+	@Override
+	public List<ApplyProcessListVO> selectApplyProcessList(String recruitNo, String pstnCmmncdNm) {
+		return myEntMapper.selectApplyProcessList(recruitNo, pstnCmmncdNm);
+	}
+
+
+
+
+	@Override
+	public int selecetAccountListCount(CustomPaginationInfoVO<AccountVO> accountList) {
+		return myEntMapper.selecetAccountListCount(accountList);
+	}
+
+
+
+
+	@Override
+	public List<AccountVO> selectOrderList(CustomPaginationInfoVO<AccountVO> accountList) {
+		return myEntMapper.selectOrderList(accountList);
+	}
+
+
+
+
+	@Override
+	public int insetEachProcess(EachProcessApplyPassVO eachProcessApplyPassVO) {
+		return myEntMapper.insetEachProcess(eachProcessApplyPassVO);
+	}
+
+
+
+
+	@Override
+	public String selectEachProcessNo(EachProcessApplyPassVO eachProcessApplyPassVO) {
+		return myEntMapper.selectEachProcessNo(eachProcessApplyPassVO);
+	}
+
+
+
+
+	@Override
+	public List<EntIntroQSTNDSNCTVO> selectOrderDsnct(String recruitNo, String pstnCmmncdNm, String orderNumber) {
+		return myEntMapper.selectOrderDsnct(recruitNo, pstnCmmncdNm, orderNumber);
+	}
+
+
+
+	@Override
+	public ServiceResult qstnDSNCTDelete(int entIntroQstnSeqNo) {
+		
+		ServiceResult result = null;
+		System.out.println("Dd");
+		
+		int pass = myEntMapper.qstnDSNCTDelete(entIntroQstnSeqNo);
+		
+		if(pass > 0) {
+			
+			result = ServiceResult.OK;
+			
+		}else {
+			
+			result = ServiceResult.FAILED;
+		}
+		
+		return result;
+	}
+
+	@Override
+	public int BBS201Count(int entNo) {
+
+		return myEntMapper.BBS201Count(entNo);
+	}
+
+
+
+
+	@Override
+	public List<BoardVO> BBS201List(BoardBBS201PaginationVO<BoardVO> bBS201PagingVO) {
+		return myEntMapper.BBS201List(bBS201PagingVO);
+	}
+
+
+
+
+	@Override
+	public ServiceResult noticeInsert(HttpServletRequest req, BoardVO bv) {
+		
+		ServiceResult result = null;
+		
+		int status = myEntMapper.noticeInsert(bv);
+		if(status > 0) {
+			List<AtchVO> noticeFileList = bv.getAtchFileList();
+			
+			try {
+				FileUpload(noticeFileList, bv.getBbsNo(), req);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			
+			result = ServiceResult.OK;		
+			
+		}else {
+			result = ServiceResult.FAILED;
+		}
+		
+		
+		return result;
+	}
+
+	
+	
+	
+	
+	
+	
+	private void FileUpload(List<AtchVO> noticeFileList, String bbsNo , HttpServletRequest req) throws Exception{
+		String savePath = "/resources/notice/";
+		
+		if(noticeFileList != null) {
+			if(noticeFileList.size() > 0) {
+				for (AtchVO atchVO : noticeFileList) {
+					String saveName = UUID.randomUUID().toString();
+					
+					saveName += "_"  + atchVO.getFileName();
+					String saveLocate = req.getServletContext().getRealPath(savePath + bbsNo);
+					File file = new File(saveLocate);
+					if(!file.exists()) {
+						file.mkdirs();
+					}
+					
+					saveLocate += "/" + saveName;
+					
+					atchVO.setBbsNo(bbsNo);
+					atchVO.setFilePath(saveLocate);
+					myEntMapper.insertNoticeFile(atchVO);
+					
+					File saveFile = new File(saveLocate);
+					atchVO.getItem().transferTo(saveFile);
+					
+				}
+			}
+		}
+		
+		
+	}
+
+
+
+
+	@Override
+	public int BBS202Count(int entNo) {
+		return myEntMapper.BBS202Count(entNo);
+	}
+
+
+
+
+	@Override
+	public List<BoardVO> BBS202List(BoardBBS202PaginationVO<BoardVO> bBS202PagingVO) {
+		return myEntMapper.BBS202List(bBS202PagingVO);
+	}
+
+
+
+
+	@Override
+	public ServiceResult idCheck(String id) {
+		
+		int idCount = myEntMapper.idCheck(id);
+		
+		if(idCount != 0) {
+			return ServiceResult.EXIST;
+		}else {
+			return ServiceResult.NOTEXIST;
+		}
+		
+	}
+
+
+
+
+
+	
+
+
+	@Override
+	public List<Map<String, String>> getQstnAnswer(Map<String, String> qstnAnswer) {
+		return myEntMapper.getQstnAnswer(qstnAnswer);
+	}
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	@Override
+	public ServiceResult signUp(AccountVO av) {
+
+		ServiceResult result = null;
+		
+		av.setAccountPswd(pe.encode(av.getAccountPswd()));
+		
+		int status = myEntMapper.signUp(av);
+		if(status > 0) {
+			myEntMapper.accountAuth(av.getAccountId());
+			myEntMapper.entAccount(av);
+			result = ServiceResult.OK;
+		}else {
+			result = ServiceResult.FAILED;
+		}
+		
+		
+		return result;
+	}
+
+
+
+
+	@Override
+	public int countId(int entNo) {
+		return myEntMapper.countId(entNo);
+	}
+
+
+
+
+	@Override
+	public List<EntAccountVO> selectId(int entNo) {
+		return myEntMapper.selectId(entNo);
+	}
+
+
+
+
+	@Override
+	public ServiceResult deleteId(String accountId) {
+
+		ServiceResult result = null;
+				
+		int status = myEntMapper.deleteId(accountId);
+		
+		if(status > 0) {
+			result = ServiceResult.OK;
+			myEntMapper.deleteAccountAuth(accountId);
+			myEntMapper.deleteEntAccount(accountId);
+		}else {
+			result = ServiceResult.FAILED;
+		}
+			
+		return result;
+	}
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	@Override
+	public ServiceResult updateApplicantPass(String applyNo, String updateClsNm, int updateOrderNumber) {
+		
+		ServiceResult result = null;
+		
+		int pass = myEntMapper.updateApplicantPass(applyNo, updateClsNm, updateOrderNumber);
+		
+		if(pass > 0) {
+			
+			result = ServiceResult.OK;
+			
+		}else {
+			
+			result = ServiceResult.FAILED;
+		}
+		
+		
+		return result;
+	}
+
+
+
+
+	@Override
+	public List<RecruitApplicantVO> getApplyNumber(String recruitNo) {
+		return myEntMapper.getApplyNumber(recruitNo);
+	}
+
+
+
+
+	@Override
+	public List<LogRecruitTableVO> getApplyHit(String recruitNo, String pstnCmmncdNm) {
+		return myEntMapper.getApplyHit(recruitNo, pstnCmmncdNm);
+	}
+
+
+
+
+	@Override
+	public List<ApplicantPassStatVO> getApplyPass(String applyNo, String yn) {
+		return myEntMapper.getApplyPass(applyNo, yn);
+	}
+
+
+
+
+	@Override
+	public List<ApplicantCareerStatVO> getApplyCareer(String applyNo) {
+		return myEntMapper.getApplyCareer(applyNo);
+	}
+
+
+
+
+	@Override
+	public List<ApplicantGenderStatVO> getApplyGender(String applyNo) {
+		return myEntMapper.getApplyGender(applyNo);
+	}
+
+
+
+
+	@Override
+	public List<ApplicantEduStatVO> getApplyEdu(String applyNo) {
+		// TODO Auto-generated method stub
+		return myEntMapper.getApplyEdu(applyNo);
+	}
+
+
+
+
+	@Override
+	public List<Map<String, String>> getPstnCmmncdList() {
+		return myEntMapper.getPstnCmmncdList();
+	}
+
+
+
+
+	@Override
+	public List<Map<String, String>> getPreferCmmncdNm() {
+		return myEntMapper.getPreferCmmncdNm();
+	}
+
+
+
+
+	@Override
+	public ServiceResult updateProcessDate(int updateSeq, LocalDate startDate, LocalDate endDate) {
+		
+		ServiceResult result = null;
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("updateSeq", updateSeq);
+		map.put("startDate", startDate);
+		map.put("endDate", endDate);
+		
+		int pass = myEntMapper.updateProcessDate(map);
+		
+		if(pass > 0) {
+			
+			result = ServiceResult.OK;
+			
+		}else {
+			
+			result = ServiceResult.FAILED;
+			
+		}
+		
+		
+		return  result;
+	}
+
+
+
+
+	@Override
+	public int getTodayApply(String customEntNo) {
+		return myEntMapper.getTodayApply(customEntNo);
+	}
+
+
+
+
+	@Override
+	public int getTotalRecruitCount(String customEntNo) {
+		return myEntMapper.getTotalRecruitCount(customEntNo);
+	}
+
+
+
+
+	@Override
+	public int getTotalApply(String customEntNo) {
+		return myEntMapper.getTotalApply(customEntNo);
+	}
+
+
+
+
+	@Override
+	public EnterpriseVO getEnterMyInfo(int entNo) {
+		return myEntMapper.getEnterMyInfo(entNo);
+	}
+
+
+
+
+	@Override
+	public int getEndedRecruitCount(String customEntNo) {
+		return myEntMapper.getEndedRecruitCount(customEntNo);
+	}
+
+
+	@Override
+	public List<Map<String, Object>> getProgressRecruit(int entNo) {
+		return myEntMapper.getProgressRecruit(entNo);
+	}
+
+
+
+
+	@Override
+	public List<Map<String, Object>> getRecentApply(String customEntNo2) {
+		return myEntMapper.getRecentApply(customEntNo2);
+	}
+
+
+
+
+	@Override
+	public List<RecruitVO> getDeadLineRecruit(int entNo) {
+		return myEntMapper.getDeadLineRecruit(entNo);
+	}
+
+
+
+
+	@Override
+	public int insertApplicantPass(Map<String, Object> updateInfo) {
+		return myEntMapper.insertApplicantPass(updateInfo);
+	}
+
+
+
+
+	@Override
+	public AccountVO selecteResumeByRsmNo(String rsmNo) {
+		return myEntMapper.selecteResumeByRsmNo(rsmNo);
+	}
+
+
+
+
+	@Override
+	public ResumeVO selecteEducationByRsmNo(String rsmNo) {
+		// TODO Auto-generated method stub
+		return myEntMapper.selecteEducationByRsmNo(rsmNo);
+	}
+
+
+
+
+	@Override
+	public List<CareerVO> selecteCareerByRsmNo(String rsmNo) {
+		// TODO Auto-generated method stub
+		return myEntMapper.selecteCareerByRsmNo(rsmNo);
+	}
+
+
+
+
+	@Override
+	public List<ExperienceVO> selectExperienceByRsmNo(String rsmNo) {
+		// TODO Auto-generated method stub
+		return myEntMapper.selectExperienceByRsmNo(rsmNo);
+	}
+
+
+
+
+	@Override
+	public List<CertificateVO> selectCertificateByRsmNo(String rsmNo) {
+		// TODO Auto-generated method stub
+		return myEntMapper.selectCertificateByRsmNo(rsmNo);
+	}
+
+
+
+
+	@Override
+	public List<PortfolioVO> selectPortfolioByRsmNo(String rsmNo) {
+		// TODO Auto-generated method stub
+		return myEntMapper.selectPortfolioByRsmNo(rsmNo);
+	}
+
+
+
+
+	@Override
+	public List<AvailLangListVO> selectAvailLangListByRsmNo(String rsmNo) {
+		// TODO Auto-generated method stub
+		return myEntMapper.selectAvailLangListByRsmNo(rsmNo);
+	}
+
+
+
+
+	@Override
+	public ServiceResult updateApplicantFail(String eachProcessSeq) {
+		
+		ServiceResult result = null;
+		
+		int pass = myEntMapper.updateApplicantFail(eachProcessSeq);
+		
+		if(pass > 0) {
+			
+			result =  ServiceResult.FAILED;
+			
+		}else {
+			
+			
+			result = ServiceResult.NOTEXIST;
+		}
+		
+		
+		return result;
+		
+	}
+
+
+
+
+	@Override
+	public List<EntIntroQSTNVO> getEntCodingTestNo(String recruitNo, String pstnCmmncdNm) {
+		return myEntMapper.getEntCodingTestNo(recruitNo, pstnCmmncdNm);
+	}
+
+
+
+
+	@Override
+	public ServiceResult codingTestInsert(EntCodingTestQstnDsnctVO ectqdv) {
+		
+		ServiceResult result = null;
+		
+		int pass = myEntMapper.codingTestInsert(ectqdv);
+		
+		if(pass > 0) {
+			
+			result = ServiceResult.OK;
+			
+		}else {
+			
+			result = ServiceResult.FAILED;
+			
+		}
+		
+		
+		return result;
+	}
+
+
+
+
+	@Override
+	public List<EntCodingTestQstnDsnctVO> selectCondingTestOrder(String recruitNo, String pstnCmmncdNm,
+			String orderNumber) {
+		return myEntMapper.selectCondingTestOrder(recruitNo, pstnCmmncdNm, orderNumber);
+	}
+
+
+
+
+}

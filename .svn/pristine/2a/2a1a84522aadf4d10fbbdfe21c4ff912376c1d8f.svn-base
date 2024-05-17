@@ -1,0 +1,214 @@
+package kr.co.itcruit.mypage.enterprise.controller;
+
+
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.mypage.enterprise.service.IMyEnterpriseService;
+import kr.co.itcruit.vo.ApplyProcessListVO;
+import kr.co.itcruit.vo.CustomPaginationInfoVO;
+import kr.co.itcruit.vo.RecruitVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@RequestMapping("myPage/enterprise")
+@Slf4j
+public class EnterpriseController {
+	
+	@Autowired
+	private IMyEnterpriseService myEntService;
+	
+
+	@RequestMapping(value = "/entInfo", method = RequestMethod.GET)
+	public String entInfo() {
+		
+		
+		return "entmypage/entInfo";
+		
+		
+	}
+	
+	@RequestMapping(value = "/recruitRegisterForm", method = RequestMethod.GET)
+	public String recruitRegisterForm(Model model) {
+		
+		
+		model.addAttribute("tOrf1", "true");
+		model.addAttribute("show1", "show");
+		model.addAttribute("active1", "active");
+		
+		return "entmypage/recruitRegister";
+		
+	}
+	
+	
+	@RequestMapping(value = "/recruitProcessQuestion", method = RequestMethod.GET)
+	public String recruitProcessQuestion(
+			
+			@RequestParam(name="page", required = false, defaultValue ="1") int currentPage,
+			@RequestParam(required = false, defaultValue = "defaultSort") String searchType,
+			@RequestParam(required = false) String searchWord,
+			@RequestParam(required = false) String processYn,
+			@RequestParam(required = false) String recruitYn,
+			
+			Model model) {
+		 
+		log.info("#################### processYn : " + processYn);
+		log.info("#################### recruitYn : " + recruitYn);
+		
+		int entNo = 9999999;
+		
+		CustomPaginationInfoVO<RecruitVO> customPagingVO = new CustomPaginationInfoVO<RecruitVO>();
+		
+			
+		customPagingVO.setSearchWord(searchWord);
+		customPagingVO.setSearchType(searchType);
+		customPagingVO.setProcessYn(processYn);
+		customPagingVO.setRecruitYn(recruitYn);
+		customPagingVO.setEntNo(entNo);
+		model.addAttribute("searchWord", searchWord);
+		model.addAttribute("searchType", searchType);
+		model.addAttribute("processYn", processYn);
+		model.addAttribute("recruitYn", recruitYn);
+		
+		
+		// 현재 페이지
+		customPagingVO.setCurrentPage(currentPage);
+		
+		// 1. 총 게시글 수 조회 
+		int totalRecord = myEntService.selectRecruitCount(customPagingVO);
+		customPagingVO.setTotalRecord(totalRecord);
+		
+		List<RecruitVO> searchList = myEntService.selectRecruitList(customPagingVO);
+		
+		customPagingVO.setDataList(searchList);
+		
+		
+		
+		model.addAttribute("customPagingVO", customPagingVO);
+		
+		model.addAttribute("tOrf1", "true");
+		model.addAttribute("show1", "show");
+		model.addAttribute("active2", "active");
+	
+		
+		return "entmypage/recruitProcessQuestion";
+		
+	}
+	
+	@RequestMapping(value = "/recruitContectList", method = RequestMethod.GET)
+	public String recruitList(Model model) {
+		
+		
+		
+		model.addAttribute("tOrf2", "true");	
+		model.addAttribute("show2", "show");
+		model.addAttribute("active3", "active");
+		
+		int entNo = 9999999;
+		
+		List<RecruitVO> recruitList = myEntService.recruitSelectListByEntNo(entNo);
+		model.addAttribute("recruitList", recruitList);
+		
+		
+		return "entmypage/recruitContectList";
+		
+	}
+	
+	@RequestMapping(value = "/recruitStatistics", method = RequestMethod.GET)
+	public String recruitStatistics(Model model) {
+		
+		
+		
+		model.addAttribute("tOrf2", "true");	
+		model.addAttribute("show2", "show");
+		model.addAttribute("active4", "active");
+		
+		return "entmypage/recruitStatistics";
+		
+	}
+	
+	@RequestMapping(value = "/talentFind", method = RequestMethod.GET)
+	public String talentFind(Model model) {
+		
+		
+		
+		model.addAttribute("active5", "active");
+		
+		return "entmypage/talentFind";
+		
+	}
+	
+	@RequestMapping(value = "/entRating", method = RequestMethod.GET)
+	public String entRating(Model model) {
+		
+		
+		model.addAttribute("active6", "active");
+		
+		return "entmypage/entRating";
+		
+	}
+	
+	@RequestMapping(value = "/entAccountApplication", method = RequestMethod.GET)
+	public String entAccountApplication(Model model) {
+		
+		
+		model.addAttribute("active7", "active");
+		
+		return "entmypage/entAccountApplication";
+		
+	}
+	
+	@RequestMapping(value = "/entInquiryDetails", method = RequestMethod.GET)
+	public String entInquiryDetails(Model model) {
+		
+		
+		model.addAttribute("active8", "active");
+		
+		return "entmypage/entInquiryDetails";
+		
+	}
+	
+	@RequestMapping(value = "/entBoard", method = RequestMethod.GET)
+	public String entBoard(Model model) {
+		
+		
+		model.addAttribute("active9", "active");
+		
+		return "entmypage/entBoard";
+		
+	}
+	
+	
+	@RequestMapping(value = "/processDetail", method = RequestMethod.GET)
+	public String processRegister(
+			@RequestParam("recruitNo") String recruitNo, 
+			@RequestParam("pstnCmmncdNm") String pstnCmmncdNm,
+			@RequestParam("recruitTtl") String recruitTtl,
+			Model model
+			){
+//		log.info("################## recruitNo : " + recruitNo);
+//		log.info("################## pstnCmmncdNm : " + pstnCmmncdNm);
+//		log.info("################## recruitTtl : " + recruitTtl);
+		
+		List<ApplyProcessListVO> apList= myEntService.selectProcess(recruitNo, pstnCmmncdNm);
+		
+		log.info("################## apList : " + apList);
+		log.info("################## recruitTtl : " + recruitTtl);
+		
+		model.addAttribute("apList", apList);
+		model.addAttribute("recruitTtl", recruitTtl);
+		
+		return "entmypage/processRegister";
+	}
+}

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IMyEnterpriseMapper">
+ 	
+ 	<insert id="recruitRegisterinsert" parameterType="recruitVO">
+ 	
+ 		INSERT INTO recruit (
+ 		
+		    recruit_no,
+		    ent_no,
+		    recruit_ttl,
+		    recruit_strt_dt,
+		    recruit_end_dt,
+		    recruit_yn,
+		    recruit_career_code_nm,
+		    recruit_career_dt,
+		    ent_url,
+		    recruit_hit,
+		    process_yn,
+		    process_amt,
+		    recruit_pay,
+		    recruit_enroll_ymd,
+		    cmmncd_grp_cd,
+		    cmmncd_nm1,
+		   	recruit_cnt,
+		   	pstn_cmmncd_nm
+		    
+		) VALUES (
+		
+		    #{recruitNo},
+		    #{entNo},
+		    #{recruitTtl},
+		    #{recruitStrtDt},
+		    #{recruitEndDt},
+		    #{recruitYn},
+		    #{recruitCareerCodeNm},
+		    #{recruitCareerDt},
+		    #{entUrl},
+		    #{recruitHit},
+		    #{processYn},
+		    #{processAmt},
+		    #{recruitPay},
+		    SYSDATE,
+		    #{cmmncdGrpCd},
+		    #{cmmncdNm1},
+		    #{recruitCnt},
+		    #{pstnCmmncdNm}
+		)
+		 	
+ 	
+ 	</insert>
+ 	
+ 	<insert id="hireSttsInsert" parameterType="recruitVO">
+ 	
+	 	INSERT INTO hire_stts (
+	    
+	    	hire_stts_no,
+	    	recruit_no,
+	    	hire_cmmnd_nm
+		
+		) VALUES (
+		
+		    SEQ_HIRE_STTS_NO.NEXTVAL,
+		    #{recruitNo},
+		    #{hireCmmncdNm}
+		)
+ 	
+ 	</insert>
+ 	
+ 	<insert id="esntlLangInsert" parameterType="recruitVO">
+ 	
+ 		INSERT INTO esntl_lang (
+ 		
+		    esntl_lang_no,
+		    recruit_no,
+		    esntl_lang_cmmncd_nm
+		    
+		) VALUES (
+		
+		    SEQ_ESNTL_LANG_NO.NEXTVAL,
+		    #{recruitNo},
+		    #{esntlLangCmmncdNm}
+		)
+ 	
+ 	</insert>
+ 	
+ 	<insert id="preferLangInsert" parameterType="recruitVO">
+ 	
+	 	
+	 	INSERT INTO "prefer_lang" (
+	 	
+		    "prefer_lang_no",
+		    recruit_no,
+		    prefer_lang_cmmncd_nm
+		    
+		) VALUES (
+		    SEQ_PREFER_LANG_NO.NEXTVAL,
+		    #{recruitNo},
+		    #{preferLangCmmncdNm}
+		)
+ 	
+ 	</insert>
+ 	
+ </mapper>

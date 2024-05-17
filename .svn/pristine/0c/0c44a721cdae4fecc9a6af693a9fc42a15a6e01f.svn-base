@@ -1,0 +1,853 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.itcruit.mapper.IResumeMapper">
+
+	<resultMap type="resumeVO" id="resumeMap">
+	    <id property="rsmNo" column="rsm_no"/>
+	    <result property="accountId" column="account_id"/>
+	    <result property="rsmGender" column="rsm_gender"/>
+	    <result property="rsmTtl" column="rsm_ttl"/>
+	    <result property="rsmNewCareer" column="rsm_new_career"/>
+	    <result property="rsmCareerYear" column="rsm_career_year"/>
+	    <result property="rsmRlsYn" column="rsm_rls_yn"/>
+	    <result property="rsmPhotoByte" column="rsm_photo"/>
+	    <result property="rsmIntroduction" column="rsm_introduction"/>
+	    <result property="eduEnd" column="edu_end"/>
+	    <result property="eduAcdmcr" column="edu_acdmcr"/>
+	    <result property="eduNm" column="edu_nm"/>
+	    <result property="grade" column="grade"/>
+	    <result property="full" column="full"/>
+	    <result property="rsmMjrNm" column="rsm_mjr_nm"/>
+	    <result property="rsmMjrCd" column="rsm_mjr_cd"/>
+	    <collection property="availLangVOList" resultMap="availLangListMap"/>
+	    <collection property="rsmPositionVO" resultMap="positionMap"/>
+	</resultMap>
+	
+	<resultMap type="availLangVO" id="availLangListMap">
+	    <id property="availLangSeq" column="avail_lang_seq"/>
+	    <result property="availLangCmmncdNm" column="avail_lang_cmmncd_nm"/>
+	    <result property="rsmNo" column="rsm_no"/>
+	</resultMap>
+	
+	<resultMap type="positionVO" id="positionMap">
+	    <id property="pstnSeq" column="pstn_seq"/>
+	    <result property="rsmNo" column="rsm_no"/>
+	    <result property="pstnCmmncdNm" column="pstn_cmmncd_nm"/>
+	    <result property="pstnCate" column="pstn_cate"/>
+	</resultMap>
+
+	<resultMap type="careerVO" id="careerMap">
+	  	<id property="careerNo" column="career_no"/>
+	  	<result property="rsmNo" column="rsm_no"/>
+	  	<result property="careerCoNm" column="career_co_nm"/>
+	  	<result property="careerDeptNm" column="career_dept_nm"/>
+	  	<result property="careerJbgdNm" column="career_jbgd_nm"/>
+	  	<result property="careerTkcgTaskNm" column="career_tkcg_task_nm"/>
+	  	<result property="careerJncmpYm" column="career_jncmp_ym"/>
+	  	<result property="careerRsgntnYm" column="career_rsgntn_ym"/>
+	  	<result property="careerHdofYn" column="career_hdof_yn"/>
+	  	<collection property="projectData" resultMap="projectCareerMap"/>
+	</resultMap>
+	
+	<resultMap type="projectVO" id="projectCareerMap">
+		<id property="projNo" column="proj_no"/>
+	    <result property="careerNo" column="career_no"/>
+	    <result property="projNm" column="proj_nm"/>
+	    <result property="projDtlCn" column="proj_dtl_cn"/>
+	</resultMap>
+	
+	<resultMap type="portfolioVO" id="portfolioMap">
+	    <id property="portNo" column="PORT_NO"/>
+	    <result property="rsmNo" column="RSM_NO"/>
+	    <result property="portUrlTtl" column="PORT_URL_TTL"/>
+	    <result property="portUrl" column="PORT_URL"/>
+	</resultMap>
+	
+	<resultMap type="portfolioFileVO" id="portfolioFileMap">
+	    <id property="portFileNo" column="PORT_FILE_NO"/>
+	    <result property="rsmNo" column="RSM_NO"/>
+	    <result property="portFileTtl" column="PORT_FILE_TTL"/>
+	</resultMap>
+	
+	<resultMap type="certificateVO" id="certificateMap">
+	    <id property="crtfctSeq" column="CRTFCT_SEQ"/>
+	    <result property="rsmNo" column="RSM_NO"/>
+	    <result property="crtfctNm" column="CRTFCT_NM"/>
+	    <result property="crtfctNo" column="CRTFCT_NO"/>
+	    <result property="crtfctQlfcAcqsYm" column="CRTFCT_QLFC_ACQS_YM"/>
+	    <result property="crtfctPblcnInstNm" column="CRTFCT_PBLCN_INST_NM"/>
+	</resultMap>
+	
+	<resultMap type="experienceVO" id="experienceMap">
+	    <id property="experNo" column="EXPER_NO"/>
+	    <result property="rsmNo" column="RSM_NO"/>
+	    <result property="experNm" column="EXPER_NM"/>
+	    <result property="experType" column="EXPER_TYPE"/>
+	    <result property="experCoNm" column="EXPER_CO_NM"/>
+	    <result property="experCn" column="EXPER_CN"/>
+	    <result property="experBgngYm" column="EXPER_BNG_YM"/>
+	    <result property="experEndYm" column="EXPER_END_YM"/>
+	    <result property="experPrgrsYn" column="EXPER_PRGRS_YN"/>
+	</resultMap>
+	
+	<resultMap type="atchFileVO" id="atchFileMap">
+	    <id property="fileNo" column="file_no"/>
+	    <result property="fileSrcNo" column="file_src_no" />
+	    <result property="orgnCmmncd" column="orgn_cmmncd" />
+	    <result property="filePath" column="file_path" />
+	    <result property="fileSize" column="file_size" />
+	    <result property="fileFancysize" column="file_fancysize" />
+	    <result property="fileMime" column="file_mime" />
+	    <result property="fileName" column="file_name" />
+	</resultMap>
+	
+	<delete id="deleteResume" parameterType="string">
+		delete
+		from
+			resume
+		where
+			rsm_no = #{rsmNo}
+	</delete>
+	
+	<select id="selectDeleteRsm" parameterType="string" resultType="resumeVO">
+		select
+			*
+		from
+			resume
+		where
+			rsm_no = #{rsmNo}
+	</select>
+	
+	<delete id="deleteRsmPortfolioFile" parameterType="string">
+		delete
+		from
+			RESUME_PORTFOLIOFILE
+		where
+			rsm_no = #{rsmNo}
+	</delete>
+
+	<delete id="deleteRsmPortFile" parameterType="string">
+		delete
+		from
+			RESUME_PORTFOLIOFILE
+		where
+			PORT_FILE_NO = #{portFileNo}
+	</delete>
+	
+	<delete id="deleteRsmAtchPortfolioFile" parameterType="string">
+		delete
+		from
+			atch
+		where
+			FILE_SRC_NO = #{portFileNo}
+		and
+			ORGN_CMMNCD = '이력서포트폴리오파일'
+	</delete>
+	
+	<select id="selectRsmPortFile" parameterType="string" resultType="string">
+		select
+			PORT_FILE_NO
+		from
+			RESUME_PORTFOLIOFILE
+		where
+			rsm_no = #{rsmNo}
+	</select>
+	
+	<select id="findRsmPortfolioFile" parameterType="string" resultType="int">
+		select
+			count(PORT_FILE_NO)
+		from
+			RESUME_PORTFOLIOFILE
+		where
+			rsm_no = #{rsmNo}
+	</select>
+	
+	<select id="selectRsmPortFileVO" parameterType="portfolioFileVO" resultType="string">
+		select
+			PORT_FILE_NO
+		from
+			RESUME_PORTFOLIOFILE
+		where
+			rsm_no = #{rsmNo}
+		and
+			PORT_FILE_TTL = #{portFileTtl}
+	</select>
+	
+	<select id="selectRsmPortFileTtl" parameterType="string" resultType="string">
+		select
+			PORT_FILE_TTL
+		from
+			RESUME_PORTFOLIOFILE
+		where
+			rsm_no = #{rsmNo}
+		order by
+			port_file_no
+	</select>
+	
+	<select id="findRsmPortfolioFileTtl" parameterType="portfolioFileVO" resultType="int">
+		select
+			count(PORT_FILE_NO)
+		from
+			RESUME_PORTFOLIOFILE
+		where
+			rsm_no = #{rsmNo}
+		and
+			PORT_FILE_TTL = #{portFileTtl}
+	</select>
+	
+	
+	
+	
+	<delete id="deleteRsmPortfolioUrl" parameterType="string">
+		delete
+		from
+			PORTFOLIO
+		where
+			rsm_no = #{rsmNo}
+	</delete>
+	
+	<select id="findRsmPortfolioUrl" parameterType="string" resultType="int">
+		select
+			count(PORT_NO)
+		from
+			PORTFOLIO
+		where
+			rsm_no = #{rsmNo}
+	</select>
+	
+	<delete id="deleteRsmCareer" parameterType="string">
+		delete
+		from
+			career
+		where
+			rsm_no = #{rsmNo}
+	</delete>
+	
+	<delete id="deleteRsmCareerProject" parameterType="int">
+		delete
+		from
+			PROJECT_CAREER
+		where
+			CAREER_NO = #{careerNo}
+	</delete>
+	
+	<select id="findRsmCareerNo" parameterType="string" resultType="object">
+		select
+			career_no
+		from
+			career
+		where
+			rsm_no = #{rsmNo}
+	</select>
+	
+	<delete id="deleteRsmExperience" parameterType="string">
+		delete
+		from
+			EXPERIENCE
+		where
+			rsm_no = #{rsmNo}
+	</delete>
+	
+	<select id="findRsmExperience" parameterType="string" resultType="int">
+		select
+			count(EXPER_NO)
+		from
+			EXPERIENCE
+		where
+			rsm_no = #{rsmNo}
+	</select>
+	
+	<delete id="deleteRsmCertificate" parameterType="string">
+		delete
+		from
+			certificate
+		where
+			rsm_no = #{rsmNo}
+	</delete>
+	
+	<select id="findRsmCertificate" parameterType="string" resultType="int">
+		select
+			count(CRTFCT_SEQ)
+		from
+			certificate
+		where
+			rsm_no = #{rsmNo}
+	</select>
+	
+	<delete id="deleteRsmPosition" parameterType="string">
+		delete
+		from
+			position
+		where
+			rsm_no = #{rsmNo}
+	</delete>
+	
+	<select id="findRsmPosition" parameterType="string" resultType="int">
+		select
+			count(pstn_seq)
+		from
+			position
+		where
+			rsm_no = #{rsmNo}
+	</select>
+	
+	<update id="deleteRsmIntro" parameterType="string">
+		update
+			resume
+		set
+		    RSM_INTRODUCTION = ''
+		where
+		    rsm_no = #{rsmNo}
+	</update>
+	
+	<select id="findRsmIntro" parameterType="string" resultType="int">
+		select
+			count(RSM_INTRODUCTION)
+		from
+			resume
+		where
+			rsm_no = #{rsmNo}
+	</select>
+	
+	<update id="deleteRsmPhoto" parameterType="string">
+		update
+			resume
+		set
+		    RSM_PHOTO = ''
+		where
+		    rsm_no = #{rsmNo}
+	</update>
+	
+	<select id="findRsmPhoto" parameterType="string" resultType="int">
+		select
+		    NVL(LENGTH(RSM_PHOTO), 0)
+		from
+		    resume
+		where
+		    rsm_no = #{rsmNo}
+	</select>
+	
+	<delete id="deleteRsmLang" parameterType="string">
+		delete
+		from
+			avail_lang_list
+		where
+			rsm_no = #{rsmNo}
+	</delete>
+	
+	<update id="updateDefaultRsmInfo" parameterType="resumeVO">
+		update
+			resume
+		set
+		    RSM_TTL = #{rsmTtl}
+		    , RSM_CAREER_YEAR = #{rsmCareerYear}
+		    , RSM_RLS_YN = #{rsmRlsYn}
+		where
+		    rsm_no = #{rsmNo}
+	</update>
+	
+	<select id="selectRsmPhoto" parameterType="string" resultType="resumeVO">
+		select
+		    RSM_NO
+		    , RSM_PHOTO
+		from
+		    resume
+		where
+		    rsm_no = #{rsmNo}
+	</select>
+	
+	<select id="selectExp" parameterType="string" resultType="experienceVO">
+		select
+		    RSM_NO
+		    , EXPER_NM
+		    , EXPER_CO_NM
+		    , EXPER_BGNG_YM
+		    , EXPER_END_YM
+		    , EXPER_CN
+		    , EXPER_PRGRS_YN
+		    , EXPER_TYPE
+		from
+		    EXPERIENCE 
+		where
+		    rsm_no = #{rsmNo}
+		order by
+			EXPER_NO
+	</select>
+	
+	<select id="selectCert" parameterType="string" resultType="certificateVO">
+		select
+		    RSM_NO
+		    , CRTFCT_NM
+		    , CRTFCT_NO
+		    , CRTFCT_QLFC_ACQS_YM
+		    , CRTFCT_PBLCN_INST_NM
+		from
+		    certificate 
+		where
+		    rsm_no = #{rsmNo}
+		order by
+			CRTFCT_SEQ
+	</select>
+	
+	<select id="selectCareerProject" parameterType="string" resultMap="careerMap">
+		select
+		    rsm.rsm_no
+		    , car.CAREER_NO
+		    , car.CAREER_CO_NM
+		    , car.CAREER_DEPT_NM
+		    , car.CAREER_JBGD_NM
+		    , car.CAREER_TKCG_TASK_NM
+		    , car.CAREER_JNCMP_YM
+		    , car.CAREER_RSGNTN_YM
+		    , car.CAREER_HDOF_YN
+		    , proj.PROJ_NM
+		    , proj.PROJ_DTL_CN
+		from
+		    resume rsm
+		left outer join
+		    career car on (rsm.rsm_no = car.rsm_no)
+		left outer join
+		    project_career proj on (car.career_no = proj.career_no)
+		where
+		    rsm.rsm_no = #{rsmNo}
+		order by
+            proj_no
+	</select>
+	
+	<select id="selectPortFile" parameterType="string" resultType="atchFileVO">
+		SELECT
+		    atch.file_no
+		    , atch.FILE_SRC_NO
+		    , atch.ORGN_CMMNCD
+		    , atch.FILE_PATH
+		    , atch.FILE_SIZE
+		    , atch.FILE_FANCYSIZE
+		    , atch.FILE_MIME
+		    , atch.FILE_NAME
+		FROM
+		    atch atch
+		left outer join
+		    RESUME_PORTFOLIOFILE rsmfile
+		on
+		    (atch.file_src_no = rsmfile.PORT_FILE_NO)
+		WHERE
+		    rsmfile.RSM_NO = #{rsmNo}
+		and
+		    atch.orgn_cmmncd = '이력서포트폴리오파일'
+		ORDER BY
+    		atch.file_no
+	</select>
+	
+	<select id="selectPortUrl" parameterType="string" resultType="portfolioVO">
+		SELECT
+		    rsm_no
+		    , port_url_ttl
+		    , port_url
+		FROM
+		    portfolio
+		WHERE
+		    rsm_no = #{rsmNo}
+		ORDER BY
+    		port_no
+	</select>
+
+	<select id="selectPositionResume" parameterType="string" resultMap="resumeMap">
+		SELECT
+		    rsm.rsm_no
+		    ,(
+                SELECT 
+                    LISTAGG(posi.PSTN_CMMNCD_NM, ',') 
+                    WITHIN GROUP (ORDER BY posi.PSTN_SEQ) 
+                FROM 
+                    position posi 
+                WHERE 
+                    rsm.rsm_no = posi.rsm_no
+            ) AS PSTN_CMMNCD_NM
+            ,(
+                SELECT 
+                    LISTAGG(posi.PSTN_CATE, ',') 
+                    WITHIN GROUP (ORDER BY posi.PSTN_SEQ) 
+                FROM 
+                    position posi 
+                WHERE 
+                    rsm.rsm_no = posi.rsm_no
+            ) AS PSTN_CATE
+		FROM
+		    resume rsm
+		WHERE
+		    rsm.rsm_no = #{rsmNo}
+	</select>
+	
+	<select id="selectExistingResume" parameterType="string" resultMap="resumeMap">
+		SELECT
+		    rsm.rsm_no
+		    ,rsm.RSM_TTL
+		    ,rsm.RSM_NEW_CAREER
+		    ,rsm.RSM_CAREER_YEAR
+		    ,rsm.RSM_RLS_YN
+		    ,rsm.RSM_INTRODUCTION
+		    ,rsm.RSM_PHOTO
+		    ,rsm.EDU_END
+		    ,rsm.EDU_NM
+		    ,rsm.GRADE
+		    ,rsm.FULL
+		    ,rsm.RSM_MJR_NM
+		    ,rsm.EDU_ACDMCR
+		    ,(SELECT LISTAGG(lang.AVAIL_LANG_CMMNCD_NM, ',') WITHIN GROUP (ORDER BY lang.AVAIL_LANG_CMMNCD_NM) FROM avail_lang_list lang WHERE rsm.rsm_no = lang.rsm_no) AS AVAIL_LANG_CMMNCD_NM
+		FROM
+		    resume rsm
+		WHERE 
+		    rsm.rsm_no = #{rsmNo}
+	</select>
+
+	<select id="selectResume" parameterType="string" resultType="resumeVO">
+		SELECT
+		    rsm_no,
+			account_id,
+			rsm_gender,
+			rsm_ttl,
+			rsm_career_year,
+			rsm_rls_yn,
+			rsm_photo,
+			rsm_introduction,
+			edu_end,
+			edu_nm,
+			grade,
+			full,
+			rsm_mjr_nm,
+			rsm_mjr_cd,
+			rsm_new_career,
+			edu_acdmcr
+		FROM
+		    resume
+		where account_id = #{accountId}
+	</select>
+	
+	
+	<insert id="insertResumeExp" parameterType="experienceVO">
+		INSERT INTO EXPERIENCE (
+			EXPER_NO
+			, RSM_NO
+			, EXPER_NM
+			, EXPER_TYPE
+			, EXPER_CO_NM
+			, EXPER_CN
+			, EXPER_BGNG_YM
+			, EXPER_END_YM
+			, EXPER_PRGRS_YN
+			
+		) VALUES (
+			SEQ_RESUME_EXP.nextval
+			, #{rsmNo}
+			, #{experNm}
+			, #{experType}
+			, #{experCoNm}
+			, #{experCn}
+			, #{experBgngYm}
+			, #{experEndYm}
+			, #{experPrgrsYn}
+		)
+	</insert>
+	
+	<insert id="insertResumeCert" parameterType="certificateVO">
+		INSERT INTO CERTIFICATE (
+			CRTFCT_SEQ
+			, RSM_NO
+			, CRTFCT_NM
+			, CRTFCT_NO
+			, CRTFCT_QLFC_ACQS_YM
+			, CRTFCT_PBLCN_INST_NM
+			
+		) VALUES (
+			SEQ_RESUME_CERT.nextval
+			, #{rsmNo}
+			, #{crtfctNm}
+			, #{crtfctNo}
+			, #{crtfctQlfcAcqsYm}
+			, #{crtfctPblcnInstNm}
+		)
+	</insert>
+	
+	<insert id="insertResumeCareerProject" parameterType="projectVO">
+		INSERT INTO PROJECT_CAREER (
+			PROJ_NO
+			, CAREER_NO
+			, PROJ_NM
+			, PROJ_DTL_CN
+			
+		) VALUES (
+			SEQ_RESUME_CAR_PROJ.nextval
+			, #{careerNo}
+			, #{projNm}
+			, #{projDtlCn}
+		)
+	</insert>
+	
+	<insert id="insertResumeCareer" parameterType="careerVO">
+		<selectKey keyProperty="careerNo" resultType="Integer" order="BEFORE">
+			select SEQ_RESUME_CAREER.nextval from dual
+		</selectKey>
+		INSERT INTO career (
+			CAREER_NO
+			, RSM_NO
+			, CAREER_CO_NM
+			, CAREER_DEPT_NM
+			, CAREER_JBGD_NM
+			, CAREER_TKCG_TASK_NM
+			, CAREER_JNCMP_YM
+			, CAREER_RSGNTN_YM
+			, CAREER_HDOF_YN
+			
+		) VALUES (
+			#{careerNo}
+			, #{rsmNo}
+			, #{careerCoNm}
+			, #{careerDeptNm}
+			, #{careerJbgdNm}
+			, #{careerTkcgTaskNm}
+			, #{careerJncmpYm}
+			, #{careerRsgntnYm}
+			, #{careerHdofYn}
+		)
+	</insert>
+	
+	<select id="checkCareerDuplicate" parameterType="careerVO" resultType="int">
+		select 
+			career_no
+		from 
+			career
+		where
+			rsm_no = #{rsmNo}
+		and
+			career_co_nm = #{careerCoNm}
+	</select>
+	
+	<update id="insertResumeEducation" parameterType="resumeVO">
+		UPDATE RESUME
+		SET
+			EDU_END = #{eduEnd}
+			, EDU_ACDMCR = #{eduAcdmcr}
+			, EDU_NM = #{eduNm}
+			, RSM_MJR_NM = #{rsmMjrNm}
+			, GRADE = #{grade}
+			, FULL = #{full}
+		WHERE
+			RSM_NO = #{rsmNo}
+	</update>
+	
+	<insert id="insertResumePortfolioFileTtl" parameterType="portfolioFileVO">
+		<selectKey keyProperty="portFileNo" resultType="String" order="BEFORE">
+			select SEQ_RESUME_PORT_FILE.nextval from dual
+		</selectKey>
+		INSERT INTO RESUME_PORTFOLIOFILE (
+			PORT_FILE_NO
+			, RSM_NO
+			, PORT_FILE_TTL
+			
+		) VALUES (
+			#{portFileNo}
+			, #{rsmNo}
+			, #{portFileTtl}
+		)
+	</insert>
+	
+	<insert id="insertResumePortfolioUrl" parameterType="portfolioVO">
+		INSERT INTO PORTFOLIO (
+			PORT_NO
+			, RSM_NO
+			, PORT_URL_TTL
+			, PORT_URL
+			
+		) VALUES (
+			SEQ_RESUME_PORT.nextval
+			, #{rsmNo}
+			, #{portUrlTtl}
+			, #{portUrl}
+		)
+	</insert>
+	
+	<update id="insertResumeIntro" parameterType="resumeVO">
+		update resume 
+		set
+			RSM_INTRODUCTION = #{rsmIntroduction}
+		where
+			rsm_no = #{rsmNo}
+	</update>
+
+	<update id="insertResumePhoto" parameterType="resumeVO">
+		update resume 
+		set
+			rsm_photo = #{rsmPhotoByte}
+		where
+			rsm_no = #{rsmNo}
+	</update>
+	
+	<insert id="insertResumePosition" parameterType="positionVO">
+		INSERT INTO POSITION (
+			PSTN_SEQ
+			, PSTN_CMMNCD_NM
+			, PSTN_CATE
+			, RSM_NO
+			
+		) VALUES (
+			SEQ_RESUME_POSI.nextval
+			, #{pstnCmmncdNm}
+			, #{pstnCate}
+			, #{rsmNo}
+		)
+	</insert>
+	
+<!-- 	<select id="selectCommncdPosition" parameterType="String" resultType="String"> -->
+<!-- 		SELECT  -->
+<!-- 		    CMMNCD -->
+<!-- 		FROM  -->
+<!-- 		( -->
+<!-- 		    SELECT  -->
+<!-- 		        CMMNCD -->
+<!-- 		        , CMMNCD_GRP_NM -->
+<!-- 		        , ROW_NUMBER() OVER (ORDER BY CMMNCD) rn -->
+<!-- 		    FROM  -->
+<!-- 		        COMMONCODE -->
+<!-- 		    WHERE -->
+<!-- 		        CMMNCD_GRP_NM = #{cmmncdGrpNm} -->
+<!-- 		) sub -->
+<!-- 		WHERE rn = 1 -->
+<!-- 	</select> -->
+	
+	<insert id="insertResumeLang" parameterType="availLangVO">
+		INSERT INTO AVAIL_LANG_LIST (
+			AVAIL_LANG_SEQ
+			, AVAIL_LANG_CMMNCD_NM
+			, RSM_NO
+			
+		) VALUES (
+			SEQ_RESUME_LANG.nextval
+			, #{availLangCmmncdNm}
+			, #{rsmNo}
+		)
+	</insert>
+	
+<!-- 	<select id="selectCommncdLang" parameterType="String" resultType="String"> -->
+<!-- 		SELECT  -->
+<!-- 		    CMMNCD -->
+<!-- 		FROM  -->
+<!-- 		( -->
+<!-- 		    SELECT  -->
+<!-- 		        CMMNCD -->
+<!-- 		        , CMMNCD_NM1 -->
+<!-- 		        , ROW_NUMBER() OVER (ORDER BY CMMNCD) rn -->
+<!-- 		    FROM  -->
+<!-- 		        COMMONCODE -->
+<!-- 		    WHERE  -->
+<!-- 		        CMMNCD_NM1 = #{cmmncdNm1} -->
+<!-- 		) sub -->
+<!-- 		WHERE rn = 1 -->
+<!-- 	</select> -->
+	
+	<insert id="insertResume" parameterType="resumeVO" useGeneratedKeys="true">
+		<selectKey keyProperty="rsmNo" resultType="String" order="BEFORE">
+			select SEQ_RESUME.nextval from dual
+		</selectKey>
+		insert into resume (
+			rsm_no
+			, account_id
+			, rsm_gender
+			, rsm_ttl
+			, rsm_new_career
+			, rsm_career_year
+			, rsm_rls_yn
+		) values (
+			#{rsmNo}
+			, #{accountId}
+			, #{rsmGender}
+			, #{rsmTtl}
+			, #{rsmNewCareer}
+			, #{rsmCareerYear}
+			, #{rsmRlsYn}
+		)
+	</insert>
+	
+	<select id="langList" parameterType="map" resultType="commoncodeVO">
+		SELECT DISTINCT
+			cmmncd_nm1
+		FROM
+		    commoncode
+		WHERE
+		    CMMNCD_GRP_CD LIKE 'PSTN%'
+		AND
+			TO_NUMBER(SUBSTR(CMMNCD_GRP_CD, 5)) <![CDATA[<]]>= 14
+		AND
+		    initcap(CMMNCD_NM1) LIKE initcap('%'||#{value}||'%')
+		ORDER BY
+            CMMNCD_NM1
+	</select>
+	
+	<select id="selectMember" parameterType="string" resultType="accountVO">
+		select
+			account_id
+			, account_pswd
+			, account_nm
+			, gender
+			, birth_ymd
+			, account_nick
+			, account_mail
+			, account_tell
+			, account_zip
+			, account_addr1
+			, account_addr2
+			, enabled
+			, auth_cmmncd
+			, join_ymd
+			, account_stts_cmmncd
+			, TO_CHAR(birth_ymd, 'yyyy') birthY
+		from 
+			account
+		where 
+			account_id = #{accountId}
+	</select>
+	
+	<select id="checkResume" parameterType="string" resultType="resumeVO">
+		SELECT
+		    r.rsm_no,
+		    r.account_id,
+		    a.auth_cmmncd
+		FROM
+		    resume r
+		INNER JOIN
+		    account a ON r.account_id = a.account_id
+		where a.account_id = #{accountId}
+		and a.auth_cmmncd = 'AUTH102'
+	</select>
+	
+	<select id="selectAllResume" parameterType="string" resultMap="resumeMap">
+		SELECT
+		    r.rsm_no,
+		    r.account_id,
+		    r.rsm_gender,
+		    r.rsm_ttl,
+		    r.rsm_career_year,
+		    r.rsm_rls_yn,
+		    r.rsm_photo,
+		    r.rsm_introduction,
+		    r.edu_end,
+		    r.edu_nm,
+		    r.grade,
+		    r.full,
+		    r.rsm_mjr_nm,
+		    r.rsm_mjr_cd,
+		    r.rsm_new_career,
+		    r.edu_acdmcr,
+		    p.pstn_seq,
+		    p.pstn_cmmncd_nm,
+		    p.pstn_cate
+		FROM
+		    resume r
+		LEFT OUTER JOIN
+		    position p ON r.rsm_no = p.rsm_no
+		Where r.account_id = #{accountId}
+	</select>
+	
+
+</mapper>

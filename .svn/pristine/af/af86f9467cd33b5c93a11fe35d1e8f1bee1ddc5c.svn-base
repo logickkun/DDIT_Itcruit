@@ -1,0 +1,13 @@
+package kr.co.itcruit.mypage.member.service;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.co.itcruit.vo.ResumeVO;
+
+public interface IMemberService {
+
+	public List<Map<String, Object>> selectResume(ResumeVO resumeVO);
+
+
+}

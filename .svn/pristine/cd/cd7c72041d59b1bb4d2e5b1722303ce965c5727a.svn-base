@@ -1,0 +1,12 @@
+package kr.co.itcruit.main.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.main.service.IRecruitListService;
+
+@Service
+public class RecruitListServiceImpl implements IRecruitListService{
+
+	//이곳은 (일반회원이) 채용정보를 조회하는 곳
+	
+}

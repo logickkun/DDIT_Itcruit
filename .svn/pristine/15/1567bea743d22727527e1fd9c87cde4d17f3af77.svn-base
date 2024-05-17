@@ -1,0 +1,9 @@
+package kr.co.itcruit.mapper;
+
+import kr.co.itcruit.vo.BoardVO;
+
+public interface IAdminMapper {
+
+	int faqInsert(BoardVO boardVO);
+
+}

@@ -1,0 +1,241 @@
+package kr.co.itcruit.board.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.board.service.IEnterpriseFreeBoardService;
+import kr.co.itcruit.board.service.IFreeBoardService;
+import kr.co.itcruit.vo.BoardCommentVO;
+import kr.co.itcruit.vo.BoardVO;
+import kr.co.itcruit.vo.CustomUser;
+import kr.co.itcruit.vo.EnterpriseVO;
+//import kr.co.itcruit.board.enterprise.service.IEnterpriseNoticeBoardService;
+import kr.co.itcruit.vo.MidPaginationVO;
+import lombok.extern.slf4j.Slf4j;
+
+@RequestMapping("/board/ent")
+@Controller
+@Slf4j
+public class EnterpriseFreeBoardController {
+	
+	static String bbsCtgryCmmncd = "BBS201";
+
+	@Inject
+	private IFreeBoardService freeBoardService;
+	
+	@Inject
+	private IEnterpriseFreeBoardService entFreeBoardService;
+	//private IEnterpriseNoticeBoardService entNotieBoardService;
+	//이렇게 나눠서 해도 되고
+	//기업게시판 관련 부분을 통채로 합쳐서 진행하는 것도 가능합니다 
+	//그렇게 되면
+	//private IEnterpriseNoticeBoardService entNotieBoardService;
+	//를 선언 해주면 됩니다
+	
+	//@RequestMapping(value="/free")
+	
+	@RequestMapping(value = "/list.do")
+	public String entBoard(
+			@RequestParam(name = "Page", required = false, defaultValue = "1") int currentPage,
+			@RequestParam(required = false, defaultValue = "title") String searchType,
+			@RequestParam(required = false) String searchWord,
+			Model model, int entNo) {
+		
+			
+//			BoardVO board = entFreeBoardService.list(entNo);
+//			model.addAttribute("board", board);
+//			log.info("###$$$" + board);
+		
+			EnterpriseVO entVO = entFreeBoardService.selectEnt(entNo);
+			model.addAttribute("entVO", entVO);
+		
+		
+			MidPaginationVO<BoardVO> pagingVO = new MidPaginationVO<BoardVO>();
+			
+			if(StringUtils.isNotBlank(searchWord)) {
+				pagingVO.setSearchType(searchType);
+				pagingVO.setSearchWord(searchWord);
+				model.addAttribute("searchType", searchType);
+				model.addAttribute("searchWord", searchWord);
+			}
+			
+			pagingVO.setEntNo(entNo);
+			pagingVO.setCurrentPage(currentPage);
+			int totalRecord = entFreeBoardService.selectEntBoardCount(pagingVO);
+			
+			pagingVO.setTotalRecord(totalRecord);
+			List<BoardVO> entdataList = entFreeBoardService.selectEntBoardList(pagingVO);
+			List<BoardVO> freedataList = entFreeBoardService.selectEntFreeBoardList(pagingVO);
+			pagingVO.setDataList(entdataList);
+			pagingVO.setFreedataList(freedataList);
+			
+			log.info("#####" + freedataList);
+			log.info("#####" + pagingVO);
+			
+			model.addAttribute("pagingVO", pagingVO);
+		return "board/ent/entBoardList";
+	}
+	
+	@RequestMapping(value = "/insert", method = RequestMethod.GET)
+	public String insertForm(
+			@RequestParam int entNo, Model model
+			) {
+		model.addAttribute("entNo", entNo);
+		return "board/ent/entBoardInsert";
+	}
+	
+	@RequestMapping(value = "/insert.do", method = RequestMethod.POST)
+	public String entBoardInsert(
+			@RequestParam int entNo,
+			HttpServletRequest req,
+			RedirectAttributes ra,
+			BoardVO boardVO, Model model
+			) {
+		String goPage = "";
+		
+		Map<String, String> errors = new HashMap<String, String>();
+		if(StringUtils.isBlank(boardVO.getBbsTtl())) {
+			errors.put("bbsTtl", "제목을 입력해주세요");
+		}
+		if(StringUtils.isBlank(boardVO.getBbsCn())) {
+			errors.put("bbsCn", "내용을 입력해주세요");
+		}
+		
+		if(errors.size() > 0) {
+			model.addAttribute("errors", errors);
+			model.addAttribute("boardVO", boardVO);
+			goPage = "board/ent/entBoardInsert";
+		}else {
+			CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			String accountId = user.getAccount().getAccountId();
+			String accountNick = user.getAccount().getAccountNick();
+			
+			
+			if(accountId != null) {
+				boardVO.setBbsWriter(accountNick); 
+				ServiceResult result = entFreeBoardService.insert(req, boardVO);
+				//log.info("##$#" + result);
+				if(result.equals(ServiceResult.OK)) {
+					model.addAttribute("entNo", entNo);
+					ra.addFlashAttribute("message", "게시글 등록이 성공했습니다!");
+					goPage = "redirect:/board/ent/detail.do?entNo=" + boardVO.getEntNo() + "&bbsNo=" + boardVO.getBbsNo();
+				}else {
+					model.addAttribute("message", "서버에러, 다시 시도해주세요");
+					goPage = "board/ent/entBoardInsert";
+				}
+			}
+		}
+		return goPage;
+	}
+	
+	@RequestMapping(value = "/detail.do", method = RequestMethod.GET)
+	public String entBoardDetail(@RequestParam int entNo, BoardCommentVO boardCommentVO,String bbsNo, ModelMap model) {
+		BoardVO bvo = new BoardVO(bbsNo, entNo);
+		BoardVO boardVO = entFreeBoardService.detail(bvo);
+		
+		List<BoardCommentVO> bcvo = freeBoardService.commentList(boardCommentVO);
+		
+		Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		model.addAttribute("entNo", entNo);
+		model.addAttribute("boardVO", boardVO);
+		model.addAttribute("bcvo", bcvo);
+		
+		log.info("$$" +boardVO );
+		return "board/ent/entBoardDetail";
+	}
+	
+	@RequestMapping(value = "/update", method = RequestMethod.GET)
+	public String entBoardupdateForm(@RequestParam int entNo, String bbsNo, ModelMap model) {
+		BoardVO bvo = new BoardVO(bbsNo, bbsCtgryCmmncd);
+		bvo.setEntNo(entNo);
+		BoardVO boardVO = entFreeBoardService.detail(bvo);
+		log.info("#$#$"+bvo);
+		log.info("#$#$"+boardVO);
+		
+		model.addAttribute("entNo", entNo);
+		model.addAttribute("boardVO", boardVO);
+		model.addAttribute("status", "update");
+		
+		
+		log.info("%%%%%%%%%%%" +boardVO);
+		
+		return "board/ent/entBoardInsert";
+	}
+	
+	@RequestMapping(value = "/update.do", method = RequestMethod.POST)
+	public String entBoardupdate(
+			@RequestParam int entNo,
+			HttpServletRequest req,
+			RedirectAttributes ra,
+			BoardVO boardVO, Model model) {
+		String goPage = "";
+		ServiceResult result = entFreeBoardService.update(req, boardVO);
+		if(result.equals(ServiceResult.OK)) {
+			ra.addFlashAttribute("message", "게시글 수정이 완료되었습니다");
+			goPage = "redirect:/board/ent/detail.do?entNo=" + boardVO.getEntNo() + "&bbsNo=" + boardVO.getBbsNo();
+		}else {
+			model.addAttribute("entNo", entNo);
+			model.addAttribute("boardVO", boardVO);
+			model.addAttribute("message", "서버에러, 다시 시도해주세요!");
+			model.addAttribute("status", "update");
+			goPage = "board/ent/entBoardInsert";
+		}
+		return goPage;
+	}
+	
+	@RequestMapping(value = "/delete.do", method = RequestMethod.POST)
+	public String entBoardDelete(
+			@RequestParam int entNo,
+			HttpServletRequest req,
+			RedirectAttributes ra,
+			String bbsNo, Model model) {
+		
+		log.info("########################"+entNo);
+		log.info("########################"+bbsNo);
+		
+		
+		String goPage = "";
+		BoardVO bvo = new BoardVO(bbsNo, bbsCtgryCmmncd);
+		bvo.setEntNo(entNo);
+		bvo.setFileSrcNo(bbsNo);
+		
+		ServiceResult result = entFreeBoardService.delete(req, bvo);
+		if(result.equals(ServiceResult.OK)) {
+			ra.addFlashAttribute("message", "게시글 삭제가 완료되었습니다" );
+			goPage = "redirect:/board/ent/list.do?entNo=" + entNo;
+		}else {
+			ra.addFlashAttribute("message", "서버오류, 다시 시도해주세요!");
+			goPage = "redirect:/board/ent/detail.do?entNo=" + entNo + "&bbsNo=" + bvo.getBbsNo();
+		}
+		return goPage;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

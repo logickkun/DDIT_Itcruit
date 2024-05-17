@@ -1,0 +1,228 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/bootstrap.min.css"><!-- BOOTSTRAP STYLE SHEET -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/font-awesome.min.css"><!-- FONTAWESOME STYLE SHEET -->
+<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/feather.css"><!-- FEATHER ICON SHEET --> --%>
+<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/owl.carousel.min.css"><!-- OWL CAROUSEL STYLE SHEET --> --%>
+<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/magnific-popup.min.css"><!-- MAGNIFIC POPUP STYLE SHEET --> --%>
+<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/lc_lightbox.css"><!-- Lc light box popup -->      --%>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/bootstrap-select.min.css"><!-- BOOTSTRAP SLECT BOX STYLE SHEET  -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/dataTables.bootstrap5.min.css"><!-- DATA table STYLE SHEET  -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/select.bootstrap5.min.css"><!-- DASHBOARD select bootstrap  STYLE SHEET  -->     
+<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/dropzone.css"><!-- DROPZONE STYLE SHEET --> --%>
+<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/scrollbar.css"><!-- CUSTOM SCROLL BAR STYLE SHEET --> --%>
+<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/datepicker.css"><!-- DATEPICKER STYLE SHEET --> --%>
+<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/flaticon.css"> <!-- Flaticon --> --%>
+<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/swiper-bundle.min.css"><!-- Swiper Slider --> --%>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/style.css"><!-- MAIN STYLE SHEET -->
+    
+<%-- <link rel="stylesheet" class="skin" type="text/css" href="${pageContext.request.contextPath }/resources/jobzillaassets/css/skins-type/skin-6.css"> --%>
+
+
+<style>
+/* 헤더,푸더랑 좌우간격 맞춤 */
+.page-content {
+  margin-left: 0rem;
+}
+.twm-log-reg-logo-head {
+    width: 1300px; /* 너비 설정 */
+    margin: 0 auto; /* 좌우 여백을 auto로 설정하여 요소를 가운데 정렬 */
+    padding: 30px 0; /* 위아래 여백 설정 */
+    border-radius: 10px;
+    background-color: #fff;
+}
+.twm-log-reg-logo-head .twm-log-reg-inner .twm-tabs-style-2 {
+    text-align: center;
+    border: 1px black solid;
+}
+.form-control {
+    height: 50px;
+    padding: 5px;
+}
+.twm-tabs-style-2 {
+    width: 600px;
+    margin: 0 auto;
+}
+.twm-tabs-style-2 .nav-tabs .nav-item .nav-link {
+	padding: 0px;
+	margin: 0px;
+	border-radius: 0px;
+}
+</style>
+<body>
+
+	<div class="page-wraper">
+      
+        <!-- CONTENT START -->
+        <div class="page-content">
+           
+            <!-- Login Section Start -->
+            <div class="section-full site-bg-white">
+                
+                <div class="container-fluid">
+                    <div class="row justify-content-center">
+                    
+                        <!-- <div class="twm-log-reg-form-wrap"> -->
+                            <div class="twm-log-reg-logo-head">
+                                <a href="index.html">
+                                    <img src="images/logo-dark.png" alt="" class="logo">
+                                </a> 
+                            </div>
+                            
+                            <div class="col-md-2"></div>
+                            <div class="col-md-4" style="border: 1px black solid;">
+                                <div class="twm-log-reg-inner">
+                                    <div class="twm-log-reg-head">
+                                        <div class="twm-log-reg-logo">
+                                            <span class="log-reg-form-title">아이디 찾기</span>
+                                            <p class="log-reg-form-content">회원가입시 등록한 이름과 이메일을 입력해주세요.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="twm-tabs-style-2">
+                                        <div class="tab-content" id="myTab2Content">
+                                            <div class="tab-pane fade show active" id="twm-login-candidate">
+                                                <div class="row justify-content-center">
+
+                                                    <div class="col-md-8">
+                                                        <div class="form-group mb-3">
+                                                            <input name="username" type="text" required="" class="form-control" placeholder="이름을 입력해주세요.">
+                                                        </div>
+                                                        <div class="form-group mb-3">
+                                                            <input name="email" type="text" class="form-control" required="" placeholder="이메일을 입력해주세요.">
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="col-md-8" >
+                                                        <div class="form-group">
+                                                            <button type="submit" style="width: 100%;" class="site-button" data-bs-toggle="modal" href="#findid">아이디 찾기</button>
+                                                        </div>
+                                                    </div>
+                                                    <!-- 모달 -->
+                                                    <!-- <a data-bs-toggle="modal" href="#saved-jobs-view" role="button" class="custom-toltip">
+                                                        <span class="fa fa-eye"></span>
+                                                        <span class="custom-toltip-block">Veiw</span>
+                                                    </a> -->
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-4" style="border: 1px black solid;">
+                                <div class="twm-log-reg-inner">
+                                    <div class="twm-log-reg-head">
+                                        <div class="twm-log-reg-logo">
+                                            <span class="log-reg-form-title">비밀번호 찾기</span>
+                                            <p class="log-reg-form-content">회원가입시 등록한 아이디, 이름, 이메일을 입력해주세요.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="twm-tabs-style-2">
+                                        <div class="tab-content" id="myTab2Content">
+                                            <div class="tab-pane fade show active" id="twm-login-candidate">
+                                                <div class="row justify-content-center">
+
+                                                    <div class="col-md-8">
+                                                        <div class="form-group mb-3">
+                                                            <input name="userid" type="text" required="" class="form-control" placeholder="아이디를 입력해주세요.">
+                                                        </div>
+                                                        <div class="form-group mb-3">
+                                                            <input name="username" type="text" class="form-control" required="" placeholder="이름을 입력해주세요.">
+                                                        </div>
+                                                        <div class="form-group mb-3">
+                                                            <input name="eamil" type="text" class="form-control" required="" placeholder="이메일을 입력해주세요.">
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="col-md-8">
+                                                        <div class="form-group">
+                                                            <button type="submit" style="width: 100%;" class="site-button" data-bs-toggle="modal" href="#findpw">비밀번호 찾기</button>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+<!--                             <div class="col-md-2"></div> -->
+                        <!-- </div> -->
+                    </div>
+                </div>
+            </div>   
+            <!-- Login Section End -->
+        </div>
+        <!-- CONTENT END -->
+
+
+        <!--Model Popup Section Start-->
+        <!-- 아이디 찾기 -->
+        <div class="modal fade twm-saved-jobs-view" id="findid" aria-hidden="true" aria-labelledby="saved_job_view" tabindex="-1">
+	
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form>
+    
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="saved_job_view">ITcruit</h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+    
+                        <div class="modal-body">
+                            <ul class="list-unstyled">
+                                <li><strong>아이디는 ****** 입니다</strong></li>
+                            </ul>
+                        </div>
+    
+                        <div class="modal-footer">
+                            <button type="button" class="site-button" data-bs-dismiss="modal">확인</button>
+                        </div>
+    
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+        <!-- 비밀번호 찾기 -->
+        <div class="modal fade twm-saved-jobs-view" id="findpw" aria-hidden="true" aria-labelledby="saved_job_view" tabindex="-1">
+	
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form>
+    
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="saved_job_view">ITcruit</h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+    
+                        <div class="modal-body">
+                            <ul class="list-unstyled">
+                                <li><strong>임시 비밀번호가 전송되었습니다.</strong></li>
+                                <li><p>메일 주소를 확인해주세요.</p></li>
+                            </ul>
+                        </div>
+    
+                        <div class="modal-footer">
+                            <button type="button" class="site-button" data-bs-dismiss="modal">확인</button>
+                        </div>
+    
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+
+
+
+ 	</div>
+
+
+
+</body>

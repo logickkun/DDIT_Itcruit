@@ -1,0 +1,19 @@
+package kr.co.itcruit.board.service.impl;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.board.service.IFreeBoardService;
+import kr.co.itcruit.vo.BoardVO;
+
+@Service
+public class FreeBoardImpl implements IFreeBoardService {
+
+	@Override
+	public List<BoardVO> list() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

@@ -1,0 +1,193 @@
+package kr.co.itcruit.codingtest.utils;
+
+import java.util.Timer;
+import kr.co.itcruit.vo.CodingtestVO;
+import lombok.extern.slf4j.Slf4j;
+import java.io.*;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.Scanner;
+import java.util.TimerTask;
+
+/**
+ * 입력받은 코드를 컴파일할 유틸
+ * @author KHT
+ */
+@Slf4j
+public class CompileUtils {
+
+//    private Timer timer;
+//    private String pakage;
+    
+    //moon은 문제 번호
+    public String doTest(CodingtestVO codingtestVO) throws Exception {
+
+        String ret = "runtime error";
+        
+        String className = "Main";
+
+//        int moon = codingtestVO.getQstnNo();
+//        String loginUser = codingtestVO.getLoginUser();
+        
+        
+        
+        
+        
+        //컴파일할 코드 변수에 저장
+        //메인코드
+        String classSourceCode = codingtestVO.getQstnMcode();
+        //입력코드
+        String classInputCode = codingtestVO.getCode();
+
+        log.info("doTest.classSourceCode >>>>>>>>>>>>>>>>>>>>>>>>" + classSourceCode);
+        log.info("doTest.classInputCode >>>>>>>>>>>>>>>>>>>>>>>>" + classInputCode);
+
+
+        // 타이머 설정
+//        timer = new Timer();
+//        long duration = 5 * 1000; // 10초를 밀리초로 변환
+//
+//        // 타이머 실행
+//        timer.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                System.out.println("제한 시간을 초과하여 종료됨.");
+//                System.exit(0); // 프로그램 종료
+//            }
+//        }, duration);
+
+
+        // 컴파일 실행 및 오류 출력
+        String error = compile(className, classSourceCode, classInputCode);
+
+        if (!error.trim().isEmpty()) {
+            //timer.cancel(); // 타이머 취소
+            System.out.println(error);
+        }
+
+
+        // 컴파일된 클래스 파일 로드
+        String folder = System.getProperty("user.dir");
+        File file = new File(folder, className + ".class");
+        File file2 = new File(folder, "Solution.class");
+        log.info("doTest file.toPath()>>>>>>>>>>>>>>>" + file.toPath());
+        byte[] classByte = Files.readAllBytes(file.toPath());
+        		
+        file.delete();
+
+        // 클래스 로드 및 메인 메서드 실행
+        FileClassLoader fc = new FileClassLoader();
+        Class dynamic = fc.findClass(classByte, className);
+        
+        Object obj = dynamic.newInstance();
+        Method main = dynamic.getMethod("main", String[].class);
+        main.invoke(obj, (Object) null);
+
+        // 타이머 취소
+        //timer.cancel();
+        return ret;
+    }
+
+    //자바 코드를 컴파일하여 오류 메시지를 반환
+    public String compile(String className, String classSourceCode, String classInputCode) {
+        
+    	//자바파일생성
+    	File file = writeClass(className, classSourceCode, classInputCode);
+
+        String command = "javac -encoding UTF-8 " + className + ".java";
+        log.info("compile.command>>>>>>>>>>>>>>" + command);
+        String result = execute(command);
+        // 임시 생성된 자바 파일 삭제.
+        //file.delete();
+        return result;
+    }
+
+    // 자바 클래스 파일을 생성
+    public File writeClass(String className, String classSourceCode, String classInputCode) {
+    	// 임의의 패키지명 부여
+    	String folder = System.getProperty("user.dir");
+        log.info(">>>>>>>>>>>>>>>>" + folder);
+     
+        String sourceName = className + ".java";
+        
+        return write(folder, sourceName, 
+        		classSourceCode);
+    }
+
+    // 파일 작성 메서드
+    private File write(String folderName, String sourceName,
+    		String classSourceCode) {
+
+        log.info("write.folderName>>>>>>>>>> " + folderName);
+        log.info("write.fileName>>>>>>>>>> " + sourceName);
+        log.info("write.classSourceCode>>>>>>>>>> " + classSourceCode);
+
+        File folder = new File(folderName);
+        if (!folder.exists()) folder.mkdirs();
+
+        File file = new File(folder, sourceName);
+        //메인소스 자바파일 작성
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write(classSourceCode);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        log.info("write.classSourceCode>>>>>>>>>>>>>>>>>>" + classSourceCode);
+
+        return file;
+    }
+
+    // 외부 명령어 실행 메서드
+    public String execute(String command) {
+
+        StringBuilder output = new StringBuilder();
+        Process process = null;
+        BufferedReader bufferReader = null;
+        Runtime runtime = Runtime.getRuntime();
+        String osName = System.getProperty("os.name");
+        
+        
+        // 윈도우일 경우
+        if (osName.indexOf("Windows") > -1) {
+            command = "cmd /c " + command;
+        }
+        
+        try {
+            process = Runtime.getRuntime().exec(command);
+            Scanner scanner = new Scanner(process.getInputStream(), "euc-kr");
+//            Scanner scanner = new Scanner(process.getInputStream(), "UTF-8");
+            while (scanner.hasNextLine()) {
+                output.append(scanner.nextLine()).append(System.getProperty("line.separator"));
+            }
+            scanner.close();
+            
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+//                scanner = new Scanner(process.getErrorStream(), "UTF-8");
+                scanner = new Scanner(process.getErrorStream(), "euc-kr");
+                while (scanner.hasNextLine()) {
+                    output.append(scanner.nextLine()).append(System.getProperty("line.separator"));
+                }
+                scanner.close();
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            output.append("IOException : ").append(e.getMessage()).append(System.getProperty("line.separator"));
+        } finally {
+            if (process != null) process.destroy();
+        }
+        return output.toString();
+    }
+
+    // 클래스 로더 --> 여기서 두 개 가져와야하는듯...
+    public static class FileClassLoader extends ClassLoader {
+        public Class findClass(byte[] classByte, String name) throws ClassNotFoundException {
+            // 클래스 이름과 패키지 이름을 합쳐서 전체 클래스 이름을 구성
+            String className = name;
+            // 패키지 이름과 클래스 이름을 함께 사용하여 클래스를 로드
+            return defineClass(className, classByte, 0, classByte.length);
+        }
+    }
+
+}

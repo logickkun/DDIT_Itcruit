@@ -1,0 +1,93 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.AtchFileVO;
+import kr.co.itcruit.vo.AtchVO;
+import kr.co.itcruit.vo.AvailLangListVO;
+import kr.co.itcruit.vo.CareerVO;
+import kr.co.itcruit.vo.CertificateVO;
+import kr.co.itcruit.vo.ExperienceVO;
+import kr.co.itcruit.vo.PortfolioFileVO;
+import kr.co.itcruit.vo.PortfolioVO;
+import kr.co.itcruit.vo.PositionVO;
+import kr.co.itcruit.vo.ProjectCareerVO;
+import kr.co.itcruit.vo.ResumeVO;
+
+public interface IResumeMapper {
+
+	//resume 등록하려는 회원정보 가져오기
+	public AccountVO selectMember(String accountId);
+
+	//resume 기술스택(사용언어) dropdown list 가져오기
+	public List<Map<String, Object>> langList(Map<String, Object> paramMap);
+
+	public List<ResumeVO> selectResume(String accountId);
+
+	//resume등록할 때 이력서번호, 회원id, 성별, 이력서제목, 신입경력여부, 연차, 이력서공개여부 작성한거 insert
+	public int insertResume(ResumeVO resumeVO);
+
+	//resume등록할 때 필수로 받는 기술스택(사용언어)의 공통코드 가져오기
+	public String selectCommncdLang(String cmmncdGrpNm);
+	//resume등록할 때 필수로 받는 기술스택(사용언어) insert
+	public int insertResumeLang(AvailLangListVO availLangVO);
+	
+	//resume등록할 때 업로드한 이미지 사진 insert
+	public int insertResumePhoto(ResumeVO resumeVO);
+	
+	//resume등록할 때 입력한 간단소개 insert
+	public int insertResumeIntro(ResumeVO resumeVO);
+
+	//resume등록할 때 입력한 개발직무의 공통코드 가져오기
+	public String selectCommncdPosition(String pstnArr);
+	//resume등록할 때 입력한 개발직무 insert
+	public int insertResumePosition(PositionVO positionVO);
+	
+	//resume등록할 때 입력한 포트폴리오 url insert
+	public int insertResumePortfolioUrl(PortfolioVO portfolioVO);
+
+	//resume등록할 때 업로드한 포트폴리오 파일 이름 insert
+	public int insertResumePortfolioFileTtl(PortfolioFileVO portFileVO);
+	
+	//resume등록할 때 입력한 최종학력 insert
+	public int insertResumeEducation(ResumeVO resumeVO);
+	
+	//resume등록할 때 경력 insert하기 전에 이미 insert된 경력인지 확인
+	public int checkCareerDuplicate(CareerVO careerVO);
+	//resume등록할 때 입력한 경력 insert
+	public int insertResumeCareer(CareerVO careerVO);
+	//resume등록할 때 입력한 경력-프로젝트 insert
+	public int insertResumeCareerProject(ProjectCareerVO projectVO);
+
+	//resume등록할 때 입력한 자격증 insert
+	public int insertResumeCert(CertificateVO certVO);
+
+	//resume등록할 때 입력한 경험 insert
+	public int insertResumeExp(ExperienceVO expVO);
+
+	// 이력서 확인
+	public List<ResumeVO> checkResume(String accountId);
+
+	//회원마이페이지에서 본인 이력서 제목 클릭 후 확인하려고 할 때. rsmNo로 정보를 불러옴
+	//기본정보, 학력, 사용언어 select
+	public List<ResumeVO> selectExistingResume(String rsmNo);
+	//직무 select
+	public List<ResumeVO> selectPositionResume(String rsmNo);
+	//경력, 프로젝트 select
+	public List<CareerVO> selectCareerProject(String rsmNo);
+	//포트폴리오 url select
+	public List<PortfolioVO> selectPortUrl(String rsmNo);
+	//포트폴리오 file select
+	public List<AtchFileVO> selectPortFile(String rsmNo);
+	//자격증 select
+	public List<CertificateVO> selectCert(String rsmNo);
+	//경험 select
+	public List<ExperienceVO> selectExp(String rsmNo);
+	//사진 select
+	public ResumeVO selectRsmPhoto(String rsmNo);
+
+
+
+}

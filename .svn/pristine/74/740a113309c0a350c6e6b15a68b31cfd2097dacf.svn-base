@@ -1,0 +1,11 @@
+package kr.co.itcruit.board.service;
+
+import java.util.List;
+
+import kr.co.itcruit.vo.BoardVO;
+
+public interface IFreeBoardService {
+
+	public List<BoardVO> list();
+
+}

@@ -1,0 +1,23 @@
+package kr.co.itcruit.vo;
+
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+/**
+ * 이력서-포트폴리오
+ * @author 김나혜
+ *
+ */
+public class PortfolioVO {
+	private int portNo;				        //포트폴리오 번호
+	private int rsmNo;				        //이력서번호(fk)
+	private String portUrlTtl; 		        //포트폴리오 url 제목
+	private String portUrl;			        //포트폴리오 url
+	private String portFileTtl; 	        //포트폴리오 파일 제목
+	
+	private List<String> portUrlTtlList; 
+	private List<String> portUrlList;
+	private List<String> portFileTtlList;
+}

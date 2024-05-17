@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.ISearchTelentMapper">
+ 
+ 	<select id="getLangList" resultType="string">
+ 		select distinct cmmncd_nm1 from commoncode
+		where cmmncd_grp_cd between 'PSTN1' and 'PSTN14'
+ 	</select>
+ 	
+ 	<select id="getPstnList" resultType="string">
+ 		select distinct cmmncd_grp_nm from commoncode
+		where cmmncd_grp_cd like 'PSTN%'
+ 	</select>
+ 	
+ </mapper>

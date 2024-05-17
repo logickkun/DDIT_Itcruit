@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IAtchFileMapper">
+ 
+ 	<insert id="atchFileInsert" parameterType="atchFileVO">
+ 	 		
+ 	 		INSERT INTO ATCH (
+			    file_no,
+			    file_src_no,
+			    orgn_cmmncd,
+			    file_path,
+			    file_size,
+			    file_fancysize,
+			    file_mime,
+			    file_name
+			) VALUES (
+			    SEQ_ATCH.NEXTVAL,
+			    #{fileSrcNo},
+			    #{orgnCmmncd},
+			    #{filePath},
+			    #{fileSize},
+			    #{fileFancysize},
+			    #{fileMime},
+			    #{fileName}
+			)
+ 	 		
+ 	  
+ 	</insert>
+
+ 	
+ 	<delete id="atchFileDelete" parameterType="atchFileVO">
+ 	
+ 		DELETE FROM atch
+ 		
+		WHERE
+		
+    		file_src_no = #{fileSrcNo} 
+    	
+ 	
+ 	</delete>
+ 	
+ 	
+ 	<select id="getFileInfo" parameterType="String" resultType="atchFileVO">
+ 	
+ 		SELECT
+ 		
+		    file_no,
+		    file_src_no,
+		    orgn_cmmncd,
+		    file_path,
+		    file_size,
+		    file_fancysize,
+		    file_mime,
+		    file_name
+		    
+		FROM
+
+		    atch
+		    
+		Where
+			
+			file_src_no = #{fileSrcNo} and orgn_cmmncd = #{orgnCmmncd}
+ 	
+ 	</select>
+ 	
+ 	<select id="selectFile" parameterType="string" resultType="atchFileVO">
+ 		select 
+ 			file_no,
+		    file_src_no,
+		    orgn_cmmncd,
+		    file_path,
+		    file_size,
+		    file_fancysize,
+		    file_mime,
+		    file_name 
+ 		from ATCH
+ 		where file_src_no = #{fileSrcNo}
+ 		and orgn_cmmncd = #{orgnCmmncd}
+ 	</select>
+
+ 
+ 
+ </mapper>

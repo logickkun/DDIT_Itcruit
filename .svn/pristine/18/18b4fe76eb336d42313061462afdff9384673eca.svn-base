@@ -1,0 +1,277 @@
+package kr.co.itcruit.mypage.enterprise.service.impl;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.mapper.IAtchFileMapper;
+import kr.co.itcruit.mapper.IEnterpriseMapper;
+import kr.co.itcruit.mapper.IMyEnterpriseMapper;
+import kr.co.itcruit.mypage.enterprise.service.IMyEnterpriseService;
+import kr.co.itcruit.vo.AtchFileVO;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.RecruitVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class EnterpriseServiceImpl implements IMyEnterpriseService{
+
+	@Autowired
+	private IMyEnterpriseMapper myEntMapper;
+	
+	@Autowired
+	private IEnterpriseMapper entMapper;
+	
+	@Autowired
+	private IAtchFileMapper fileMapper;
+	
+	@Override
+	@Transactional
+	public ServiceResult recruitRegisterinsert(RecruitVO recruitVO, HttpServletRequest req) {
+
+	    // 기업 로그인 세션에서 기업번호 가져오기.
+	    int entNo = 9999;
+	    String entName = "DDDDDDDDDD";
+	    
+	    String recruitNo = getRecruitNo(entNo, recruitVO.getPstnCmmncdNm());
+	    recruitVO.setRecruitNo(recruitNo);
+	    recruitVO.setEntNo(entNo);
+	    recruitVO.setEntNm(entName);
+	    
+	    log.info("#################hireInfoVO" + recruitVO);
+	    
+	    ServiceResult result = null;
+	    
+	    try {
+	    	
+	        int pass = myEntMapper.recruitRegisterinsert(recruitVO);
+	        int passOne = preferlang(recruitVO);
+	        int passTwo = esntlLang(recruitVO);
+	        int passThree = hireStts(recruitVO);
+	        int passFour = atchFileInsert(recruitVO, req);
+	        
+	        if (pass == 1 && passOne == 1 && passTwo == 1 && passThree == 1 && passFour == 1) {
+	            result = ServiceResult.OK;
+	        } else {
+	            result = ServiceResult.FAILED;
+	        }
+	    } catch (Exception e) {
+	        log.error(e.getMessage());
+	        result = ServiceResult.FAILED;
+	    }
+	    
+	    return result;
+	}
+
+
+	
+	
+	 
+	@Override
+	public ServiceResult recruitRegisterEdit(RecruitVO recruitVO, HttpServletRequest req) {
+		
+		myEntMapper.recruitRegisterinsert(recruitVO);
+		recruitVO.setMergeCount(1);
+		
+		ServiceResult result = null;
+		
+		try {
+		
+			int passOne = preferlang(recruitVO);
+			recruitVO.setMergeCount(1);
+			
+			int passThree = hireStts(recruitVO);
+			recruitVO.setMergeCount(1);
+			
+	        int passTwo = esntlLang(recruitVO);
+//	        int passFour = atchFileInsert(recruitVO, req);
+	        
+//	        if (passOne == 1 && passTwo == 1 && passThree == 1 && passFour == 1) {
+	            result = ServiceResult.OK;
+//	        } else {
+//	            result = ServiceResult.FAILED;
+//	        }
+	        
+		} catch (Exception e) {
+			
+	        log.error(e.getMessage());
+	        result = ServiceResult.FAILED;
+	        
+		}
+	        
+		
+		return result;
+	}
+	
+	
+	@Override
+	public List<RecruitVO> recruitSelectList() {
+		
+		List<RecruitVO> questionList = myEntMapper.recruitSelectList();
+		
+		return questionList;
+	}
+
+
+
+
+	@Override
+	public List<RecruitVO> recruitSelectInfo(String recruitNo, String pstnCmmncdNm) {
+		
+		List<RecruitVO> recruitVO = myEntMapper.recruitSelectInfo(recruitNo, pstnCmmncdNm);
+		
+		return recruitVO;
+	}
+
+  
+	
+	public int hireStts(RecruitVO recruitVO) {
+		
+		int pass = 0;
+		int mergeCount = 2;
+		
+		if(recruitVO.getMergeCount() == 1) {
+			
+		    if (!recruitVO.getPreferLangCmmncdNms().isEmpty()) {
+			    	
+		        recruitVO.setHireCmmncdNm("delete");
+		        myEntMapper.hireSttsInsert(recruitVO);
+		    }
+		}
+		
+		
+		
+		for (String  hireCmmncdNm : recruitVO.getHireCmmncdNms()) {
+			recruitVO.setHireCmmncdNm(hireCmmncdNm);
+			recruitVO.setMergeCount(mergeCount);
+			int cnt = myEntMapper.hireSttsInsert(recruitVO);
+			
+			if(cnt > 0) {
+				
+				pass = 1;
+				
+			}
+					
+		}
+		
+		
+		
+		
+		return pass;
+	}
+
+	public int esntlLang(RecruitVO recruitVO) {
+		
+		int pass = 0;
+		int mergeCount = 2;
+		
+		if(recruitVO.getMergeCount() == 1) {
+			
+		    if (!recruitVO.getPreferLangCmmncdNms().isEmpty()) {
+			    	
+		        recruitVO.setEsntlLangCmmncdNm("Delete");
+		        myEntMapper.esntlLangInsert(recruitVO);
+		    }
+		}
+		
+		for (String  esntlLangCmmncdNm : recruitVO.getEsntlLangCmmncdNms()) {
+			recruitVO.setEsntlLangCmmncdNm(esntlLangCmmncdNm);
+			recruitVO.setMergeCount(mergeCount);
+			int cnt = myEntMapper.esntlLangInsert(recruitVO);
+			
+			if(cnt > 0) {
+							
+				pass = 1;
+			}
+		}
+		
+		return pass;
+	}
+	
+	public int preferlang(RecruitVO recruitVO) {
+		
+		int pass = 0;
+		int mergeCount = 2; //2번은 인서트
+		
+		
+		if(recruitVO.getMergeCount() == 1) {
+			
+		    if (!recruitVO.getPreferLangCmmncdNms().isEmpty()) {
+			    	
+		        recruitVO.setPreferLangCmmncdNm("delete");
+		        myEntMapper.preferLangInsert(recruitVO);
+		    }
+		}
+		
+		
+		for (String  preferLangCmmncdNm : recruitVO.getPreferLangCmmncdNms()) {
+			
+			recruitVO.setPreferLangCmmncdNm(preferLangCmmncdNm);
+			recruitVO.setMergeCount(mergeCount);
+			int cnt = myEntMapper.preferLangInsert(recruitVO);
+			
+			if(cnt > 0) {
+				
+				pass = 1;
+			}
+			
+		}
+		
+		return pass;
+		
+	}
+	
+	
+	private int atchFileInsert(RecruitVO recruitVO, HttpServletRequest req) {
+			
+			int pass = 0;
+			
+			String fileSrcNo = recruitVO.getRecruitNo() + recruitVO.getPstnCmmncdNm();
+			String orgnCmmncd = "채용공고";
+			
+			for(MultipartFile recruitFile : recruitVO.getRecruitFile()) {
+				
+				AtchFileVO afv = new AtchFileVO(recruitFile, req, fileSrcNo, orgnCmmncd);
+				
+				fileMapper.atchFileInsert(afv);
+				
+				pass = 1;
+				
+			}
+			
+			return pass;
+	}
+
+
+
+	private String getRecruitNo(int entNo, String pstnCmmncdNm) {
+		
+//		EnterpriseVO entVO = entMapper.selectEnt(entNo);
+//		String entName = entVO.getEntNm();
+		Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
+        String currentDate = sdf.format(now);
+//		int rnd = (int)(Math.random() * 9000) + 1000;
+		StringBuilder sb = new StringBuilder();
+		sb.append(currentDate);
+		sb.append("_");
+		sb.append(entNo);
+		
+		return sb.toString();
+	}
+
+
+}

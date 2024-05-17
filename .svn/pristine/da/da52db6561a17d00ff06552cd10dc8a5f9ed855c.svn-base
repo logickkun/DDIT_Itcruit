@@ -1,0 +1,12 @@
+package kr.co.itcruit.account.service;
+
+import javax.servlet.http.HttpServletRequest;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.vo.AccountVO;
+
+public interface IMemberAccountService {
+	
+	public ServiceResult signup(HttpServletRequest req, AccountVO accountVO);
+
+}

@@ -1,0 +1,16 @@
+package kr.co.itcruit.enterprise.like.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/like")
+public class LikeController {
+	
+//	기업 / 채용 좋아요 눌렀을 경우 이놈이 일함
+	
+	
+	//1. 관심기업추가
+	//2. 관심채용추가
+	
+}

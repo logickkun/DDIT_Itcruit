@@ -1,0 +1,242 @@
+package kr.co.itcruit.resume.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.mapper.IResumeMapper;
+import kr.co.itcruit.resume.service.IResumeService;
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.AvailLangListVO;
+import kr.co.itcruit.vo.CareerVO;
+import kr.co.itcruit.vo.CertificateVO;
+import kr.co.itcruit.vo.EducationVO;
+import kr.co.itcruit.vo.ExperienceVO;
+import kr.co.itcruit.vo.PortfolioVO;
+import kr.co.itcruit.vo.PositionVO;
+import kr.co.itcruit.vo.ResumeVO;
+
+@Service
+public class ResumeServiceImpl implements IResumeService{
+	
+	@Inject
+	private IResumeMapper resumeMapper;
+	
+//	@Inject
+//	private IPositionMapper positionMapper;
+//	
+//	@Inject
+//	private IAvailLangListMapper availLangListMapper;
+//	
+//	@Inject
+//	private IPortfolioMapper portfolioMapper;
+//	
+//	@Inject
+//	private ICareerMapper careerMapper;
+//	
+//	@Inject
+//	private ICertificateMapper certificateMapper;
+//	
+//	@Inject
+//	private IExperienceMapper experienceMapper;
+
+	
+	//resume 등록하려는 회원정보 가져오기
+	@Override
+	public AccountVO selectMember(String accountId) {
+		return resumeMapper.selectMember(accountId);
+	}
+	
+	//resume 기술스택(사용언어) dropdown list 가져오기
+	@Override
+	public List<Map<String, Object>> langList(Map<String, Object> paramMap) {
+		return resumeMapper.langList(paramMap);
+	}
+
+	@Override
+	public List<ResumeVO> selectResume(String accountId) {
+		return resumeMapper.selectResume(accountId);
+	}
+
+	//resume등록할 때 이력서번호, 회원id, 성별, 이력서제목, 신입경력여부, 연차, 이력서공개여부 작성한거 insert
+	@Override
+	public ServiceResult insertResume(HttpServletRequest req, ResumeVO resumeVO) {
+		
+		ServiceResult result = null;
+		
+		int status = resumeMapper.insertResume(resumeVO);
+		
+		if(status > 0) { //기본정보 insert됐으면
+			
+			List<AvailLangListVO> availLangListVOList = resumeVO.getAvailLangVO();	//기술스택(사용언어)
+
+			List<PositionVO> positionVOList = resumeVO.getPositionVO();				//개발직무
+			List<PortfolioVO> portfolioVOList = resumeVO.getPortVO();				//포트폴리오
+			List<EducationVO> educationVOList = resumeVO.getEduVO();				//최종학력
+			List<CareerVO> careerVOList = resumeVO.getCareerVO();					//경력
+			List<CertificateVO> certificateVOList = resumeVO.getCertVO();			//자격증
+			List<ExperienceVO> experienceVOList = resumeVO.getExpVO();				//경험
+			
+			if (availLangListVOList != null) { //기술스택(사용언어) 데이터 존재하면
+				if(availLangListVOList.size() > 0) {
+					
+					for (AvailLangListVO availLangListVO : availLangListVOList) {
+						
+						availLangListVO.setRsmNo(resumeVO.getRsmNo()); //이력서 번호 설정
+						
+						List<String> langArrList = availLangListVO.getLangArr();
+						
+						if (langArrList != null) {
+							if(langArrList.size() > 0) {
+								
+								for (String langArr : langArrList) {
+									
+									System.out.println("서비스!!!!!"+langArr);
+									System.out.println("rsmno!!!!!"+resumeVO.getRsmNo());
+									
+									//resume등록할 때 필수로 받는 기술스택(사용언어)의 공통코드 가져오기
+									String availLangCmmncd = resumeMapper.selectCommncdLang(langArr);
+									System.out.println("commncdLang!!!!!" + availLangCmmncd);
+									availLangListVO.setAvailLangCmmncd(availLangCmmncd); //현재 해당하는 사용언어에 대한 공통코드 설정
+									
+									//resume등록할 때 필수로 받는 기술스택(사용언어) insert
+									int langStatus = resumeMapper.insertResumeLang(availLangListVO);
+									if(langStatus > 0) {
+										result = ServiceResult.OK;
+									}else {
+										result = ServiceResult.FAILED;
+										return result;
+									}
+								}
+							}
+						}
+					}
+				}
+		    }
+			
+			if(positionVOList != null) {
+				if(positionVOList.size() > 0) {
+					int positionStatus = insertResumePosition(positionVOList, resumeVO.getRsmNo());
+					if(positionStatus > 0 ) {
+						result = ServiceResult.OK;
+					}else {
+						result = ServiceResult.FAILED;
+						return result;
+					}
+				}
+			}
+			
+			if(portfolioVOList != null) {
+				if(portfolioVOList.size() > 0) {
+					int portStatus = insertResumePortfolio(portfolioVOList, resumeVO.getRsmNo());
+					if(portStatus > 0 ) {
+						result = ServiceResult.OK;
+					}else {
+						result = ServiceResult.FAILED;
+						return result;
+					}
+				}
+			}
+			
+			
+			
+			
+//			result = ServiceResult.OK;
+			
+		}else {
+			result = ServiceResult.FAILED;
+			return result;
+		}
+		
+		return result;
+	}
+
+	//이력서 등록할 때 포트폴리오 데이터가 있으면
+	private int insertResumePortfolio(List<PortfolioVO> portfolioVOList, int rsmNo) {
+		
+		int positionStatus = 0;
+		
+		for (PortfolioVO portfolioVO : portfolioVOList) {
+			
+			System.out.println("ㅎㅎㅎㅎㅎㅎㅎ");
+			System.out.println("ㅎㅎㅎㅎㅎㅎㅎ");
+			System.out.println("ㅎㅎㅎㅎㅎㅎㅎ");
+			System.out.println("ㅎㅎㅎㅎㅎㅎㅎ");
+			System.out.println("ㅎㅎㅎㅎㅎㅎㅎ"+portfolioVO);
+			
+			portfolioVO.setRsmNo(rsmNo); //이력서 번호 설정
+			
+			List<String> portUrlTtlList = portfolioVO.getPortUrlTtlList();
+			List<String> portUrlList = portfolioVO.getPortUrlList();
+			
+			List<String> portFileTtlList = portfolioVO.getPortFileTtlList();
+			
+			
+//			if (portUrlTtlList != null) {
+//				if(portUrlTtlList.size() > 0) {
+//					
+//					for (String pstnArr : pstnArrList) {
+//						
+//						System.out.println("포지션 서비스!!!!!");
+//						System.out.println("포지션 서비스!!!!!");
+//						System.out.println("포지션 서비스!!!!!");
+//						System.out.println("포지션 서비스!!!!!");
+//						System.out.println("포지션 서비스!!!!!"+pstnArr);
+//						
+//						//resume등록할 때 입력한 개발직무의 공통코드 가져오기
+//						String pstnCmmncd = resumeMapper.selectCommncdPosition(pstnArr);
+//						System.out.println("pstnCmmncd!!!!!" + pstnCmmncd);
+//						positionVO.setPstnCmmncd(pstnCmmncd); //현재 해당하는 개발직무에 대한 공통코드 설정
+//						
+//						//resume등록할 때 입력한 데이터 개발직무 insert
+//						positionStatus = resumeMapper.insertResumePosition(positionVO);
+//					}
+//				}
+//			}
+		}
+		return positionStatus;
+	}
+
+	//이력서 등록할 때 개발직무 데이터가 있으면
+	private int insertResumePosition(List<PositionVO> positionVOList, int rsmNo) {
+		
+		int positionStatus = 0;
+		
+		for (PositionVO positionVO : positionVOList) {
+			
+			positionVO.setRsmNo(rsmNo); //이력서 번호 설정
+			
+			List<String> pstnArrList = positionVO.getPstnArr();
+			
+			if (pstnArrList != null) {
+				if(pstnArrList.size() > 0) {
+					
+					for (String pstnArr : pstnArrList) {
+						
+						System.out.println("포지션 서비스!!!!!");
+						System.out.println("포지션 서비스!!!!!");
+						System.out.println("포지션 서비스!!!!!");
+						System.out.println("포지션 서비스!!!!!");
+						System.out.println("포지션 서비스!!!!!"+pstnArr);
+						
+						//resume등록할 때 입력한 개발직무의 공통코드 가져오기
+						String pstnCmmncd = resumeMapper.selectCommncdPosition(pstnArr);
+						System.out.println("pstnCmmncd!!!!!" + pstnCmmncd);
+						positionVO.setPstnCmmncd(pstnCmmncd); //현재 해당하는 개발직무에 대한 공통코드 설정
+						
+						//resume등록할 때 입력한 데이터 개발직무 insert
+						positionStatus = resumeMapper.insertResumePosition(positionVO);
+					}
+				}
+			}
+		}
+		return positionStatus;
+	}
+
+
+}

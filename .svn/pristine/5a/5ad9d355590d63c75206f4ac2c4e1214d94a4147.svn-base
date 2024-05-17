@@ -1,0 +1,31 @@
+package kr.co.itcruit.resume.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.mapper.IResumeMapper;
+import kr.co.itcruit.resume.service.IResumeService;
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.ResumeVO;
+
+@Service
+public class ResumeServiceImpl implements IResumeService{
+	
+	@Inject
+	private IResumeMapper resumeMapper;
+
+	@Override
+	public AccountVO selectMember(String accountId) {
+		return resumeMapper.selectMember(accountId);
+	}
+
+	@Override
+	public List<Map<String, Object>> langList(Map<String, Object> paramMap) {
+		return resumeMapper.langList(paramMap);
+	}
+
+}

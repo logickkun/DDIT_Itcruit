@@ -1,0 +1,22 @@
+package kr.co.itcruit.vo;
+
+import lombok.Data;
+
+@Data
+/**
+ * 이력서-경력사항
+ * @author 김나혜
+ *
+ */
+public class CareerVO {
+	private int careerNo;				//경력번호
+	private int rsmNo;					//이력서번호(fk)
+	private String careerCoNm;			//회사명
+	private String careerDeptNm;		//부서명
+	private String careerJbgdNm;		//직급/직책
+	private String careerTkcgTaskNm;	//담당업무
+	private String careerJncmpYmd;		//입사년월
+	private String careerRsgntnYmd;		//퇴사년월
+	private String careerHdofYn;		//재직여부
+
+}

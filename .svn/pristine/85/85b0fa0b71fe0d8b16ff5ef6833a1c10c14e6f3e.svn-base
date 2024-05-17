@@ -1,0 +1,29 @@
+package kr.co.itcruit.main.service.impl;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.main.service.IRecruitListService;
+import kr.co.itcruit.mapper.IRecruitMapper;
+import kr.co.itcruit.vo.RecruitVO;
+
+@Service
+public class RecruitListServiceImpl implements IRecruitListService{
+
+	@Inject
+	private IRecruitMapper recruitMapper;
+	
+	//이곳은 (일반회원이) 채용정보를 조회하는 곳
+	
+	
+	
+	@Override
+	public RecruitVO recruitDetail(int entNo) {
+		
+		return recruitMapper.recruitDetail(entNo); // 채용상세페이지
+		
+	}
+
+	
+}

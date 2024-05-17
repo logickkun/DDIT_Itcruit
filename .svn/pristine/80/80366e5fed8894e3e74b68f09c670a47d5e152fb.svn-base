@@ -1,0 +1,386 @@
+package kr.co.itcruit.codingtest.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.co.itcruit.codingtest.service.ICodingTestService;
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.CodingtestBoardVO;
+import kr.co.itcruit.vo.CodingtestVO;
+import kr.co.itcruit.vo.CustomPaginationInfoVO;
+import kr.co.itcruit.vo.CustomUser;
+import kr.co.itcruit.vo.EachProcessApplyPassVO;
+import kr.co.itcruit.vo.EntCodingtestVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@RequestMapping("/codingtest")
+@Slf4j
+public class CodingTestController {
+
+	@Inject
+	private ICodingTestService codingtestService;
+	/**
+	 * 코딩테스트 리스트페이지로 이동
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/list.do")
+	public String getTestList(
+			Model model,
+			@RequestParam(required = false) String pastQstnCtgryNm,
+			@RequestParam(required = false) String qstnSubject,
+			@RequestBody(required = false) CodingtestVO codeVO,
+			HttpSession session
+			) {
+		
+		CustomPaginationInfoVO<CodingtestVO> customPagingVO =
+				new CustomPaginationInfoVO<CodingtestVO>();
+		
+		log.info(">>>>>>>>>>>>>>>>>>>>" + pastQstnCtgryNm);
+		log.info(">>>>>>>>>>>>>>>>>>>>" + qstnSubject);
+		if(codeVO == null) {
+			codeVO = new CodingtestVO();
+		} 
+//		
+		if(pastQstnCtgryNm != null && !pastQstnCtgryNm.isEmpty()) {
+			model.addAttribute("pastQstnCtgryNm", pastQstnCtgryNm);
+			codeVO.setPastQstnCtgryNm(pastQstnCtgryNm);
+		} 
+//		
+		if(qstnSubject != null && !qstnSubject.isEmpty()) {
+			model.addAttribute("qstnSubject", qstnSubject);
+			codeVO.setQstnSubject(qstnSubject);
+		}
+		String accountId = "";
+		
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();		
+		if(principal instanceof CustomUser) {
+			//로그인 된 상태면
+			CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();		
+			accountId =  user.getAccount().getAccountId();
+		} else {
+			accountId = "";
+		}
+
+		log.info("accountId>>>>>>>>>>>>>>" + accountId);
+		
+		AccountVO accoutVO = null;
+		if(accountId != null && !accountId.equals("")) {
+			accoutVO = codingtestService.getMyCodePower(accountId);
+		}
+		
+		codeVO.setAccountId(accountId);
+		
+		List<CodingtestVO> codeList = codingtestService.selectList(codeVO);
+		
+		
+		CodingtestVO codingtestVO = codingtestService.getOptionInfo();
+		
+		log.info(">>>>>>\n"+codingtestVO); //유형 및 기출문제 목록
+		
+		model.addAttribute("codingtestVO", codingtestVO);
+		model.addAttribute("codeList", codeList);
+		model.addAttribute("accoutVO", accoutVO);
+		return "main/testList";		
+	}
+	
+	@RequestMapping(value="/list.do", method=RequestMethod.POST)
+	public ResponseEntity<List<CodingtestVO>> getTestListByVO(
+			@RequestBody(required = false) CodingtestVO codeVO
+			) {
+		
+//		HttpSession session = req.getSession();
+//		AccountVO account = (AccountVO) session.getAttribute("SessionInfo");
+		
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();		
+		if(principal instanceof CustomUser) {
+			//로그인 된 상태면
+			CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();		
+			AccountVO accountVO = user.getAccount();
+		    codeVO.setAccountId(accountVO.getAccountId());
+		} 
+//		else {
+//			HttpHeaders headers = new HttpHeaders();
+//		    headers.setLocation(URI.create("/main/loginForm.do"));
+//		    return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+//		}
+//		CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		if(user != null) {
+//			AccountVO accountVO = user.getAccount();
+//		    codeVO.setAccountId(accountVO.getAccountId());
+//		} else {
+//			codeVO.setAccountId("");
+//		}
+
+		log.info(">>>>>>>>>>>>>> 여기오긴하나???? \n"+codeVO);
+		//new 최신순
+		//high 정답높은
+		//low 정답낮은
+		log.info("daasdasasdasdasd");
+
+//		CustomPaginationInfoVO<CodingtestVO> customPagingVO =
+//				new CustomPaginationInfoVO<CodingtestVO>();
+		
+		
+		List<CodingtestVO> codeList = codingtestService.selectList(codeVO);
+		log.info("getTestListByVO >>>>>>>>>>>>\n"+codeVO);
+	
+		log.info("codingtestController>>>>>>>>>>>>" + codeList);
+		
+		return new ResponseEntity<List<CodingtestVO>>(codeList, HttpStatus.OK);		
+	
+	}
+	
+	
+	//@RequestBody (required = false) CodingtestVO codingtestVO
+	/**
+	 * 코딩테스트 문제페이지로 이동
+	 * @param model
+	 * @param qstnNo
+	 * @return
+	 */
+	@RequestMapping(value="/detail.do", method=RequestMethod.GET)
+	public String getTestDetailByQstnNo(
+			Model model,
+			@RequestParam int qstnNo
+			) {
+		log.info("getTestDetailByQstnNo >>>>>" + qstnNo);
+		
+		CodingtestVO codingtestVO = codingtestService.getQstnByNo(qstnNo);
+		model.addAttribute("codingtestVO", codingtestVO);
+		
+		log.info("getTestDetailByQstnNo>>>>>>>>>>>>" + codingtestVO);
+		
+		return "codingtest/detail";			
+	}
+	
+	/**
+	 * @param codingtestVO
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/solve.do", method=RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	public ResponseEntity<String> solve(
+			@RequestBody CodingtestVO codingtestVO
+			) {
+		
+		String accountId = "";
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();		
+		if(principal instanceof CustomUser) {
+			//로그인 된 상태면
+			CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();		
+			accountId =  user.getAccount().getAccountId();
+		} else {
+			
+		}
+		//DynamicCompileUtils dynamic = new DynamicCompileUtils();
+		
+		if(codingtestVO.isFlag()) {
+			log.info("제출 옴???????????????????" + codingtestVO.getCode());
+		} else {
+			log.info("테스트 옴???????????????????" + codingtestVO.isFlag());
+		}
+		
+		log.info("CodingtestController.solve >>>>>>>>>>>>>>>>>>>" + codingtestVO);
+		
+		codingtestVO.setAccountId(accountId);
+        String result = codingtestService.doCompile(codingtestVO);
+		
+        
+        log.info(result);
+        return new ResponseEntity<String>(result, HttpStatus.OK);
+    }
+	
+	// /codingtest/question
+	@RequestMapping(value="/question.do", method=RequestMethod.POST)
+	public String goQuestionBoard(
+			Model model,
+			CodingtestVO codingtestVO
+			) {
+		String goPage ="";
+		if(codingtestVO == null) {
+			return "redirect:/codingtest/list.do";
+		}
+		int qstnNo = codingtestVO.getQstnNo();
+		log.info("goQuestionBoard>>>>>>>>>>>>>>>" + qstnNo);
+		//codeBoardList
+		List<CodingtestBoardVO> codeBoard = codingtestService.getCodeBoardByQstnNo(qstnNo);
+		
+		log.info("goQuestionBoard>>>>>>>>>>>>>" + codeBoard);
+//		log.info(">>>>>>>>>>>>>>>>" + qstnNo);
+//		model.addAttribute("qstnNo", qstnNo);
+		goPage = "codingtest/questionList";	
+		return goPage;
+	}
+	
+	
+	
+	//기업 코딩테스트 페이지 이동
+	@RequestMapping(value="/entTestList.do", method=RequestMethod.GET)
+	public String entCodingtestList(
+			Model model,
+			@RequestParam Map<String, String> map
+			) {
+		
+		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+			//비로그인인 경우 로그인 페이지로 이동
+		    return "redirect:/main/loginForm.do";
+		} 
+		
+		CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();		
+		String accountId = user.getAccount().getAccountId();
+		
+		log.info("기업코테문제지 번호>>>>>>>>>>" + map);
+		
+		int entCodingtestNo = Integer.parseInt(map.get("entCodingtestNo"));
+		int processSeq = Integer.parseInt(map.get("processSeq"));
+		int eachOrder = Integer.parseInt(map.get("eachOrder"));
+		
+		log.info("기업코테문제지 번호>>>>>>>>>>" + entCodingtestNo);
+		log.info("시퀀스 번호>>>>>>>>>>" + processSeq);
+		log.info("테스트 순서 번호>>>>>>>>>>" + eachOrder);
+		log.info("로그인 한 계정>>>>>>>>>>" + accountId);
+		
+		EachProcessApplyPassVO eapVO = new EachProcessApplyPassVO();
+		
+		eapVO.setAccountId(accountId);
+		eapVO.setEachOrder(eachOrder);
+		eapVO.setProcessSeq(processSeq);
+		
+		log.info("파라메터 정보>>>>>>>>>>" + eapVO);
+		
+		//apply_no를 잘 가져왔다면...
+		if(codingtestService.checkNormalTester(eapVO) != null && !codingtestService.checkNormalTester(eapVO).isEmpty()) {
+			EntCodingtestVO entCodingtest = codingtestService.getEntCodingtestByNo(entCodingtestNo);
+			log.info("문제번호로 코테 리스트 가져오기>>>>>>>>>>>>>>>>" + entCodingtest);
+			entCodingtest.setApplyNo(codingtestService.checkNormalTester(eapVO));
+			model.addAttribute("entCodingtest", entCodingtest);
+			return "codingtest/entCodingtestList";
+		}
+		
+//		EntCodingtestVO entCodingtest = codingtestService.getEntCodingtestByNo(entCodingtestNo);
+//		
+//		log.info("문제번호로 코테 리스트 가져오기>>>>>>>>>>>>>>>>" + entCodingtest);
+//		
+//		model.addAttribute("entCodingtest", entCodingtest);
+//		goPage = "codingtest/entCodingtestList";	
+		return "redirect:/main/index";
+	}
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//기업 코딩테스트 제출
+	@ResponseBody
+	@RequestMapping(value="/entcodingSolve.do", method=RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+	public ResponseEntity<String> entcodingSolve(
+			@RequestBody EntCodingtestVO entCodingtestVO
+			) {
+		
+		CodingtestVO codingtestVO = null;
+		
+		String accountId = "";
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();		
+		if(principal instanceof CustomUser) {
+			//로그인 된 상태면
+			CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();		
+			accountId =  user.getAccount().getAccountId();
+			entCodingtestVO.setAccountId(accountId);
+		} else {
+			
+		}
+		
+		//우선 entCodingtestVO로 받아온 정보 저장 후
+		//entCodingtestNo=2, applyNo=240509_109_웹백엔드_100002, 
+		//qstnAnsr=, entCodingtestNoOrder=1, accountId=qqq123) 이렇게 여서개의 정보를
+		// 우선 ent_codingtest_qstn_ansr에 입력 후 컴파일 시작하기
+		// 만약 있으면 update
+		log.info("CodingtestController.entcodingSolve >>>>>>>>>>>>>>>>>>>" + entCodingtestVO);
+		codingtestService.submitEntCodingtest(entCodingtestVO);
+		
+		//가져온 문제번호로 해당 문제의 메인코드, input, ouput 가져와서
+		//compileUtil에 입력하기
+//		int qstnNo = entCodingtestVO.getQstnNo();
+		codingtestVO = codingtestService.getInfo(entCodingtestVO.getQstnNo());
+		//codingtestVO에 입력할 데이터는 entCodingtest에서 가져온 qstnAnsr과 문제번호
+		log.info("CodingtestController.entcodingSolve >>>>>>>>>>>>>>>>>>>" + codingtestVO);
+		
+        //String result = codingtestService.doCompile(codingtestVO);
+		
+		
+		
+        String result = "";
+//        log.info(result);
+        return new ResponseEntity<String>(result, HttpStatus.OK);
+    }
+	
+	
+	
+	
+	
+	
+	
+	
+}

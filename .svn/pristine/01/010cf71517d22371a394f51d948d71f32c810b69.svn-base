@@ -1,0 +1,86 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!-- Sidebar START -->
+<nav class="navbar sidebar navbar-expand-xl navbar-dark bg-dark">
+
+	<!-- Navbar brand for xl START -->
+	<div class="d-flex align-items-center">
+		<a class="navbar-brand" href="enfInfo">
+			<img class="navbar-brand-item" src="${pageContext.request.contextPath}/resources/assets/images/logo-light.svg" alt="">
+		</a>
+	</div>
+	<!-- Navbar brand for xl END -->
+	
+	<div class="offcanvas offcanvas-start flex-row custom-scrollbar h-100" data-bs-backdrop="true" tabindex="-1" id="offcanvasSidebar">
+		<div class="offcanvas-body sidebar-content d-flex flex-column bg-dark">
+
+			<!-- Sidebar menu START -->
+			<ul class="navbar-nav flex-column" id="navbar-sidebar">
+				
+				
+				<!-- menu item 2 -->
+				<li class="nav-item">
+					<a class="nav-link" data-bs-toggle="collapse" href="#collapsepage" role="button" aria-expanded="${not empty tOrf1 ? 'true' : 'false'}" aria-controls="collapsepage">
+						<i class="bi bi-clipboard-check fa-clipboard-list fa-fw me-2"></i>채용 관리
+					</a>
+					<!-- Submenu -->
+					<ul class="nav collapse flex-column ${show1}" id="collapsepage" data-bs-parent="#navbar-sidebar">
+						<li class="nav-item"> <a class="nav-link ${active1}" href="recruitRegisterForm">채용 공고 등록</a></li>
+						<li class="nav-item"> <a class="nav-link ${active2}" href="recruitProcessQuestion">공고 관리</a></li>
+					</ul>
+				</li>
+				
+				<!-- Menu item 4 -->
+				<li class="nav-item">
+					<a class="nav-link" data-bs-toggle="collapse" href="#collapseinstructors" role="button" aria-expanded="${not empty tOrf2 ? 'true' : 'false'}" aria-controls="collapseinstructors">
+						<i class="bi bi-people-fill fa-fw me-2"></i>지원자 관리
+					</a>
+					<!-- Submenu -->
+					<ul class="nav collapse flex-column ${show2}" id="collapseinstructors" data-bs-parent="#navbar-sidebar">
+						<li class="nav-item"> <a class="nav-link ${active3}" href="recruitContectList">채용 공고 목록</a></li>
+						<li class="nav-item"> <a class="nav-link ${active4}" href="recruitStatistics">채용 공고 통계</a></li>
+					</ul>
+				</li>
+				
+				<!-- Menu item 3 -->
+				<li class="nav-item"> <a class="nav-link ${active5}" href="talentFind"><i class="bi bi-search fa-fw me-2"></i>인재 찾기</a></li>
+				
+				<!-- Menu item 6 -->
+				<li class="nav-item"> <a class="nav-link ${active6}" href="entRating"><i class="bi bi-clipboard-data fa-fw me-2"></i>기업평가 관리</a></li>
+
+				<!-- Menu item 7 -->
+				<li class="nav-item"> <a class="nav-link ${active7}" href="entAccountApplication"><i class="bi bi-person-plus-fill fa-fw me-2"></i>계정 추가</a></li>
+				
+				<!-- Menu item 7 -->
+				<li class="nav-item"> <a class="nav-link ${active8}" href="entInquiryDetails"><i class="bi bi-send fa-fw me-2"></i>문의 내역</a></li>
+
+				<!-- Menu item 9 -->
+				<li class="nav-item"> <a class="nav-link ${active9}" href="entBoard"><i class="bi bi-chat-right-text fa-fw me-2"></i>기업게시판 관리</a></li>
+				
+				<!-- Menu item 9 -->
+				<li class="nav-item"> <a class="nav-link ${active10}" href="entInfo"><i class="bi bi-info-square fa-fw me-2"></i>기업정보</a></li>
+
+			</ul>
+			<!-- Sidebar menu end -->
+
+			<!-- Sidebar footer START -->
+			<div class="px-3 mt-auto pt-3">
+				<div class="d-flex align-items-center justify-content-between text-primary-hover">
+						<a class="h5 mb-0 text-body" href="admin-setting.html" data-bs-toggle="tooltip" data-bs-placement="top" title="Settings">
+							<i class="bi bi-gear-fill"></i>
+						</a>
+						<a class="h5 mb-0 text-body" href="index.html" data-bs-toggle="tooltip" data-bs-placement="top" title="Home">
+							<i class="bi bi-globe"></i>
+						</a>
+						<a class="h5 mb-0 text-body" href="sign-in.html" data-bs-toggle="tooltip" data-bs-placement="top" title="Sign out">
+							<i class="bi bi-power"></i>
+						</a>
+				</div>
+			</div>
+			<!-- Sidebar footer END -->
+
+				</div>
+			</div>
+</nav>
+<!-- Sidebar END -->

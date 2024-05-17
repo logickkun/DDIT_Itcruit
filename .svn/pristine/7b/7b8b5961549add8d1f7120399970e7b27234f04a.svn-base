@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IMyMemberMapper">
+ 
+ 	<resultMap type="resumeVO" id="resumeMap">
+	    <id property="rsmNo" column="rsm_no"/>
+	    <result property="accountId" column="account_id"/>
+	    <result property="birthYmd" column="birth_ymd"/>
+	    <result property="rsmGender" column="rsm_gender"/>
+	    <result property="rsmTtl" column="rsm_ttl"/>
+	    <result property="rsmNewCareer" column="rsm_new_career"/>
+	    <result property="rsmCareerYear" column="rsm_career_year"/>
+	    <result property="rsmRlsYn" column="rsm_rls_yn"/>
+	    <result property="rsmIntroduction" column="rsm_introduction"/>
+	    <result property="eduEnd" column="edu_end"/>
+	    <result property="eduAcdmcr" column="edu_acdmcr"/>
+	    <result property="eduNm" column="edu_nm"/>
+	    <result property="grade" column="grade"/>
+	    <result property="full" column="full"/>
+	    <result property="rsmMjrNm" column="rsm_mjr_nm"/>
+	    <result property="rsmMjrCd" column="rsm_mjr_cd"/>
+	</resultMap>
+ 	
+ 	<resultMap type="availLangVO" id="availLangListMap">
+	    <id property="availLangSeq" column="avail_lang_seq"/>
+	    <result property="availLangCmmncd" column="avail_lang_cmmncd"/>
+	    <result property="rsmNo" column="rsm_no"/>
+	</resultMap>
+	
+	<resultMap type="positionVO" id="positionMap">
+	    <id property="pstnSeq" column="pstn_seq"/>
+	    <result property="rsmNo" column="rsm_no"/>
+	    <result property="pstnCmmncd" column="pstn_cmmncd"/>
+	</resultMap>
+	
+	
+	
+ 	
+ 
+ 	<resultMap type="careerVO" id="careerMap">
+ 		<id property="careerNo" column="career_no"/>
+	  	<result property="rsmNo" column="rsm_no"/>
+	  	<result property="careerCoNm" column="career_co_nm"/>
+	  	<result property="careerDeptNm" column="career_dept_nm"/>
+	  	<result property="careerJbgdNm" column="career_jbgd_nm"/>
+	  	<result property="careerTkcgTaskNm" column="career_tkcg_task_nm"/>
+	  	<result property="careerJncmpYm" column="career_jncmp_ym"/>
+	  	<result property="careerRsgntnYm" column="career_rsgntn_ym"/>
+	  	<result property="careerHdofYn" column="career_hdof_yn"/>
+	  	<collection property="projectData" resultMap="projectCareerMap"/>
+	</resultMap>
+	
+	<resultMap type="projectVO" id="projectCareerMap">
+		<id property="projNo" column="proj_no"/>
+	    <result property="careerNo" column="career_no"/>
+	    <result property="projNm" column="proj_nm"/>
+	    <result property="projDtlCn" column="proj_dtl_cn"/>
+	</resultMap>
+ 
+	<select id="selectResume" resultType="map">
+		select
+		    rsm.*
+		    , lang.*
+		    , comm.cmmncd_nm1
+		from 
+		    resume rsm
+		    , avail_lang_list lang
+		    , commoncode comm
+		where 
+		    rsm.rsm_no = lang.rsm_no
+		and
+		    lang.avail_lang_cmmncd = comm.cmmncd
+		and
+		    rsm.account_id = #{accountId}
+		order by
+		    rsm.rsm_no desc
+	</select>
+	
+ </mapper>

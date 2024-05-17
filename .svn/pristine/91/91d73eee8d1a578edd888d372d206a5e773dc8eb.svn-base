@@ -1,0 +1,123 @@
+package kr.co.itcruit.enterprise.like.controller;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.enterprise.like.service.ILikeService;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.RecruitVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/like")
+public class LikeController {
+	
+//	기업 / 채용 좋아요 눌렀을 경우 이놈이 일함
+	
+	@Inject
+	private ILikeService likeService;
+	//1. 관심기업추가
+	//2. 관심채용추가
+	
+	// 관심기업 추가
+	@RequestMapping(value = "/loveEnt.do")
+	public ResponseEntity<String> loveEnt(@RequestBody EnterpriseVO enterpriseVO,
+			Model model) {
+		
+//		log.info(enterpriseVO.toString());
+		ServiceResult result = likeService.loveEnt(enterpriseVO);
+		String yn = "";
+		
+		if(result.equals(ServiceResult.OK)) {
+			yn = "Y";
+		}else {
+			yn = "N";
+		}
+			
+		return new ResponseEntity<String>(yn, HttpStatus.OK);
+	}
+	
+	// 관심기업 삭제
+	@RequestMapping(value = "/hateEnt.do")
+	public ResponseEntity<String> hateEnt(@RequestBody EnterpriseVO enterpriseVO,
+			Model model) {
+		
+//		log.info(enterpriseVO.toString());
+		ServiceResult result = likeService.hateEnt(enterpriseVO);
+		String yn = "";
+		
+		if(result.equals(ServiceResult.OK)) {
+			yn = "Y";
+		}else {
+			yn = "N";
+		}
+			
+		return new ResponseEntity<String>(yn, HttpStatus.OK);
+	}
+	
+	
+	// 지원버튼
+	@RequestMapping(value = "/apply.do")
+	public ResponseEntity<RecruitVO> applyCheck(@RequestBody RecruitVO recruitVO,
+			Model model, HttpSession session) {
+		
+		
+		RecruitVO recruit = likeService.applyCheck(recruitVO);
+		log.info("!!!!!" + recruit);
+		if(recruit.getProcessYn().equals("Y")) {
+			model.addAttribute("recruit", recruit);
+		}else {
+			model.addAttribute("recruit", recruit);
+		}
+		
+		
+//		log.info(enterpriseVO.toString());
+//		log.info("지원버튼클릭할때 세션정보 ", session.getAttribute("SessionInfo").toString());
+//		String goPage = "";
+//		RecruitVO recruit = new RecruitVO();
+//		
+//		if(session.getAttribute("SessionInfo") == null) {
+//			model.addAttribute("message", "회원가입 후 이용해주세요.");
+//			goPage = "redirect:/main/loginForm.do";
+//		}else {
+//			recruit = likeService.applyCheck(recruitVO);
+//			log.info("%%%%   " + recruit.toString());
+//			
+//			
+//			if(recruit != null) { // 프로세스 이용
+//				model.addAttribute("recruit", recruit);
+//				
+//			}
+//		}
+		
+//		if(recruitVO == null) { // 비회원
+//			model.addAttribute("message", "회원가입 후 이용해주세요.");
+//			goPage = "conn/registerForm";
+//		}else {
+//			
+//			recruit = likeService.applyCheck(recruitVO);
+//			log.info("%%%%   " + recruit.toString());
+//			
+//			
+//			if(recruit != null) { // 프로세스 이용
+//				model.addAttribute("recruit", recruit);
+//				
+//			}
+//		}
+//		
+		return new ResponseEntity<RecruitVO>(recruit, HttpStatus.OK);
+//		return null;
+	}
+	
+	
+}

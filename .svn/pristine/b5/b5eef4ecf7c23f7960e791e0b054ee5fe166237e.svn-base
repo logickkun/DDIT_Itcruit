@@ -1,0 +1,72 @@
+package kr.co.itcruit.mypage.enterprise.service.impl;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.mapper.IEnterpriseMapper;
+import kr.co.itcruit.mapper.IMypageEnterpriseMapper;
+import kr.co.itcruit.mypage.enterprise.service.IEnterpriseService;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.hireInfoVO;
+
+@Service
+public class EnterpriseServiceImpl implements IEnterpriseService{
+
+	@Autowired
+	private IMypageEnterpriseMapper myEntMapper;
+	
+	@Autowired
+	private IEnterpriseMapper entMapper;
+	
+	
+	@Override
+	public ServiceResult hireRegisterinsert(hireInfoVO hireInfoVO) {
+		
+		int entSession = 1;  // 기업 로그인 세션.
+		
+		EnterpriseVO entvo = entMapper.selectEnt(entSession);
+		
+		String entName = entvo.getEntNm().substring(0, 2);
+		
+		Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
+        String currentDate = sdf.format(now);
+		
+		int rnd = (int)(Math.random() * 9000) + 1000;
+		
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(entName);
+		sb.append("_");
+		sb.append(currentDate);
+		sb.append("_");
+		sb.append(rnd);
+		
+		
+		
+		
+		ServiceResult result = null;
+		
+		int pass = myEntMapper.hireRegisterinsert(hireInfoVO);
+		
+		
+		if(pass > 0) {
+			
+			
+			result = ServiceResult.OK;
+			
+		}else {
+			
+			
+			result = ServiceResult.FAILED;
+			
+		}
+		
+		return result;
+	}
+
+}

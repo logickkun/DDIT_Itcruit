@@ -1,0 +1,15 @@
+package kr.co.itcruit.mapper;
+
+import kr.co.itcruit.vo.RecruitVO;
+
+public interface IMyEnterpriseMapper {
+
+	public int recruitRegisterinsert(RecruitVO recruitVO);
+
+	public int hireSttsInsert(RecruitVO recruitVO);
+
+	public int esntlLangInsert(RecruitVO recruitVO);
+
+	public int preferLangInsert(RecruitVO recruitVO);
+
+}

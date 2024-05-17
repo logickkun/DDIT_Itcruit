@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<settings>
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+		<setting name="jdbcTypeForNull" value="NULL" />
+	</settings>
+
+	<!-- 자주 사용하는 타입의 별칭을 셋팅 -->
+	<typeAliases>
+<!-- 		<typeAlias type="kr.or.ddit.vo.MemberVO" alias="memberVO"/> -->
+		<typeAlias type="kr.co.itcruit.vo.AccountVO" alias="accountVO"/>
+		
+		<!-- 안희재 -->
+		<typeAlias type="kr.co.itcruit.vo.PaginationInfoVO" alias="pagingVO"/>
+		<typeAlias type="kr.co.itcruit.vo.AccountAuthVO" alias="accountAuthVO"/>
+		<typeAlias type="kr.co.itcruit.vo.RecruitApplicantVO" alias="recruitApplicantVO"/>
+		<typeAlias type="kr.co.itcruit.vo.InterestNoticesVO" alias="interestNoticesVO"/>
+		<typeAlias type="kr.co.itcruit.vo.EntIntroQSTNANSRVO" alias="entIntroQSTNANSRVO"/>
+		<typeAlias type="kr.co.itcruit.vo.EntAccountVO" alias="entAccountVO"/>
+		
+		<!-- 김영상 -->
+		<typeAlias type="kr.co.itcruit.vo.EnterpriseVO" alias="enterpriseVO"/>
+		<typeAlias type="kr.co.itcruit.vo.ListPaginationVO" alias="listPagingVO"/>
+		<typeAlias type="kr.co.itcruit.vo.MiniPaginationVO" alias="miniPagingVO"/>
+		<typeAlias type="kr.co.itcruit.vo.EntScoreVO" alias="entscoreVO"/>
+		<typeAlias type="kr.co.itcruit.vo.ReviewPaginationVO" alias="reviewPagingVO"/>
+		<typeAlias type="kr.co.itcruit.vo.EntInterviewVO" alias="entinterviewVO"/>
+		<typeAlias type="kr.co.itcruit.vo.InterviewPaginationVO" alias="interviewPagingVO"/>
+		<typeAlias type="kr.co.itcruit.vo.RecruitStatsVO" alias="recruitstatsVO"/>
+		<typeAlias type="kr.co.itcruit.vo.RecruitPaginationVO" alias="recruitPagingVO"/>
+		<typeAlias type="kr.co.itcruit.vo.RecruitListPaginationVO" alias="recruitListPagingVO"/>
+		<typeAlias type="kr.co.itcruit.vo.EntSttsPaginationVO" alias="entSttsPagingVO"/>
+		<typeAlias type="kr.co.itcruit.vo.BoardBBS201PaginationVO" alias="bbs201PagingVO"/>
+		<typeAlias type="kr.co.itcruit.vo.BoardBBS202PaginationVO" alias="bbs202PagingVO"/>
+		
+		<!-- 김나혜 -->
+		<typeAlias type="kr.co.itcruit.vo.ResumeVO" alias="resumeVO"/>
+		<typeAlias type="kr.co.itcruit.vo.CommoncodeVO" alias="commoncodeVO"/>
+		<typeAlias type="kr.co.itcruit.vo.PositionVO" alias="positionVO"/>
+		<typeAlias type="kr.co.itcruit.vo.AvailLangListVO" alias="availLangVO"/>
+		<typeAlias type="kr.co.itcruit.vo.PortfolioVO" alias="portfolioVO"/>
+		<typeAlias type="kr.co.itcruit.vo.PortfolioFileVO" alias="portfolioFileVO"/>
+		<typeAlias type="kr.co.itcruit.vo.CareerVO" alias="careerVO"/>
+		<typeAlias type="kr.co.itcruit.vo.ProjectCareerVO" alias="projectVO"/>
+		<typeAlias type="kr.co.itcruit.vo.CertificateVO" alias="certificateVO"/>
+		<typeAlias type="kr.co.itcruit.vo.ExperienceVO" alias="experienceVO"/>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<!-- 김현태 -->
+		<typeAlias type="kr.co.itcruit.vo.CodingtestVO" alias="codingtestVO"/>
+		<typeAlias type="kr.co.itcruit.vo.ExtendVO" alias="extendVO"/>
+		<typeAlias type="kr.co.itcruit.vo.CalendarVO" alias="calendarVO"/>
+		<typeAlias type="kr.co.itcruit.vo.CalInfoListVO" alias="calInfoListVO"/>
+		<typeAlias type="kr.co.itcruit.vo.CalInfoListVO" alias="calInfoListVO"/>
+		<typeAlias type="kr.co.itcruit.vo.CodepowerVO" alias="codepowerVO"/>
+		<typeAlias type="kr.co.itcruit.vo.CodingtestBoardVO" alias="codingtestBoardVO"/>
+		<typeAlias type="kr.co.itcruit.vo.MyScheduleVO" alias="myscheduleVO"/>
+		<typeAlias type="kr.co.itcruit.vo.AddScheduleVO" alias="addScheduleVO"/>
+		<typeAlias type="kr.co.itcruit.vo.SearchTalentVO" alias="searchTalentVO"/>
+		<typeAlias type="kr.co.itcruit.vo.RecruitCardVO" alias="recruitCardVO"/>
+		<typeAlias type="kr.co.itcruit.vo.MemberProcessCheckVO" alias="memberProcessCheckVO"/>
+		<typeAlias type="kr.co.itcruit.vo.MemberProcessStatVO" alias="memberProcessStatVO"/>
+		
+		
+		
+		
+		
+		
+		
+		
+
+		
+		<!-- 최현명 -->
+		<typeAlias type="kr.co.itcruit.vo.RecruitVO" alias="recruitVO"/>
+		<typeAlias type="kr.co.itcruit.vo.AtchFileVO" alias="atchFileVO"/>
+		<typeAlias type="kr.co.itcruit.vo.CommoncodeVO" alias="commoncodeVO"/>
+		<typeAlias type="kr.co.itcruit.vo.HireSttsVO" alias="hireSttsVO"/>
+		<typeAlias type="kr.co.itcruit.vo.EsntlLangVO" alias="esntlLangVO"/>
+		<typeAlias type="kr.co.itcruit.vo.PreferLangVO" alias="preferLangVO"/>
+		<typeAlias type="kr.co.itcruit.vo.CustomPaginationInfoVO" alias="customPagingVO"/>
+		<typeAlias type="kr.co.itcruit.vo.ApplyProcessListVO" alias="applyProcessListVO"/>
+		<typeAlias type="kr.co.itcruit.vo.ApplyProcessListPayVO" alias="applyProcessListPayVO"/>
+		<typeAlias type="kr.co.itcruit.vo.EntIntroQSTNVO" alias="entIntroQSTNVO"/>
+		<typeAlias type="kr.co.itcruit.vo.EntIntroQSTNDSNCTVO" alias="entIntroQSTNDSNCTVO"/>
+		<typeAlias type="kr.co.itcruit.vo.EachProcessApplyPassVO" alias="eachProcessApplyPassVO"/>
+		<typeAlias type="kr.co.itcruit.vo.LogRecruitTableVO" alias="logRecruitTableVO"/>
+		<typeAlias type="kr.co.itcruit.vo.ApplicantPassStatVO" alias="applicantPassStatVO"/>
+		<typeAlias type="kr.co.itcruit.vo.ApplicantCareerStatVO" alias="applicantCareerStatVO"/>
+		<typeAlias type="kr.co.itcruit.vo.ApplicantGenderStatVO" alias="applicantGenderStatVO"/>
+		<typeAlias type="kr.co.itcruit.vo.ApplicantEduStatVO" alias="applicantEduStatVO"/>
+		<typeAlias type="kr.co.itcruit.vo.AlarmVO" alias="alarmVO"/>
+		
+		
+		
+		
+		
+		
+		
+		<!-- 신하림 -->
+		<typeAlias type="kr.co.itcruit.vo.BoardVO" alias="boardVO"/>
+		<typeAlias type="kr.co.itcruit.vo.AtchVO" alias="atchVO"/>
+		<typeAlias type="kr.co.itcruit.vo.BoardCommentVO" alias="boardCommentVO"/>
+		<typeAlias type="kr.co.itcruit.vo.MidPaginationVO" alias="midPaginationVO"/>
+		<typeAlias type="kr.co.itcruit.vo.BoardReportVO" alias="boardReportVO"/>
+		
+	</typeAliases>
+
+</configuration>

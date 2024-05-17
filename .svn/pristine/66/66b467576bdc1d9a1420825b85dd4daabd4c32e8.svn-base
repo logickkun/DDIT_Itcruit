@@ -1,0 +1,96 @@
+package kr.co.itcruit.codingtest.controller;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.co.itcruit.codingtest.service.ICodingTestService;
+import kr.co.itcruit.vo.CodingtestVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@RequestMapping("/codingtest")
+@Slf4j
+public class CodingTestController {
+
+	@Inject
+	private ICodingTestService codingtestService;
+	
+	
+	
+	/**
+	 * 코딩테스트 리스트페이지로 이동
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/list.do", method=RequestMethod.GET)
+	public String getTestList(Model model) {
+		
+		List<CodingtestVO> codeList = codingtestService.selectList();
+		log.info("codingtestController>>>>>>>>>>>>" + codeList);
+		model.addAttribute("codeList", codeList);
+		return "main/testList";			
+	
+	
+		
+	
+	}
+	
+	
+	
+	/**
+	 * 코딩테스트 문제페이지로 이동
+	 * @param model
+	 * @param qstnNo
+	 * @return
+	 */
+	@RequestMapping(value="/detail.do", method=RequestMethod.GET)
+	public String getTestDetailByQstnNo(
+			Model model,
+			@RequestParam int qstnNo
+			) {
+		log.info("getTestDetailByQstnNo >>>>>" + qstnNo);
+		
+		CodingtestVO codingtestVO = codingtestService.getQstnByNo(qstnNo);
+		model.addAttribute("codingtestVO", codingtestVO);
+		return "codingtest/detail";			
+	}
+	
+	
+	/**
+	 * 코딩테스트 테스트 페이지
+	 * @param model
+	 * @param codingtestVO
+	 * @return
+	 */
+	@RequestMapping(value="/test.do", method=RequestMethod.POST)
+	public String doTestByVO(
+			Model model,
+			CodingtestVO codingtestVO
+			) {
+		
+		return "codingtest/detail";	
+	}
+	
+	
+	@RequestMapping(value="/solve.do", method=RequestMethod.POST)
+	public String doSolvetByVO(
+			Model model,
+			CodingtestVO codingtestVO
+			) {
+		
+		log.info("codingtestVO >>>>>>>>>>>>>>>>>>>" + codingtestVO);
+		log.info("getQstnForm()>>>>>>>>>>>>>>>>>>" + codingtestVO.getQstnForm());
+		log.info("getQstnMcode()>>>>>>>>>>>>>>>>>>" + codingtestVO.getQstnMcode());
+		
+		return "codingtest/detail";	
+	}
+	
+		
+}

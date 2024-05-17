@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IFreeBoardMapper">
+ 
+ 	<select id="list" parameterType="boardVO" resultType="boardVO">
+ 		select 
+ 			bbs_no,bbs_reg_dt, bbs_inq_cnt, bbs_ttl, bbs_cn, bss_writer, bss_ctgry_cmmncd, bss_delyn
+		from board 
+		where bss_ctgry_cmmncd = 1
+ 	</select>
+ 
+ 	
+ 
+ </mapper>

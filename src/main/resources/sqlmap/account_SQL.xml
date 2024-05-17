@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IAccountMapper">
+ 
+ 	<resultMap type="accountVO" id="accountMap">
+ 		<id property="accountId" column="account_id"/>
+		<result property="accountId" column="account_id" />
+		<result property="accountNm" column="account_nm" />
+		<result property="accountNick" column="account_nick" />
+		<result property="accountMail" column="account_mail" />
+		<result property="accountTell" column="account_tell" />
+		<result property="accountZip" column="account_zip" />
+		<result property="accountAddr1" column="account_addr1" />
+		<result property="accountAddr2" column="account_addr2" />
+		<result property="accountPswd" column="account_pswd" />
+		<result property="enabled" column="enabled" />
+		<result property="authCmmncd" column="auth_cmmncd" />
+		<result property="joinYmd" column="join_ymd" />
+		<result property="accountSttsCmmncd" column="account_stts_cmmncd" />
+		<result property="socialName" column="social_name" />
+		<result property="birthYmd" column="birth_ymd" />
+		<result property="gender" column="gender" />
+		<collection property="authList" resultMap="accountAuthMap"/>
+ 	</resultMap>
+ 	
+ 	
+ 	<resultMap type="accountAuthVO" id="accountAuthMap">
+ 		<result property="accountId" column="account_id"/>
+ 		<result property="auth" column="auth"/>
+ 	</resultMap>
+ 
+	<insert id="signup" parameterType="accountVO" >
+		insert into account(
+			account_id, account_nm, account_nick, account_mail,
+			account_tell, account_zip, account_addr1, account_addr2,
+			account_pswd, enabled, auth_cmmncd, join_ymd,
+			account_stts_cmmncd, gender, birth_ymd, codingtest_score
+		) values (
+			#{accountId}, #{accountNm}, #{accountNick}, #{accountMail},
+			#{accountTell}, #{accountZip}, #{accountAddr1}, #{accountAddr2},
+			#{accountPswd}, '1', 'AUTH102', sysdate,
+			'STTS0101', #{gender}, #{birthYmd}, 1000
+		)
+	</insert>
+ 
+ 	<insert id="addAccountAuth" parameterType="accountVO">
+ 		insert into account_auth(
+ 			account_id, auth
+ 		) values (
+ 			#{accountId}, 'ROLE_AUTH102'
+ 		)
+ 	</insert>
+ 	
+ 	<insert id="addEnterpriseAuth" parameterType="accountVO">
+ 		insert into account_auth(
+ 			account_id, auth
+ 		) values (
+ 			#{accountId}, 'ROLE_AUTH103'
+ 		)
+ 	</insert>
+ 	
+ 
+ 	<select id="searchId" parameterType="accountVO" resultType="accountVO">
+ 		select 
+ 			account_id
+ 		from account
+ 		where account_nm = #{accountNm}
+ 		and account_mail = #{accountMail}
+ 	</select>
+ 	
+ 	<select id="searchPw" parameterType="accountVO" resultType="string">
+ 		select 
+ 			account_pswd
+ 		from account
+ 		where account_id = #{accountId}
+ 		and account_nm = #{accountNm}
+ 		and account_mail = #{accountMail}
+ 	</select>
+ 	
+ 	<update id="updateTemppw" parameterType="accountVO">
+ 		update account 
+ 		set
+ 			account_pswd = #{accountPswd}
+ 		where account_id = #{accountId}
+ 		and account_nm = #{accountNm}
+ 		and account_mail = #{accountMail}
+ 	</update>
+ 	
+ 
+ 	<insert id="kakaoSignup" parameterType="accountVO" >
+		insert into account(
+			account_id, account_nm, account_nick, account_mail,
+			account_tell, account_zip, account_addr1, account_addr2,
+			account_pswd, enabled, auth_cmmncd, join_ymd,
+			account_stts_cmmncd, gender, birth_ymd, social_name, codingtest_score
+		) values (
+			#{accountId}, #{accountNm}, '0', #{accountMail},
+			#{accountTell}, '0', '0', '0',
+			'0', '1', 'AUTH102', sysdate,
+			'STTS0101', #{gender}, #{birthYmd}, 'kakao', 1000
+		)
+	</insert>
+	
+	<select id="idCheck" parameterType="accountVO" resultType="string">
+		select 
+ 			account_id
+ 		from account
+ 		where account_id = #{accountId}
+	</select>
+	
+	<select id="memberSignin" parameterType="accountVO" resultType="accountVO">
+		select
+			account_id, account_nm, account_nick, account_mail,
+			account_tell, account_zip, account_addr1, account_addr2,
+			account_pswd, enabled, auth_cmmncd, join_ymd,
+			account_stts_cmmncd, gender, birth_ymd
+		from account
+		where account_id = #{accountId}
+		and account_pswd = #{accountPswd}
+		and auth_cmmncd = #{AUTH102}
+	</select>
+	
+	<select id="enterpriseSignin" parameterType="accountVO" resultType="accountVO">
+		select
+			account_id, account_nm, account_nick, account_mail,
+			account_tell, account_zip, account_addr1, account_addr2,
+			account_pswd, enabled, auth_cmmncd, join_ymd,
+			account_stts_cmmncd, gender, birth_ymd
+		from account
+		where account_id = #{accountId}
+		and account_pswd = #{accountPswd}
+		and auth_cmmncd = #{AUTH103}
+	</select>
+	
+	<update id="kakaoInfoUpdate" parameterType="accountVO">
+		update account 
+ 		set
+ 			account_id = #{accountId},
+ 			account_zip = #{accountZip},
+ 			account_nick = #{accountNick},
+ 			account_addr1 = #{accountAddr1},
+ 			account_addr2 = #{accountAddr2},
+ 			account_pswd = #{accountPswd}
+ 		where 
+ 			account_id = #{kakaoId}
+	</update>
+	
+	<insert id="insert" parameterType="accountVO">
+		insert into account(
+			account_id, account_nm, account_nick, account_mail,
+			account_tell, account_zip, account_addr1, account_addr2,
+			account_pswd, enabled, auth_cmmncd, join_ymd,
+			account_stts_cmmncd
+		) values (
+			#{accountId}, #{accountNm}, #{accountNick}, #{accountMail},
+			#{accountTell}, #{accountZip}, #{accountAddr1}, #{accountAddr2},
+			#{accountPswd}, '1', 'AUTH103', sysdate,
+			'STTS0103'
+		)
+	</insert>
+	
+	<select id="readByUserId" parameterType="string" resultMap="accountMap">
+		select
+		    a.account_id,
+		    account_nm,
+		    account_nick,
+		    account_mail,
+		    account_tell,
+		    account_zip,
+		    account_addr1,
+		    account_addr2,
+		    account_pswd,
+		    enabled,
+		    auth_cmmncd,
+		    join_ymd,
+		    account_stts_cmmncd,
+		    social_name,
+		    birth_ymd,
+		    gender,
+		    auth 
+		FROM 
+		    account a left outer join account_auth aa on(a.account_id = aa.account_id)
+		    where a.account_id = #{accountId}
+	</select>
+ 
+ 	<insert id="entAccount" parameterType="enterpriseVO">
+ 		insert into ENT_ACCOUNT(
+ 			ent_no, account_id
+ 		) values (
+ 			#{entNo}, #{loginId}
+ 		)
+ 	</insert>
+ 	
+ 	<select id="selectAccount" parameterType="accountVO" resultType="accountVO">
+ 		select
+ 			account_id, account_stts_cmmncd, auth_cmmncd
+ 		from account
+ 		where account_id = #{accountId}
+ 		and account_stts_cmmncd = #{accountSttsCmmncd}
+ 		and auth_cmmncd != 'AUTH101'
+ 	</select>
+ 	
+ 	<select id="searchEntNo" parameterType="string" resultType="entAccountVO">
+ 		select
+		    account_id,
+		    ent_no
+		from ent_account
+		where account_id = #{accountId}
+ 	</select>
+ 
+ 
+ </mapper>

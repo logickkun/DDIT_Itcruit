@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programming Challenge Interface</title>
+
+<!-- 코드미러 관련 설정 시작 -->
+<link rel=stylesheet href="../doc/docs.css">
+
+<!-- 코드미러 기본 css -->
+<link rel="stylesheet" href="../lib/codemirror.css">
+
+<!-- 전체화면 css -->
+<link rel="stylesheet" href="../addon/display/fullscreen.css">
+
+<!-- 에디터 테마 css -->
+<link rel="stylesheet" href="../theme/3024-day.css">
+<link rel="stylesheet" href="../theme/3024-night.css">
+<link rel="stylesheet" href="../theme/ayu-dark.css">
+<link rel="stylesheet" href="../theme/cobalt.css">
+<link rel="stylesheet" href="../theme/darcula.css">
+<link rel="stylesheet" href="../theme/eclipse.css">
+<link rel="stylesheet" href="../theme/midnight.css">
+<link rel="stylesheet" href="../theme/monokai.css">
+<link rel="stylesheet" href="../theme/panda-syntax.css">
+
+<script src="../lib/codemirror.js"></script>
+<script src="../mode/javascript/javascript.js"></script>
+<script src="../addon/selection/active-line.js"></script>
+<script src="../addon/edit/matchbrackets.js"></script>
+
+<!-- 전체화면 js -->
+<script src="../mode/xml/xml.js"></script>
+<script src="../addon/display/fullscreen.js"></script>
+
+<!-- 코드미러 관련 설정 끝 -->
+
+<style>
+  body { 
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #ffffff; 
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container { 
+    display: flex; 
+    justify-content: space-between; 
+    flex-wrap: wrap;
+	height: 80vh;
+  }
+
+  .section { 
+    background-color: #1e1e1e; 
+    padding: 20px;
+    margin-bottom: 20px; 
+    border-radius: 5px;
+    margin-top: 0;
+    overflow: auto; 
+	height: 40vh;
+}
+  
+	/*
+	.code-editor { 
+    height: 200px; 
+    width: 100%; 
+	height: 80%;
+    background-color: #ffffff; 
+    color: #333333; 
+    border: none;
+    padding: 10px;
+    margin-bottom: 20px; /
+    border-radius: 5px;
+    box-sizing: border-box; 
+
+  }
+  */
+  
+  .result { 
+    background-color: #262626; 
+    padding: 10px;
+    border-radius: 5px;
+	height: 75%;
+  }
+  
+  /* 코드 미러 관련 스타일 */
+  .CodeMirror {border: 1px solid black; font-size:13px}
+  
+
+  /* 결과창 */
+    .result textarea {
+        width: 100%;
+        overflow-x: auto;
+        white-space: pre-wrap;
+    }
+  
+  /* div 영역의 크기 설정*/
+	.left {
+        width: 29%;
+		margin-right: 10px;
+		height: 80%;
+    }
+
+    .right {
+        width: 69%;
+		margin-left: 10px;
+    }
+	
+	
+	#codeResult {
+        resize: none;
+        background-color: #1e1e1e;
+		color: #a9b7c6;
+		height: 80%;
+		font-size: 17px;
+    }
+	
+
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Left Column -->
+  <div class="left">
+    <!-- Problem Statement -->
+    <div class="section">
+      <h2>문제 설명</h2>
+	  <hr/>
+      <p>여기에 문제 설명을 입력하세요...</p>
+	 
+    </div>
+
+    <!-- Input/Output Examples -->
+    <div class="section">
+      <h3>입출력 예</h3>
+	  <hr/>
+      <div class="input-output">
+        <strong>n</strong> 15<br>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div class="right">
+    <!-- Code Input -->
+    <div class="section">
+	    <span style="float: left;">언어: 
+			<select onchange="selectLang()" id="selectLang">
+				<option selected value="C">C</option>
+				<option value="C++">C++</option>
+				<option value="C#">C#</option>
+				<option value="JAVA">JAVA</option>
+				<option value="JAVASCRIPT">JAVASCRIPT</option>
+				<option value="PYTHON">PYTHON</option>
+			</select>
+		</span>	
+      <span style="float: right;">테마: <!-- selectTheme -->
+		  <select onchange="selectTheme()" id=select>
+			<option selected>default</option>
+			<option>3024-day</option>
+			<option>3024-night</option>
+			<option>ayu-dark</option>
+			<option>cobalt</option>
+			<option>darcula</option>
+			<option>eclipse</option>
+			<option>midnight</option>
+			<option>monokai</option>
+			<option>panda-syntax</option>
+		</select>
+	 </span>
+	<br/>
+	
+
+		<form><textarea id="code" name="code">
+		function findSequence(goal) {
+		  function find(start, history) {
+			if (start == goal)
+			  return history;
+			else if (start > goal)
+			  return null;
+			else
+			  return find(start + 5, "(" + history + " + 5)") ||
+					 find(start * 3, "(" + history + " * 3)");
+		  }
+		  return find(1, "1");
+		}</textarea></form>
+		
+		<span>※코드블럭을 선택하시고 f11을 눌러 전체화면 모드를 사용할 수 있습니다.</span>
+		
+	</div>
+
+    <!-- Result -->
+    <div class="section">
+      <h3>결과창</h3>
+      <div class="result">
+        <textarea id="codeResult" name="codeResult"></textarea>
+      </div>
+    </div>
+	
+  </div>
+</div>
+
+<script>
+
+
+	// 코드미러 스크립트 시작 ##########################################################
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      lineNumbers: true,
+      styleActiveLine: true,
+	  matchBrackets: true,
+      extraKeys: {
+        "F11": function(cm) {
+          cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+        },
+        "Esc": function(cm) {
+          if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+        }
+      }
+    });
+  
+  
+  
+  var input = document.getElementById("select");
+  function selectTheme() {
+    var theme = input.options[input.selectedIndex].textContent;
+    editor.setOption("theme", theme);
+    location.hash = "#" + theme;
+  }
+  var choice = (location.hash && location.hash.slice(1)) ||
+               (document.location.search &&
+                decodeURIComponent(document.location.search.slice(1)));
+  if (choice) {
+    input.value = choice;
+    editor.setOption("theme", choice);
+  }
+  CodeMirror.on(window, "hashchange", function() {
+    var theme = location.hash.slice(1);
+    if (theme) { input.value = theme; selectTheme(); }
+  });
+  
+  // 코드미러 스크립트 끝 ##########################################################
+</script>
+
+</body>
+</html>

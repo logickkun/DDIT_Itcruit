@@ -1,0 +1,234 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<main>
+
+<!-- =======================Page content START -->
+<section class="pt-0">
+	<div class="container">
+		<div class="row">
+
+			<!-- Left sidebar START -->
+			<div class="col-xl-3" style="max-width: 300px;">
+
+				<!-- Responsive offcanvas body START -->
+				<div class="offcanvas-xl offcanvas-end" tabindex="-1" id="offcanvasSidebar">
+					<!-- Offcanvas header -->
+					<div class="offcanvas-header bg-light">
+						<h5 class="offcanvas-title" id="offcanvasNavbarLabel">My profile</h5>
+						<button  type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasSidebar" aria-label="Close"></button>
+					</div>
+					<!-- Offcanvas body -->
+					<div class="offcanvas-body p-3 p-xl-0">
+						<div class="borde rounded-3 pb-2 p-3 w-100" style="background-color: white; margin-left: 30px; margin-top: -15px;">
+							<!-- Dashboard menu -->
+							<div class="list-group list-group-dark list-group-borderless">
+								<a href="#" class="write-post-Btn">
+									<button type="button"><i class="bi bi-pencil"></i> 글 작성하기</button>
+								</a>
+								<!-- 인기글 -->
+								<div class="popular-list">
+									<div class="popular-list-title">
+										<i class="bi bi-fire"></i> 인기글
+									</div>
+									<div class="popular-list-list">
+										<a href="">Lorem Ipsum is sim...</a>    
+										<a href="">Lorem Ipsum is sim...</a>    
+										<a href="">Lorem Ipsum is sim...</a>    
+										<a href="">Lorem Ipsum is sim...</a>    
+										<a href="">Lorem Ipsum is sim...</a>    
+									</div>
+								</div>
+								<!-- 인기글 -->
+								<div class="popular-list">
+									<div class="popular-list-title">
+										<i class="bi bi-eye"></i> 최근 본 글
+									</div>
+									<div class="popular-list-list">
+										<a href="">Lorem Ipsum is sim...</a>    
+										<a href="">Lorem Ipsum is sim...</a>    
+										<a href="">Lorem Ipsum is sim...</a>    
+										<a href="">Lorem Ipsum is sim...</a>    
+										<a href="">Lorem Ipsum is sim...</a> 
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Responsive offcanvas body END -->
+			</div>
+			<!-- Left sidebar END -->
+			
+			<!-- Main content START -->
+			<div class="col-xl-9">
+		
+				<!-- Card START -->
+				<div class="card border bg-transparent rounded-3">
+					<!-- Card header START -->
+					<form class="postForm">
+						<input type="text" class="postForm-title" name="title" placeholder="제목을 입력해주세요" required><br><br>
+						<textarea class="content" name="content" required></textarea><br><br>
+						<button class="submitBtn" type="submit">등록</button>
+					</form>
+
+					
+				</div>
+			</div>
+			<!-- Main content END -->
+		</div><!-- Row END -->
+	</div>
+</section>
+<!-- =======================Page content END -->
+
+</main>
+
+<style>
+
+.write-post-Btn button {
+    width: 218px; /* 버튼의 너비를 150px로 설정 */
+    height: 70px;
+    position: relative; /* 요소를 상대적으로 위치시킵니다. */
+    left: 9px; /* 왼쪽으로 20px 이동 */
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 10px; /* 둥근 테두리 설정 */
+    background-color: #FFE8FF;
+    border: none; 
+}
+
+.popular-list {
+    background-color: #FFE8FF;
+    padding: 20px 10px 20px 10px; 
+    border-radius: 10px; 둥근 테두리 설정
+    color: black;
+    margin: 10px;
+    padding-right: 150px;
+}
+
+.popular-list-title {
+    width: 200px;
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+.popular-list-list a {
+    width: 300px;
+    display: block; 각 링크를 블록 레벨 요소로 만듭니다.
+    margin-bottom: 5px; 링크 아래쪽 여백 설정
+    color: rgb(97, 97, 97); 텍스트 색상을 검정색으로 설정
+    font-size: 15px;
+    padding-left: 20px;
+    text-decoration: underline;
+}
+
+.conArea{
+    color: black;
+    padding-left: 30px
+}
+
+.post-title{
+    padding-bottom: 20px;
+    font-size: 30px; 
+    color: #000;
+}
+
+.post-title a{
+    color: #000;      
+}
+
+.post-de{
+    font-size: 12px; 
+}
+
+/* 목록 */
+.title-header {
+  text-align: center;
+}
+
+.center-header {
+  text-align: center;
+}
+
+.title-cell {
+  width: 500px;
+}
+
+.center-cell {
+  text-align: center;
+}
+
+/* 입력폼 */
+.postForm{
+    padding: 30px;
+    text-align: right;
+}
+
+.postForm-title{
+    border: none;
+    width: 880px;
+    height: 50px;
+    font-size: 30px;
+    padding-left: 10px;
+}
+
+input[type="text"], textarea {
+    outline: none; 클릭 시 테두리 제거
+    border: 1px solid white; 기본적인 테두리 설정
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+input[type="text"]:focus, textarea:focus {
+    border-color: #ffffff; 클릭 시 테두리 색상 변경
+}
+
+.submitBtn{
+    color: black;
+    background-color: #FFE8FF;
+    border: none;
+    padding: 10px 20px 10px 20px;
+    border-radius: 10px;
+}
+
+/* 상세보기 css */
+.count-date {
+    padding-left: 30px;
+    여기에 추가적인 스타일을 정의할 수 있습니다.
+}
+
+.edit-del-Btn{
+    text-align: right;
+    margin-top: -30px;
+}
+
+.editBtn, .delBtn{
+    color: lightslategray;
+    background-color: #DCD8FC;
+    border: none;
+    width: 100px; 너비 조정
+    height: 40px; 높이 조정
+    border-radius: 5px;
+}
+
+/* 신고 */
+.report-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; 변경: 오른쪽 정렬
+    margin-top: -30px;
+    padding-right: 10px;
+  }
+
+.report-button {
+    display: none;
+    border: 1px solid rgb(194, 194, 194);
+    padding: 5px 15px 5px 15px;
+    background-color: white;
+}
+
+.content{
+    padding: 50px;
+}
+
+</style>
+

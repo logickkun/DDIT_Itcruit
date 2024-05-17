@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+
+<!-- 	tiles를 이용한 메인템플릿 구성요소 설정 -->
+	<definition name="index" template="/WEB-INF/views/index.jsp">
+		<put-attribute name="header" value="/WEB-INF/views/tiles/header.jsp"/>
+		<put-attribute name="footer" value="/WEB-INF/views/tiles/footer.jsp"/>
+	</definition>
+	
+	
+<!-- tiles를 이용한 회원마이페이지 템플릿 구성 요소 설정 -->
+	<definition name="memberPage" template="/WEB-INF/views/memberPage.jsp">
+		<put-attribute name="sidebar" value="/WEB-INF/views/tiles/memberSidebar.jsp"/>
+		<put-attribute name="topbar" value="/WEB-INF/views/tiles/memberTopbar.jsp"/>
+	</definition>
+	
+<!-- tiles를 이용한 기업마이페이지 템플릿 구성 요소 설정 -->
+	<definition name="entmypage" template="/WEB-INF/views/entmypage.jsp">
+		<put-attribute name="sidebar" value="/WEB-INF/views/tiles/entsidebar.jsp"/>
+		<put-attribute name="topbar" value="/WEB-INF/views/tiles/enttopbar.jsp"/>
+	</definition>
+	
+	
+<!-- tiles를 이용한 관리자 템플릿 구성 요소 설정 -->
+	<definition name="adminPage" template="/WEB-INF/views/adminPage.jsp">
+		<put-attribute name="sidebar" value="/WEB-INF/views/tiles/adminSidebar.jsp"/>
+	</definition>
+	
+	
+<!-- tiles를 이용한 코딩테스트 페이지 구성 요소 설정 -->	
+<!-- 	<definition name="codePage" template="/WEB-INF/views/codePage.jsp"> -->
+<!-- 		<put-attribute name="codetopbar" value="/WEB-INF/views/tiles/codetopbar.jsp"/> -->
+<!-- 	</definition> -->
+
+
+
+<!-- 	tiles body 적용 폴더 경로 설정 -->
+	<definition name="main/*" extends="index">
+		<put-attribute name="content" value="/WEB-INF/views/main/{1}.jsp"/>
+	</definition>
+	
+	<definition name="resume/*" extends="index">
+		<put-attribute name="content" value="/WEB-INF/views/resume/{1}.jsp"/>
+	</definition>
+
+	
+	<definition name="board/*" extends="index">
+		<put-attribute name="content" value="/WEB-INF/views/board/{1}.jsp"/>
+	</definition>
+	
+	<definition name="board/ent/*" extends="index">
+		<put-attribute name="content" value="/WEB-INF/views/board/ent/{1}.jsp"/>
+	</definition>
+	
+	<definition name="board/notice/*" extends="index">
+		<put-attribute name="content" value="/WEB-INF/views/board/notice/{1}.jsp"/>
+	</definition>
+
+	
+	<definition name="conn/*" extends="index">
+		<put-attribute name="content" value="/WEB-INF/views/login/{1}.jsp"/>
+	</definition>
+	
+
+	<definition name="ent/*" extends="index">
+		<put-attribute name="content" value="/WEB-INF/views/ent/{1}.jsp"/>
+	</definition>
+
+	
+	
+	
+	<!-- 최현명 -->
+	<definition name="entmypage/*" extends="entmypage">
+		<put-attribute name="content" value="/WEB-INF/views/entmypage/{1}.jsp"/>
+	</definition>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- 김현태 -->
+<!-- 	<definition name="codingtsest/*" extends="codePage"> -->
+<!-- 		<put-attribute name="content" value="/WEB-INF/views/codingtest/{1}.jsp"/> -->
+<!-- 	</definition> -->
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- 김나혜-->
+	<definition name="memberPage/*" extends="memberPage">
+		<put-attribute name="content" value="/WEB-INF/views/member/{1}.jsp"/>
+	</definition>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- 김영상-->
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- 신하림 -->
+	<definition name="admin/*" extends="adminPage">
+		<put-attribute name="content" value="/WEB-INF/views/admin/{1}.jsp"/>
+	</definition>
+	
+	
+	<definition name="footerMenu/*" extends="index">
+		<put-attribute name="content" value="/WEB-INF/views/footerMenu/{1}.jsp"/>
+	</definition>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- 안희재 -->
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+</tiles-definitions>

@@ -1,0 +1,17 @@
+package kr.co.itcruit.vo;
+
+import lombok.Data;
+
+@Data
+public class ApplyProcessListVO {
+	
+	private int processSeq;
+	private String recruitNo;
+	private String strtYmd;
+	private String prsntnYmd;
+	private int applyProcessCost;
+	private String clsNm;
+	private int applyProcessOrder;
+	private String pstnCmmncdNm;
+
+}

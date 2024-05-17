@@ -1,0 +1,72 @@
+package kr.co.itcruit.websocket;
+
+import java.util.HashMap;
+
+import org.json.JSONObject;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.CustomUser;
+import lombok.extern.slf4j.Slf4j;
+
+@Component
+@Slf4j
+public class WebSocketHandler extends TextWebSocketHandler{
+	
+	
+	HashMap<String, WebSocketSession> loginSessionMap = new HashMap<String, WebSocketSession>();
+
+	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        super.afterConnectionEstablished(session);
+
+        CustomUser user = (CustomUser) session.getAttributes().get("user");
+        if (user != null) {
+            AccountVO av = user.getAccount();
+            String accountId = av.getAccountId();
+
+            if (accountId != null) {
+                loginSessionMap.put(accountId, session);
+                log.info("들어와라 참깨 : " + accountId);
+            }else {
+            	log.error("참깨 실패");
+            }
+        }
+    }
+	
+
+	@Override
+	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+		super.afterConnectionClosed(session, status);
+		loginSessionMap.values().remove(session);
+		log.info("꺼져라 참깨 : " + session.getId());
+	}
+	
+	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        super.handleTextMessage(session, message);
+        CustomUser user = (CustomUser) session.getAttributes().get("user");
+        AccountVO av = user.getAccount();
+        String account = av.getAccountNm();
+        
+        	
+        String payload = message.getPayload();
+        
+        if (payload.contains("passStatus")) {
+            JSONObject jsonMessage = new JSONObject(payload);
+            boolean isPass = jsonMessage.getBoolean("isPass");
+            String id = jsonMessage.getString("id");
+
+            WebSocketSession targetSession = loginSessionMap.get(id);
+            if (targetSession != null && targetSession.isOpen()) {
+                targetSession.sendMessage(new TextMessage("합격 여부: " + (isPass ? "합격" : "불합격")));
+            } else {
+                System.out.println("못찾겠다 참깨");
+            }
+        }
+    }
+
+	
+}

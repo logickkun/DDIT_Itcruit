@@ -1,0 +1,33 @@
+package kr.co.itcruit.mypage.enterprise.service.impl;
+
+import java.util.List;
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.mapper.ISearchTelentMapper;
+import kr.co.itcruit.mypage.enterprise.service.ISearchTelentService;
+import kr.co.itcruit.vo.SearchTelentVO;
+
+@Service
+public class SearchTelentServiceImpl implements ISearchTelentService{
+
+	@Inject
+	private ISearchTelentMapper searchTelentMapper;
+	
+	@Override
+	public SearchTelentVO getOptionInfo() {
+		SearchTelentVO svo = new SearchTelentVO();
+		svo.setLangList(searchTelentMapper.getLangList());
+		svo.setPstnList(searchTelentMapper.getPstnList());
+		svo.setLocalList(searchTelentMapper.getLocalList());
+		return svo;
+	}
+
+	@Override
+	public List<SearchTelentVO> getTelentList(SearchTelentVO searchTelentVO) {
+		// TODO Auto-generated method stub
+		return searchTelentMapper.getTelentList(searchTelentVO);
+	}
+
+}

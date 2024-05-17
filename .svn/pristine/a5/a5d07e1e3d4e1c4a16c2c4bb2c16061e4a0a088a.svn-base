@@ -1,0 +1,21 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.ListPaginationVO;
+
+public interface IEnterpriseMapper {
+
+	public int selectEntCount(ListPaginationVO<EnterpriseVO> pagingVO);
+
+	public List<EnterpriseVO> selectEntList(ListPaginationVO<EnterpriseVO> pagingVO);
+
+	public int deleteLikeEnt(EnterpriseVO entVO);
+
+	public int insertLikeEnt(EnterpriseVO entVO);
+
+	public EnterpriseVO selectEnt(int entNo);
+
+}

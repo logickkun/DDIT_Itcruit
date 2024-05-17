@@ -1,0 +1,27 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.AtchVO;
+import kr.co.itcruit.vo.BoardReportVO;
+import kr.co.itcruit.vo.EntSttsPaginationVO;
+import kr.co.itcruit.vo.RecruitPaginationVO;
+
+public interface IAdminMapper {
+
+	public List<AtchVO> entSttsList(EntSttsPaginationVO<AtchVO> atchPagingVO);
+
+	public int entApproval(AccountVO av);
+
+	public int reportCount();
+
+	public List<BoardReportVO> reportList(RecruitPaginationVO<BoardReportVO> reportPagingVO);
+
+	public int handlingYn(BoardReportVO brVO);
+
+	public int stopAccount(AccountVO av);
+
+	public int entSttsCount();
+
+}

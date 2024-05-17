@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IRecruitMapper">
+ 
+ 	<select id="recruitDetail" parameterType="string" resultType="recruitVO">
+ 		select 
+ 			RECRUIT_NO ,ENT_NO ,RECRUIT_TTL, 
+ 			RECRUIT_STRT_DT, RECRUIT_END_DT, RECRUIT_YN,
+ 			RECRUIT_CAREER_CODE_NM, RECRUIT_CAREER_DT, ENT_URL,
+ 			RECRUIT_HIT, PROCESS_YN, PROCESS_AMT,
+ 			RECRUIT_PAY, RECRUIT_ENROLL_YMD, CMMNCD_GRP_CD,
+ 			CMMNCD_NM1, RECRUIT_CNT, PSTN_CMMNCD_NM
+ 		from recruit
+ 		where recruit_no = #{recruitNo}
+ 	</select>
+ 	
+ 	<select id="applyCheck" parameterType="recruitVO" resultType="recruitVO">
+ 		select 
+ 			process_yn, ent_url
+ 		from recruit
+ 		where recruit_no = #{recruitNo}
+ 	</select>
+ 	
+ 	<!-- 리절트맵을 만들어야함 RecruitVO + EnpriseVO = resultMap -->
+ 	<select id="selectInitRecruitList" parameterType="pagingVO" resultType="recruitVO">
+ 		SELECT * FROM (
+            SELECT
+                a.*,
+                ROW_NUMBER() OVER (ORDER BY a.recruit_no DESC) AS rnum
+            FROM (
+                SELECT
+                    recruit_no, ent_no, recruit_ttl, recruit_strt_dt, recruit_end_dt,
+                    recruit_yn, recruit_career_code_nm, recruit_career_dt, ent_url,
+                    recruit_hit, process_yn, process_amt, recruit_pay, recruit_enroll_ymd,
+                    cmmncd_grp_cd, cmmncd_nm1, recruit_cnt, pstn_cmmncd_nm
+                FROM
+                    recruit
+                  
+                ORDER BY recruit_no DESC
+            ) a
+        ) b
+        WHERE
+         <![CDATA[
+            b.rnum >= #{startRow} AND b.rnum <= #{endRow}
+         ]]>
+ 	</select>
+ 
+ </mapper>

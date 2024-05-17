@@ -1,0 +1,616 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri ="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+
+
+<style>
+
+	.pt-5 {
+		display: none;
+	}
+	
+	/* 지원서 작성 버튼 속성 */
+	.btn-success {
+	    color: #fff;
+	    background-color: #cd7bfe;
+	    border-color: #cd7bfe;
+	}
+
+	.btn-success:hover {
+	    color: #fff;
+	    background-color: #a135bc;
+	    border-color: #a135bc;
+	}
+
+    p {
+        word-wrap: break-word;
+    }
+       
+	#cont {
+		margin: 50px auto;
+		width: 50%;
+		height: 70%;
+		background-color: white;
+		
+		color: black;
+	}
+	
+	/* 풀캘린더 헤드툴바 글자크기 설정 */
+	.fc-header-toolbar .fc-toolbar-title {
+        font-size: 20px; 
+    }
+    
+    /* 풀캘린더 헤드툴바 center속성을 가로졍렬 설정 */
+ 	.fc-toolbar-chunk {
+        display: flex;
+        align-items: center;
+    }
+    
+    
+    /* 날짜의 폰트 크기, 색상을 수정합니다 */
+    .fc-daygrid-day-number {
+        font-size: 13px;
+        color: #000000;
+    }
+
+	/* 풀캘린더 요일 폰트 수정 */
+	.fc-col-header-cell-cushion {
+		color: #000000;
+	}
+	
+	
+  	/* 풀캘린더 요일 폰트 수정 */
+  	.fc-event-time {
+  	 	display: none;
+  	}
+  	
+  	/* 풀캘린더 폰트컬러 수정 */
+/*   	.fc-event-title { */
+/*   		color: #000000; */
+/*   	} */
+  	
+  	/* 풀캘린더 날짜 표시 위치 수정 */
+  	.fc-daygrid-day-top {
+        display: flex;
+        justify-content: flex-start;
+    }
+  	
+
+    
+    .fc .fc-button-primary {
+    	background-color: #cc77ff;
+    	border: none;
+	}
+  
+  	.fc .fc-button-primary:disabled {
+    	background-color: #E4B7FF;
+    	border: none;
+    }
+    
+    #addSchedultBtn {
+    	background-color: gray;
+    	color: white;
+    	border: none;
+    }
+    #addSchedultBtn:hover {
+    	background-color: black;
+    	color: white;
+    	border: none;
+    }
+
+  	
+</style>
+
+<main>
+
+<div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addEventModalLabel">이벤트 추가</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+       
+          <div class="mb-3">
+            <label for="eventTitle" class="form-label">이벤트 제목</label>
+            <input type="text" class="form-control" id="eventTitle" required>
+          </div>
+          <div class="mb-3">
+            <label for="eventStart" class="form-label">시작 시간</label>
+            <input type="text" class="form-control" id="eventStart" required>
+          </div>
+          <div class="mb-3">
+            <label for="eventEnd" class="form-label">종료 시간</label>
+            <input type="text" class="form-control" id="eventEnd" required>
+          </div>
+          <div class="mb-3">
+            <label for="eventDescription" class="form-label">내용</label>
+            <textarea class="form-control" id="eventDescription" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="eventColor" class="form-label">이벤트 색상</label>
+            <input type="color" class="form-control" id="eventColor" required>
+          </div>
+          <div class="mb-3">
+            <label for="fontColor" class="form-label">폰트 색상</label>
+            <input type="color" class="form-control" id="fontColor" required>
+          </div>
+          <button type="submit" class="btn btn-primary" id="addSchedule">추가</button>
+       
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Page main content START -->
+	<div class="page-content-wrapper border">
+<%-- 	<c:set var="calInfoVO" value="${calInfoVO }" /> --%>
+	
+	<div class="container">
+	
+        <div class="row mb-2 align-items-center">
+            
+            <!-- 달력 -->
+            <div class="col-sm-9 vertical-divider">
+              <div id="Wrapper">
+				<div id='calendar'></div>
+			 </div>
+            </div>
+
+			<div class="col-sm-3">
+		    <div class="card">
+		        <div class="card-body">
+		            <h5 class="card-title">스케줄 관리</h5>
+		            
+		            	<div class="mb-3" id="deleteArea">
+					        <!-- Font Awesome 휴지통 아이콘 추가 -->
+					        <i class="fa fa-trash"></i> 스케줄 삭제
+					    </div>
+		            
+		            
+		                <div class="mb-3">
+		                    <label for="skedName" class="form-label">스케줄 명:</label>
+		                    <input type="text" class="form-control" id="skedName" name="skedName" required>
+		                </div>
+		                <div class="mb-3">
+		                    <label for="skedStart" class="form-label">시작 시간:</label>
+		                    <input type="datetime-local" class="form-control" id="skedStart" name="skedStart" required>
+		                </div>
+		                <div class="mb-3">
+		                    <label for="skedEnd" class="form-label">종료 시간:</label>
+		                    <input type="datetime-local" class="form-control" id="skedEnd" name="skedEnd" required>
+		                </div>
+		                <div class="mb-3">
+		                    <label for="skedContent" class="form-label">내용:</label>
+		                    <textarea class="form-control" id="skedContent" name="skedContent" required></textarea>
+		                </div>
+		                <div class="mb-3">
+		                    <label for="skedColor" class="form-label">스케줄 컬러:</label>
+		                    <input type="color" class="form-control" id="skedColor" name="skedColor" value="#ff0000" required>
+		                    <select id="skedColorList" name="skedColorList" class="form-select mt-2">
+		                        <option value="#3a87ad">Blue</option>
+		                        <option value="#6cbf5b">Green</option>
+		                        <option value="#f0ad4e">Yellow</option>
+		                        <option value="#ed6b75">Red</option>
+		                        <option value="#9b59b6">Purple</option>
+		                        <option value="#4a4a4a">Gray</option>
+		                    </select>
+		                </div>
+		                
+		                <div class="mb-3">
+						    <label for="skedTxtColor" class="form-label">폰트 컬러:</label>
+						    <input type="color" class="form-control" id="skedTxtColor" name="skedTxtColor" value="#ffffff" required>
+						    <select id="skedTxtColorList" name="skedTxtColorList" class="form-select mt-2">
+						        <option value="#ffffff">White</option>
+						        <option value="#000000">Black</option>
+						        <option value="#3a87ad">Blue</option>
+						        <option value="#6cbf5b">Green</option>
+						        <option value="#f0ad4e">Yellow</option>
+						        <option value="#ed6b75">Red</option>
+						        <option value="#9b59b6">Purple</option>
+						        <option value="#4a4a4a">Gray</option>
+						    </select>
+						</div>
+		                
+		                <button type="button" class="btn btn-primary" id="addSchedultBtn">추가하기</button>
+		        </div>
+		    </div>
+		</div>     
+    </div>
+	
+	<script>
+		
+		//db에서 뽑아낸 데이터 json파일로 가져와서 달력에 넣는 방식
+// 		var modalBody = document.querySelector('.modal-body');
+		
+		
+		const addSchedultBtn = document.getElementById("addSchedultBtn");
+	    const addSchedule = document.getElementById('addSchedule');
+	       
+		var localList = document.getElementById("localList");
+		
+		var eventSources = ${eventSources};
+		
+		console.log(eventSources);
+		
+		document.addEventListener('DOMContentLoaded', function() {
+			
+			
+			document.getElementById('skedColorList').addEventListener('change', function() {
+		        var selectedColor = this.value;
+		        document.getElementById('skedColor').value = selectedColor;
+		    });
+			
+			document.getElementById('skedTxtColorList').addEventListener('change', function() {
+		        var selectedTxtColor = this.value;
+		        document.getElementById('skedTxtColor').value = selectedTxtColor;
+		    });
+			
+			//var eventSources = ${eventSources};
+	        //캘린더 헤더 옵션
+	        const headerToolbar = {
+	            left: 'title',
+	            center: '', 
+	            right: 'prev,today,next'
+	        }
+	                 
+	        const calendarEl = document.querySelector('#calendar'); //달력지정
+	
+	        const calendarOption = {
+	        	//eventLimit : 999,
+	            contentHeight: 'auto',
+	           
+	            expandRows: true, // 화면에 맞게 높이 재설정
+	            slotMinTime: '09:00', // Day 캘린더 시작 시간
+	            slotMaxTime: '18:00', // Day 캘린더 종료 시간
+	          
+				// 맨 위 헤더 지정
+	            headerToolbar: headerToolbar,
+	            initialView: 'dayGridMonth',  
+	            locale: 'kr',        // 언어 설정
+	            selectable: true,    // 영역 선택
+	            editable: true,      // event(일정) 
+	            /* 시작일 및 기간 수정가능여부
+	            eventStartEditable: false,
+	            eventDurationEditable: true,
+	            */
+	           
+	            //이벤트 숨김
+	            //eventDisplay: 'block',
+	            
+// 	            contentHeight: 600,
+	            nowIndicator: true,
+	            events: eventSources,
+	            
+	            datesSet: function(info) {
+	            
+	            	var startOfMonth = info.view.currentStart;
+		            var startYear = startOfMonth.getFullYear();
+		            
+		      		var startMonth;
+		      		if(startOfMonth.getMonth()+1 < 10) {
+		      			startMonth = "0"+(startOfMonth.getMonth()+1);
+		      		} else {
+		      			startMonth = (startOfMonth.getMonth()+1)
+		      		}
+		      		
+				    date = startYear+"-"+startMonth;
+				    
+				    //refreshCalendar();
+			    }
+	        }
+	
+		    $(document).ready(function() {
+
+			    			    
+			});
+			
+	
+	        // 캘린더 생성
+	        const calendar = new FullCalendar.Calendar(calendarEl, calendarOption);
+	       
+	        calendar.render();
+			
+	        //이벤트 삭제
+	        calendar.on('eventDragStop', info => {
+	        	//채용인지 내일정인데 판단위한 flag 설정
+	        	var flag = true;
+			    // 삭제 영역 요소 가져오기
+			    var deleteAreaEl = document.getElementById('deleteArea');
+			    // 삭제 영역의 위치와 크기 정보 가져오기
+			    var deleteAreaRect = deleteAreaEl.getBoundingClientRect();
+			
+			    // 드래그된 이벤트의 마우스 이벤트 가져오기
+			    var mouseEvent = info.jsEvent;
+			    
+			 	//이벤트삭제 - 채용인지 내스케줄인지 먼저 판단하기
+		    	//info.event.extendedProps.recruitNo;
+		    	var recruitNo = info.event.extendedProps.recruitNo;
+				var skedNo = info.event.extendedProps.skedNo;
+				
+				if(recruitNo == null || recruitNo == "")
+					flag = true; //true면 내일정
+				
+				if(skedNo == null || skedNo == "")
+					flag = false; //false면 즐찾채용
+			    // 마우스 위치가 삭제 영역 내에 있는지 확인
+			    if (
+			        mouseEvent.clientX >= deleteAreaRect.left &&
+			        mouseEvent.clientX <= deleteAreaRect.right &&
+			        mouseEvent.clientY >= deleteAreaRect.top &&
+			        mouseEvent.clientY <= deleteAreaRect.bottom
+			    ) {
+			    	
+					
+					 // 이벤트 삭제전에 확인
+					if(confirm("정말 삭제하시겠습니까?")) {
+						var deleteData = {
+							recruitNo : recruitNo,
+							skedNo : skedNo,
+							flag : flag
+						}
+						
+						$.ajax({
+			                url: '/myPage/member/deleteSchedule.do', 
+			                type: 'POST',
+			                contentType : "application/json; charset=utf-8",
+			                beforeSend: function(xhr) {
+				             	xhr.setRequestHeader(header, token);
+				           	},
+			                data:  JSON.stringify(deleteData),
+			                success: function(response) {
+				          		calendar.removeAllEvents();
+						        calendar.addEventSource(response);
+						        calendar.render();	                	
+			                },
+			                error: function(xhr, status, error) {
+			                    console.error('통신 실패 :', error);
+			                }
+			            });
+					}
+			    } else {
+			    	
+			    	if(!flag) {
+			    		alert("채용은 변경불가");
+			    		info.revert();
+			    	}
+			    }
+			});
+	        
+			//이벤트 변경
+			calendar.on("eventDrop", info => {
+				
+				var recruitNo = info.event.extendedProps.recruitNo;
+				var skedNo = info.event.extendedProps.skedNo;
+				var start = info.event.start;
+			    var end = info.event.end;
+			    
+			    if(end == null){
+			    	start.setDate(start.getDate() + 1);
+			    	start = start.toISOString().substring(0, 10);
+			    	end = start
+			    } else {
+			    	start = start.toISOString().substring(0, 19);
+				    end = end.toISOString().substring(0, 19);
+			    }
+			    
+			    
+			    
+// 			    skedCn	: skedCn,
+//         		skedNm : skedNm,
+//         		skedStrtYmd : skedStrtYmd,
+//         		skedEndYmd : skedEndYmd,
+//         		skedColor : skedColor,
+//         		skedTxtColor : skedTxtColor
+        		
+			    var updateData = {
+			    	skedNo : skedNo,
+			    	skedStrtYmd : start,
+			    	skedEndYmd : end
+			    }
+			    
+				if(skedNo == null || skedNo == ""){
+					return;
+				}
+				
+				//일때만 이벤트 발생
+				if(recruitNo == null || recruitNo == ""){
+					//var skedNo = info.event.extendedProps.skedNo;
+					$.ajax({
+		                url: '/myPage/member/updateSchedule.do', 
+		                type: 'POST',
+		                contentType : "application/json; charset=utf-8",
+		                beforeSend: function(xhr) {
+			             	xhr.setRequestHeader(header, token);
+			           	},
+		                data:  JSON.stringify(updateData),
+		                success: function(response) {
+		                	//response이 새로운 달력 데이터 이므로새로 그려주기
+			          		calendar.removeAllEvents();
+					        calendar.addEventSource(response);
+					        calendar.render();	                	
+		                },
+		                error: function(xhr, status, error) {
+		                    console.error('통신 실패 :', error);
+		                }
+		            });
+				}
+					
+					
+					
+					//이면 발생안함
+				
+// 			    if (confirm("이벤트를 제거하시겠습니까?")) {
+// 			        var eventId = info.event.id; 
+			      
+// 			        $.ajax({
+// 			            url: '/remove-event',
+// 			            type: 'POST',
+// 			            data: { eventId: eventId }, 
+// 			            success: function(response) {
+// 			                console.log('이벤트 제거 성공!');
+// 			                calendar.refetchEvents(); 
+// 			            },
+// 			            error: function(xhr, status, error) {
+// 			                console.error('이벤트 제거 실패:', error);
+// 			            }
+// 			        });
+// 			    } else {
+			        
+// 			        info.revert();
+// 			    }
+			});
+			
+			calendar.on("dateClick", info => {
+// 				alert("날짜 클릭했을 때 일정보려고 하는데 왜 일정추가가 먼저 발생해");
+				//날짜 클릭이벤트 사용했을 때에는 
+				const clickedDate = info.date; // 클릭한 날짜 정보
+			    // 클릭한 날짜를 ISO 8601 형식으로 변환
+			    const clickedDateISO = clickedDate.toISOString();
+			});
+			
+			
+			calendar.on("select", info => {
+			    const selectionInfo = info;
+			
+			    // 선택된 날짜의 시작과 끝 정보
+			    var start = selectionInfo.start;
+			    var end = selectionInfo.end;
+			
+			    // 선택된 날짜 범위 출력
+			    start.setDate(start.getDate() + 1);
+				start = start.toISOString().substring(0, 10);
+				end = end.toISOString().substring(0, 10);
+				
+				if(start != end) {
+					start = start + "T00:00";
+					end = end +"T23:59";
+				}
+				
+// 			    if(confirm("일정을 추가하시겠습니까?")){
+// 			    	$('#addEventModal').modal('show');
+// 			    	document.getElementById('eventStart').value = start;
+// 			        document.getElementById('eventEnd').value = end;
+// 			    }
+			    
+			    Swal.fire({
+		            text: "일정을 추가하시겠습니까?",
+		            icon: "info",
+		            showCancelButton: true, // cancel버튼 보이기. 기본은 원래 없음
+		            confirmButtonColor: '#3085d6', // confrim 버튼 색깔 지정
+		            cancelButtonColor: '#d33', // cancel 버튼 색깔 지정
+		            confirmButtonText: '확인', // confirm 버튼 텍스트 지정
+		            cancelButtonText: '취소', // cancel 버튼 텍스트 지정
+			        reverseButtons: false
+			        
+		        }).then((result) => {
+		            if(result.value) {
+		            	$('#addEventModal').modal('show');
+				    	document.getElementById('eventStart').value = start;
+				        document.getElementById('eventEnd').value = end;
+		            }
+		        });
+			    
+			    
+			    
+			});
+			
+			
+		
+	        calendar.on("eventClick", info => {
+	        	
+				var recruitNo = info.event.extendedProps.recruitNo;
+				var skedNo = info.event.extendedProps.skedNo;
+				
+				if(recruitNo == null || recruitNo == ""){
+					//개인일정
+					alert(skedNo)
+				}
+				
+				if(skedNo == null || skedNo == ""){
+					//즐겨찾기한 채용일정
+					alert(recruitNo)
+				}
+				
+        
+	        });
+	        
+	      //  calendar.on("eventMouseEnter", info => console.log("eEnter:", info));
+	      //  calendar.on("eventMouseLeave", info => console.log("eLeave:", info));
+	       // calendar.on("dateClick", info => console.log("dateClick:", info));
+	        addSchedule.addEventListener('click', function(event) {
+	            const skedNm = document.getElementById('eventTitle').value;
+	            const skedStrtYmd = document.getElementById('eventStart').value;
+	            const skedEndYmd = document.getElementById('eventEnd').value;
+	            const skedCn = document.getElementById('eventDescription').value;
+	            const skedColor = document.getElementById('eventColor').value;
+	            const skedTxtColor = document.getElementById('fontColor').value;
+	            
+	            scheduleData = {
+	            		skedCn	: skedCn,
+	            		skedNm : skedNm,
+	            		skedStrtYmd : skedStrtYmd,
+	            		skedEndYmd : skedEndYmd,
+	            		skedColor : skedColor,
+	            		skedTxtColor : skedTxtColor
+	            }
+	            
+	            addEvent(scheduleData);
+	            $('#addEventModal').modal('hide');
+	        });
+	       
+	        
+	        addSchedultBtn.addEventListener('click', function(event) {
+	            const skedNm = document.getElementById('skedName').value;
+			    const skedStrtYmd = document.getElementById('skedStart').value;
+			    const skedEndYmd = document.getElementById('skedEnd').value;
+			    const skedCn = document.getElementById('skedContent').value;
+			    const skedColor = document.getElementById('skedColor').value;
+			    const skedTxtColor = document.getElementById('skedTxtColor').value;
+	            
+	            scheduleData = {
+	            		skedCn	: skedCn,
+	            		skedNm : skedNm,
+	            		skedStrtYmd : skedStrtYmd,
+	            		skedEndYmd : skedEndYmd,
+	            		skedColor : skedColor,
+	            		skedTxtColor : skedTxtColor
+	            }
+	            
+	            addEvent(scheduleData);
+	       
+	        });
+	        
+	        
+	        function addEvent(event){
+	        	$.ajax({
+	                url: '/myPage/member/addSchedule.do', 
+	                type: 'POST',
+	                contentType : "application/json; charset=utf-8",
+	                beforeSend: function(xhr) {
+		             	xhr.setRequestHeader(header, token);
+		           	},
+	                data:  JSON.stringify(event),
+	                success: function(response) {
+	                	//response이 새로운 달력 데이터 이므로새로 그려주기
+		          		calendar.removeAllEvents();
+				        calendar.addEventSource(response);
+				        calendar.render();	                	
+	                },
+	                error: function(xhr, status, error) {
+	                    console.error('통신 실패 :', error);
+	                }
+	            });
+	        }
+	        
+	 });
+		
+		
+		
+    </script>
+		
+	</div>
+</main>

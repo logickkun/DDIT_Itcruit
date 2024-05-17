@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.itcruit.mapper.IResumeMapper">
+	
+	<select id="selectMember" parameterType="string" resultType="accountVO">
+		select
+			account_id
+			, account_pswd
+			, account_nm
+			, gender
+			, birth_ymd
+			, account_nick
+			, account_mail
+			, account_tell
+			, account_zip
+			, account_addr1
+			, account_addr2
+			, enabled
+			, auth_cmmncd
+			, join_ymd
+			, account_stts_cmmncd
+			, TO_CHAR(birth_ymd, 'yyyy') birthY
+		from 
+			account
+		where 
+			account_id = #{accountId}
+	</select>
+	
+	<select id="langList" parameterType="map" resultType="commoncodeVO">
+		SELECT DISTINCT
+			cmmncd_nm1
+		FROM
+		    commoncode
+		WHERE
+		    CMMNCD_GRP_CD LIKE 'PSTN%'
+		AND
+			TO_NUMBER(SUBSTR(CMMNCD_GRP_CD, 5)) <![CDATA[<]]>= 14
+		AND
+		    initcap(CMMNCD_NM1) LIKE initcap('%'||#{value}||'%')
+		ORDER BY
+            CMMNCD_NM1
+	</select>
+
+</mapper>

@@ -1,0 +1,89 @@
+package kr.co.itcruit.mypage.admin.service.impl;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.mapper.IAdminMapper;
+import kr.co.itcruit.mapper.IEnterpriseMapper;
+import kr.co.itcruit.mapper.IFreeBoardMapper;
+import kr.co.itcruit.mypage.admin.service.IAdminService;
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.AtchVO;
+import kr.co.itcruit.vo.BoardVO;
+import kr.co.itcruit.vo.MidPaginationVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class AdminServiceImpl implements IAdminService {
+
+	
+	@Inject
+	private IFreeBoardMapper freeBoardMapper;
+	
+	@Inject
+	private IAdminMapper adminMapper;
+	
+	
+	
+	@Override
+	public ServiceResult faqInsert(BoardVO boardVO) {
+		ServiceResult result = null;
+		
+		int status = freeBoardMapper.insert(boardVO);
+		if(status > 0) {
+			result = ServiceResult.OK;
+		}else {
+			result = ServiceResult.FAILED;
+		}
+		return result;
+	}
+
+	@Override
+	public List<BoardVO> selectFreeBoardList(MidPaginationVO<BoardVO> pagingVO) {
+		log.info("" + pagingVO);
+		log.info(freeBoardMapper.selectFreeBoardList(pagingVO).toString());
+		return freeBoardMapper.selectFreeBoardList(pagingVO);
+	}
+
+	@Override
+	public List<AtchVO> entSttsList() {
+
+		System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 서비스");
+		
+		List<AtchVO> list = adminMapper.entSttsList();
+		
+		return list;
+		
+	}
+
+	@Override
+	public ServiceResult entApproval(AccountVO av) {
+		
+		ServiceResult result = null;
+		int status = 0;
+		
+		if(av.getAccountIds() != null && !av.getAccountIds().isEmpty()  ) {
+			for (int i = 0; i < av.getAccountIds().size(); i++) {
+				av.setAccountId(av.getAccountIds().get(i));
+				status = adminMapper.entApproval(av);
+			}
+		}else if(!av.getAccountId().isEmpty()) {
+			status = adminMapper.entApproval(av);
+		}
+		
+		if(status > 0) {
+			result = ServiceResult.OK;
+		}else {
+			result = ServiceResult.FAILED;
+		}
+		
+		
+		return result;
+	}
+
+
+}

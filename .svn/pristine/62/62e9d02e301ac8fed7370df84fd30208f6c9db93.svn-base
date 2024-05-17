@@ -1,0 +1,296 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.ApplicantCareerStatVO;
+import kr.co.itcruit.vo.ApplicantEduStatVO;
+import kr.co.itcruit.vo.ApplicantGenderStatVO;
+import kr.co.itcruit.vo.ApplicantPassStatVO;
+import kr.co.itcruit.vo.ApplyProcessListPayVO;
+import kr.co.itcruit.vo.ApplyProcessListVO;
+import kr.co.itcruit.vo.AtchVO;
+import kr.co.itcruit.vo.AvailLangListVO;
+import kr.co.itcruit.vo.BoardBBS201PaginationVO;
+import kr.co.itcruit.vo.BoardBBS202PaginationVO;
+import kr.co.itcruit.vo.BoardVO;
+import kr.co.itcruit.vo.CareerVO;
+import kr.co.itcruit.vo.CertificateVO;
+import kr.co.itcruit.vo.CustomPaginationInfoVO;
+import kr.co.itcruit.vo.EachProcessApplyPassVO;
+import kr.co.itcruit.vo.EntAccountVO;
+import kr.co.itcruit.vo.EntCodingTestQstnDsnctVO;
+import kr.co.itcruit.vo.EntCodingtestVO;
+import kr.co.itcruit.vo.EntIntroQSTNDSNCTVO;
+import kr.co.itcruit.vo.EntIntroQSTNVO;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.ExperienceVO;
+import kr.co.itcruit.vo.LogRecruitTableVO;
+import kr.co.itcruit.vo.PortfolioVO;
+import kr.co.itcruit.vo.QstnDSNCTVO;
+import kr.co.itcruit.vo.RecruitApplicantVO;
+import kr.co.itcruit.vo.RecruitVO;
+import kr.co.itcruit.vo.ResumeVO;
+
+public interface IMyEnterpriseMapper {
+
+	public int recruitRegisterInsert(RecruitVO recruitVO);
+
+	public int recruitRegisterEdit(RecruitVO recruitVO);
+	
+	public int recruitRegisterRemove(RecruitVO recruitVO);
+	
+	public void recruitHireSttsInsert(RecruitVO recruitVO);
+
+	public void recruitEsntlLangInsert(RecruitVO recruitVO);
+	
+	public void recruitPreferLangInsert(RecruitVO recruitVO);
+	
+	public int recruitHireSttsRemove(RecruitVO recruitVO);
+
+	public int recruitEsntlLangRemove(RecruitVO recruitVO);
+
+	public int recruitPreferLangRemove(RecruitVO recruitVO);
+
+	public List<RecruitVO> recruitSelectList();
+	
+	public List<RecruitVO> recruitSelectInfo(@Param("recruitNo") String recruitNo,@Param("pstnCmmncdNm") String pstnCmmncdNm);
+
+	public List<RecruitVO> recruitSelectListByEntNo(@Param("entNo") int entNo);
+
+	public int selectRecruitCount(CustomPaginationInfoVO<RecruitVO> customPagingVO);
+
+	public List<RecruitVO> selectRecruitList(CustomPaginationInfoVO<RecruitVO> customPagingVO);
+
+	public void applyProcessListInsert(ApplyProcessListVO aplv);
+
+	public void applyProcessListPayInsert(ApplyProcessListPayVO aplpv);
+
+	public List<ApplyProcessListVO> selectProcess(@Param("recruitNo") String recruitNo,@Param("pstnCmmncdNm") String pstnCmmncdNm);
+
+	public void entIntroQSTNInsert(EntIntroQSTNVO qstn);
+
+	public List<EntIntroQSTNDSNCTVO> selectDsnct(@Param("recruitNo") String recruitNo,@Param("pstnCmmncdNm") String pstnCmmncdNm);
+
+	public int qstnDSNCTInsert(QstnDSNCTVO qdv);
+
+	public int qstnDSNCTUpdate(@Param("entIntroQstnNo")String entIntroQstnNo,@Param("entIntroQstnCn") String entIntroQstnCn, @Param("entIntroQstnUpdateCn")String entIntroQstnUpdateCn);
+
+	public List<EntIntroQSTNVO> getentIntroQstnNo(@Param("recruitNo") String recruitNo, @Param("pstnCmmncdNm")String pstnCmmncdNm);
+
+	public List<ApplyProcessListVO> selectApplyProcessList(@Param("recruitNo")String recruitNo, @Param("pstnCmmncdNm") String pstnCmmncdNm);
+
+	public int selecetAccountListCount(CustomPaginationInfoVO<AccountVO> accountList);
+
+	public List<AccountVO> selectOrderList(CustomPaginationInfoVO<AccountVO> accountList);
+
+	public int insetEachProcess(EachProcessApplyPassVO eachProcessApplyPassVO);
+
+	public String selectEachProcessNo(EachProcessApplyPassVO eachProcessApplyPassVO);
+
+	public List<EntIntroQSTNDSNCTVO> selectOrderDsnct(@Param("recruitNo") String recruitNo,@Param("pstnCmmncdNm") String pstnCmmncdNm,@Param("orderNumber") String orderNumber);
+
+	public int qstnDSNCTDelete(@Param("entIntroQstnCn") String entIntroQstnCn, @Param("entIntroQstnNo") int entIntroQstnNo);
+
+	public int BBS201Count(int entNo);
+
+	public List<BoardVO> BBS201List(BoardBBS201PaginationVO<BoardVO> bBS201PagingVO);
+
+	public int noticeInsert(BoardVO bv);
+
+	public void insertNoticeFile(AtchVO atchVO);
+
+	public int BBS202Count(int entNo);
+
+	public List<BoardVO> BBS202List(BoardBBS202PaginationVO<BoardVO> bBS202PagingVO);
+
+	public int qstnDSNCTUpdate(@Param("entIntroQstnSeqNo") int entIntroQstnSeqNo, @Param("entIntroQstnUpdateCn") String entIntroQstnUpdateCn);
+
+	public int qstnDSNCTDelete(int entIntroQstnSeqNo);
+
+	public int idCheck(String id);
+
+	public int signUp(AccountVO av);
+
+	public void accountAuth(String accountId);
+
+	public void entAccount(AccountVO av);
+
+	public int countId(int entNo);
+
+	public List<EntAccountVO> selectId(int entNo);
+
+	public int deleteId(String accountId);
+
+	public void deleteAccountAuth(String accountId);
+
+	public void deleteEntAccount(String accountId);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	public List<Map<String, String>> getQstnAnswer(Map<String, String> qstnAnswer);
+
+	public EnterpriseVO selectEntInfoByEntNo(int entNo);
+
+	public int updateApplicantPass(@Param("eachProcessSeq")String eachProcessSeq, @Param("updateClsNm")String updateClsNm, @Param("updateOrderNumber") int updateOrderNumber);
+
+	public List<RecruitApplicantVO> getApplyNumber(@Param("applyNo") String applyNo);
+
+	public List<LogRecruitTableVO> getApplyHit(@Param("recruitNo") String recruitNo,  @Param("pstnCmmncdNm") String pstnCmmncdNm);
+
+	public List<ApplicantPassStatVO> getApplyPass(@Param("applyNo") String applyNo, @Param("yn") String yn);
+
+	public List<ApplicantCareerStatVO> getApplyCareer(String applyNo);
+
+	public List<ApplicantGenderStatVO> getApplyGender(String applyNo);
+
+	public List<ApplicantEduStatVO> getApplyEdu(String applyNo);
+
+	public List<LogRecruitTableVO> getLogHitStat(String recruitNo);
+
+	public List<Map<String, String>> getPstnCmmncdList();
+
+	public List<Map<String, String>> getPreferCmmncdNm();
+
+	public int updateProcessDate(Map<String, Object> map);
+
+	public int getTodayApply(String customEntNo);
+
+	public int getTotalRecruitCount(String customEntNo);
+
+	public int getTotalApply(String customEntNo);
+
+	public int getEndedRecruitCount(String customEntNo);
+
+	public EnterpriseVO getEnterMyInfo(int entNo);
+
+	public List<Map<String, Object>> getProgressRecruit(int entNo);
+
+	public List<Map<String, Object>> getRecentApply(String customEntNo2);
+
+	public List<RecruitVO> getDeadLineRecruit(int entNo);
+
+	public int insertApplicantPass(Map<String, Object> updateInfo);
+
+	public AccountVO selecteResumeByRsmNo(String rsmNo);
+
+	public ResumeVO selecteEducationByRsmNo(String rsmNo);
+
+	public List<CareerVO> selecteCareerByRsmNo(String rsmNo);
+
+	public List<ExperienceVO> selectExperienceByRsmNo(String rsmNo);
+
+	public List<CertificateVO> selectCertificateByRsmNo(String rsmNo);
+
+	public List<PortfolioVO> selectPortfolioByRsmNo(String rsmNo);
+
+	public List<AvailLangListVO> selectAvailLangListByRsmNo(String rsmNo);
+
+	public int updateApplicantFail(String eachProcessSeq);
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public int applyProcessListInsertDelete(RecruitVO recruitVO);
+
+	public void entCodingTestInsert(EntCodingtestVO ecv);
+
+	public List<EntIntroQSTNVO> getEntCodingTestNo(@Param("recruitNo") String recruitNo,@Param("pstnCmmncdNm") String pstnCmmncdNm);
+
+	public int codingTestInsert(EntCodingTestQstnDsnctVO ectqdv);
+
+	public List<EntCodingTestQstnDsnctVO> selectCondingTestOrder(@Param("recruitNo")String recruitNo, @Param("pstnCmmncdNm") String pstnCmmncdNm,
+			@Param("orderNumber")String orderNumber);
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	///김영상
+	
+
+}

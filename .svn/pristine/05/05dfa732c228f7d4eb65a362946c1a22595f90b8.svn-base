@@ -1,0 +1,128 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<!-- Page main content START -->
+	<div class="page-content-wrapper border">
+
+		<!-- Title -->
+		<div class="row">
+			<div class="col-12">
+				<h1 class="h3 mb-2 mb-sm-0">문의게시판</h1>
+			</div>
+		</div>
+
+		<!-- Card START -->
+		<div class="card bg-transparent">
+
+			<!-- Card header START -->
+			<div class="card-header bg-transparent border-bottom px-0">
+				<!-- Search and select START -->
+				<div class="row g-3 align-items-center justify-content-between">
+			
+			
+				</div>
+				<!-- Search and select END -->
+			</div>
+			
+				<div class="card-body px-0">
+					<div class="table-responsive border-0">
+						<table class="table align-middle p-4 mb-0 table-hover text-center">
+							<thead>
+								<tr style="background-color: #DCD8FC;">
+								    <th scope="col" class="border-0 rounded-start" style="color: black;">문의번호</th>
+								    <th scope="col" class="border-0" style="color: black;">제목</th>
+								    <th scope="col" class="border-0" style="color: black;">작성일</th>
+								    <th scope="col" class="border-0" style="color: black;">상태</th>
+								    <th scope="col" class="border-0" style="color: black;">답변하기</th>
+								</tr>
+
+							</thead>
+					
+							<tbody>
+								<tr>
+									<td>A057</td>
+									<td>제목입니다</td>
+									<td>2024-04-23</td>
+									<td style="color: red;">미답변</td>
+									<td><a href="#" class="btn btn-secondary-soft mb-0" data-bs-toggle="modal" data-bs-target="#viewReview">답변하기</a></td>
+								</tr>
+								<tr>
+									<td>A057</td>
+									<td>제목입니다</td>
+									<td>2024-04-23</td>
+									<td style="color: green;">답변</td>
+									<td><a href="#" class="btn btn-secondary-soft mb-0" data-bs-toggle="modal" data-bs-target="#viewReview">답변하기</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<div class="card-footer bg-transparent p-0">
+				<!-- Pagination START -->
+				<div class="d-sm-flex justify-content-sm-between align-items-sm-center">
+					<!-- Content -->
+					<p class="mb-0 text-center text-sm-start"></p>
+					<!-- Pagination -->
+					<nav class="d-flex justify-content-center mb-0" aria-label="navigation">
+						<ul class="pagination pagination-sm pagination-primary-soft d-inline-block d-md-flex rounded mb-0">
+							<li class="page-item mb-0"><a class="page-link" href="#" tabindex="-1"><i class="fas fa-angle-left"></i></a></li>
+							<li class="page-item mb-0"><a class="page-link" href="#">1</a></li>
+							<li class="page-item mb-0 active"><a class="page-link" href="#">2</a></li>
+							<li class="page-item mb-0"><a class="page-link" href="#">3</a></li>
+							<li class="page-item mb-0"><a class="page-link" href="#"><i class="fas fa-angle-right"></i></a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+	</div>
+
+<!-- **************** MAIN CONTENT END **************** -->
+
+<!-- Back to top -->
+<div class="back-top"><i class="bi bi-arrow-up-short position-absolute top-50 start-50 translate-middle"></i></div>
+
+<!-- Popup modal for reviwe START -->
+<div class="modal fade" id="viewReview" tabindex="-1" aria-labelledby="viewReviewLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<!-- Modal header -->
+			<div class="modal-header bg-purple">
+				<h5 class="modal-title text-white" id="viewReviewLabel">답변하기</h5>
+				<button type="button" class="btn btn-sm btn-light mb-0" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+			</div>
+			<!-- Modal body -->
+			<div class="modal-body">
+				<div class="d-md-flex">
+					<!-- Avatar -->
+					<div class="avatar avatar-md me-4 flex-shrink-0">
+						<img class="avatar-img rounded" src="assets/images/게시판/문의.png" alt="avatar">
+					</div>
+					<!-- Text -->
+					<div>
+						<div class="d-sm-flex mt-1 mt-md-0 align-items-center">
+							<h5 class="me-3 mb-0">모르겠어요</h5>
+							<!-- Review star -->
+							<ul class="list-inline mb-0">
+								2024-04-03
+							</ul>
+						</div>
+						<!-- Info -->
+						<p class="small mb-2">문의번호 : 053</p>
+						<p class="mb-2">Handsome met debating sir dwelling age material. As style lived he worse dried. Offered related so visitors we private removed. Moderate do subjects to distance. </p>
+							<div class="form-floating">
+								<textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+								<label for="floatingTextarea2">답변을 작성해주세요</label>
+							</div>
+					</div>	
+				</div>
+			</div>
+			<!-- Modal footer -->
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger-soft my-0" data-bs-dismiss="modal">답변 등록</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Popup modal for reviwe END -->
+	

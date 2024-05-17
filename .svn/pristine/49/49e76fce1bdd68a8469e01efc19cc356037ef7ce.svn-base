@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IFreeBoardMapper">
+ 
+ 	<resultMap type="boardVO" id="boardMap">
+ 		<id property="bbsNo" column="bbs_no"/>
+ 		<result property="bbsNo" column="bbs_no"/>
+ 		<result property="bbsRegDt" column="bbs_reg_dt"/>
+ 		<result property="bbsInqCnt" column="bbs_inq_cnt"/>
+ 		<result property="bbsTtl" column="bbs_ttl"/>
+ 		<result property="bbsCn" column="bbs_cn"/>
+ 		<result property="bbsWriter" column="bbs_writer"/>
+ 		<result property="accountId" column="account_id"/>
+ 		<result property="bbsCtgryCmmncd" column="bbs_ctgry_cmmncd"/>
+ 		<result property="bbsDelyn" column="bbs_delyn"/>
+ 		<result property="bssCmntCn" column="bss_cmnt_cn"/>
+ 		<collection property="atchFileList" resultMap="atchFileMap"/>
+ 	</resultMap>
+ 	
+ 	<resultMap type="atchVO" id="atchFileMap">
+ 		<id property="fileNo" column="file_no"/>
+ 		<result property="fileNo" column="file_no"/>
+ 		<result property="fileSrcNo" column="file_src_no"/>
+ 		<result property="orgnCmmncd" column="orgn_cmmncd"/>
+ 		<result property="filePath" column="file_path"/>
+ 		<result property="fileSize" column="file_size"/>
+ 		<result property="fileFancysize" column="file_fancysize"/>
+ 		<result property="fileMime" column="file_mime"/>
+ 		<result property="fileName" column="file_name"/>
+ 	</resultMap>
+ 	
+ 	<select id="selectFreeBoardCount" parameterType="midPaginationVO" resultType="int">
+ 		select count(bbs_no)
+ 		from board
+ 		where 1=1
+ 		and bbs_ctgry_cmmncd = #{bbsCtgryCmmncd}
+ 		<include refid="boardSearch"/>
+ 	</select>
+ 	
+ 	<sql id="boardSearch">
+ 		<if test="searchType != null and searchType == 'title'">
+ 			and (bbs_ttl like '%' || #{searchWord} || '%')
+ 		</if>
+ 		<if test="searchType != null and searchType == 'writer'">
+ 			and (bbs_writer '%' || #{searchWord} || '%')
+ 		</if>
+ 	</sql>
+ 	
+ 	<select id="selectFreeBoardList" parameterType="midPaginationVO" resultType="boardVO">
+ 		select 
+			b.*
+		from(
+			select
+				a.*, row_number() over(order by a.BBS_REG_DT desc) rnum
+			from(
+				select 
+					BBS_NO, BBS_TTL, BBS_CN, BBS_WRITER, BBS_REG_DT, BBS_INQ_CNT, REPLY_YN
+				from BOARD
+				  where 1=1
+		          and bbs_ctgry_cmmncd = #{bbsCtgryCmmncd}
+		          <include refid="boardSearch"/>
+		          order by BBS_NO desc
+			) a
+		) b
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+ 	</select>
+ 	
+ 	<insert id="insert" parameterType="boardVO" useGeneratedKeys="true">
+ 		<selectKey keyProperty="bbsNo" resultType="String" order="BEFORE">
+ 			select seq_board.nextval from dual
+ 		</selectKey>
+			INSERT INTO board (
+				bbs_no
+				,bbs_ttl
+				,bbs_cn
+				,bbs_writer
+				,bbs_ctgry_cmmncd
+			) VALUES (
+				#{bbsNo}
+				,#{bbsTtl}
+				,#{bbsCn}
+				,#{bbsWriter}
+				,#{bbsCtgryCmmncd}
+			)
+ 	</insert>
+ 	
+ 	<insert id="insertFile" parameterType="atchVO">
+ 		INSERT INTO atch (
+		    file_no
+		    , file_src_no
+		    , orgn_cmmncd
+		    , file_path
+		    , file_size
+		    , file_fancysize
+		    , file_mime
+		    , file_name
+		) VALUES (
+		    SEQ_ATCH.nextval
+		  , #{fileSrcNo}
+		  , #{orgnCmmncd}
+		  , #{filePath}
+		  , #{fileSize}
+		  , #{fileFancysize}
+		  , #{fileMime}
+		  , #{fileName}
+		)
+ 	</insert>
+ 	
+
+	<update id="incrementHit" parameterType="boardVO">
+		update board
+		set
+			bbs_inq_cnt = bbs_inq_cnt +1
+		where bbs_no = #{bbsNo}
+	</update> 
+	
+	<select id="detail" parameterType="boardVO" resultMap="boardMap">
+		SELECT
+		    b.bbs_no AS bbs_no,
+		    b.bbs_reg_dt,
+		    b.bbs_inq_cnt,
+		    b.bbs_ttl,
+		    b.bbs_cn,
+		    b.bbs_writer,
+		    (select acc.account_id from account acc 
+			where acc.account_nick =  b.bbs_writer) as account_id,
+		    b.bbs_ctgry_cmmncd,
+		    b.bbs_delyn,
+		    a.file_no,
+		    a.file_src_no,
+		    a.orgn_cmmncd,
+		    a.file_path,
+		    a.file_size,
+		    a.file_fancysize,
+		    a.file_mime,
+		    a.file_name,
+		    bc.BSS_CMNT_CN
+		FROM
+		    board b
+		LEFT OUTER JOIN
+		    atch a ON (b.bbs_no = a.FILE_SRC_NO)
+		LEFT JOIN
+		    board_comment bc ON (bc.BBS_NO = b.bbs_no)
+		where b.bbs_no = #{bbsNo} 
+	</select>
+	
+	<update id="update" parameterType="boardVO">
+		update board
+		set
+		  bbs_ttl = #{bbsTtl}
+		, bbs_cn = #{bbsCn}
+		, bbs_reg_dt = sysdate
+		where bbs_no = #{bbsNo} 
+	</update>
+	
+	<select id="selectBoardFile" parameterType="int" resultType="atchVO">
+		select 
+		    file_path
+		from atch
+		where file_no = #{fileNo}
+	</select>
+	
+	<delete id="deleteBoardFileList" parameterType="int">
+		delete from atch
+		where file_no = #{fileNo}
+	</delete> 
+	
+	<delete id="delete" parameterType="String">
+		delete from board
+		where bbs_no = #{bbsNo}
+	</delete>
+	
+	<delete id="deleteBoardFile" parameterType="atchVO">
+		delete from atch
+		where file_src_no = #{fileSrcNo}
+	</delete>
+	
+	<select id="download" parameterType="int" resultType="atchVO">
+		SELECT
+		    file_no
+		  , file_src_no
+		  , orgn_cmmncd
+		  , file_path
+		  , file_size
+		  , file_fancysize
+		  , file_mime
+		  , file_name
+		FROM
+		    atch
+		where file_no = #{fileNo}
+	</select>
+	
+ 	
+	<select id="bestList" resultType="boardVO">
+	    
+	  SELECT  
+		    bbs_no,
+		    SUBSTR(bbs_ttl, 1, 10) AS bbs_ttl     
+       FROM (
+           SELECT
+               bbs_no
+             , bbs_inq_cnt
+             , bbs_ttl
+             , rownum rnum
+           FROM board
+           <![CDATA[
+           WHERE bbs_reg_dt >= TO_CHAR(SYSDATE-7,'YYYYMMDD')
+           ]]>
+           and bbs_ctgry_cmmncd = 'BBS101' 
+           and bbs_delyn = 'N'
+           ORDER BY bbs_inq_cnt DESC          
+       )           
+       <![CDATA[
+       WHERE rnum <= 5
+	    ]]>
+	</select>
+
+
+ 
+
+<!-- 댓글 -->
+	<insert id="insertComment" parameterType="boardCommentVO">
+		INSERT INTO board_comment (
+		    bss_cmnt_no
+		    , bss_cmnt_tm
+		    , bss_cmnt_cn
+		    , bbs_no
+		    , bss_cmnt_writer
+		) VALUES (
+		    SEQ_COMMENT.nextval
+		  , sysdate
+		  , #{bssCmntCn}
+		  , #{bbsNo}
+		  , #{bssCmntWriter}
+		)
+	</insert>
+	
+	<select id="commentList" parameterType="boardCommentVO" resultType="boardCommentVO">
+		SELECT
+		    bss_cmnt_no
+		  , bss_cmnt_tm
+		  , bss_cmnt_cn
+		  , bbs_no
+		  , bss_cmnt_writer
+		  , bss_cmnt_delyn
+		FROM
+		    board_comment
+		where
+			bbs_no = #{bbsNo}
+		ORDER BY
+   			bss_cmnt_tm DESC
+	</select>
+	
+	<delete id="deleteComment" parameterType="boardCommentVO">
+		DELETE FROM board_comment
+		WHERE
+			bss_cmnt_no = #{bssCmntNo}
+	</delete>
+	
+	<update id="updateComment" parameterType="boardCommentVO">
+		update board_comment
+		set
+			bss_cmnt_cn = #{bssCmntCn}
+		where bss_cmnt_no = #{bssCmntNo}
+	</update>
+	
+	
+<!--관리자 문의 답변상태 업데이트  -->
+	<update id="inquiryAnswerUpdate"  parameterType="boardCommentVO">
+		UPDATE board b
+		SET b.REPLY_YN = '답변'
+		WHERE b.BBS_NO IN (
+		    SELECT bc.BBS_NO
+		    FROM BOARD_COMMENT bc
+		    WHERE bc.BBS_NO = b.BBS_NO
+		)
+	</update>
+ 
+ 
+ <!-- 신고 -->
+ 	<insert id="insertReport" parameterType="boardReportVO">
+ 		INSERT INTO board_report (
+		    report_no
+		    , bbs_report_id
+		    , bbs_report_cmmncd
+		    , bbs_no
+		    , cmmt_no
+		    , write_id
+		    , report_ymd
+		) VALUES (
+		    SEQ_REPORT.nextval
+		  , #{bbsReportId}
+		  , #{bbsReportCmmncd}
+		  , #{bbsNo}
+		  , #{cmmtNo}
+		  , #{writeId}
+		  , sysdate
+		)
+ 	</insert>
+ 	
+ 	<select id="adminfreeBoardReport" parameterType="midPaginationVO" resultType="boardReportVO">
+ 		SELECT
+		    b.*
+		    from(
+		        select
+		            a.*, row_number() over(order by a.report_ymd desc) rnum
+		        from(
+		            select
+		                  report_no
+		                  , bbs_report_id
+		                  , bbs_report_cmmncd
+		                  , bbs_no
+		                  , cmmt_no
+		                  , write_id
+		                  , report_ymd
+		                  , handling_yn
+		            from board_report
+		            where 1=1
+		            and cmmt_no = 0
+		        )a
+		    )b
+		<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+ 	</select>
+ 	
+ 	<select id="selectFreeBoardReportCount" parameterType="midPaginationVO" resultType="int">
+ 		select count(REPORT_NO)
+	 		from BOARD_REPORT
+	 		where 1=1
+            and cmmt_no = 0
+ 	</select>
+ 	
+ 	<select id="selectFreeBoardCommentReportCount" parameterType="midPaginationVO" resultType="int">
+		SELECT COUNT(REPORT_NO)
+			FROM BOARD_REPORT
+			WHERE cmmt_no > 0
+ 	</select>
+ 	
+ 	<select id="adminfreeBoardCommentReport" parameterType="midPaginationVO" resultType="boardReportVO">
+ 		select 
+		    b.REPORT_NO,
+		    b.BBS_REPORT_ID,
+		    b.BBS_REPORT_CMMNCD,
+		    b.BBS_NO,
+		    b.CMMT_NO,
+		    b.WRITE_ID,
+		    b.REPORT_YMD,
+		    b.handling_yn,
+            c.BSS_CMNT_NO,
+            c.BSS_CMNT_TM,
+            c.BSS_CMNT_CN,
+            c.BBS_NO AS COMMENT_BBS_NO,
+            c.BSS_CMNT_WRITER,
+            c.BSS_CMNT_DELYN
+		from (
+		    select
+		        a.*, row_number() over(order by a.REPORT_YMD desc) num
+		    from (
+		        SELECT
+		            report_no,
+		            bbs_report_id,
+		            bbs_report_cmmncd,
+		            bbs_no,
+		            cmmt_no,
+		            write_id,
+		            report_ymd,
+		            handling_yn
+		        FROM
+		            board_report
+		        where 1=1          
+		        and board_report.cmmt_no > 0
+		    ) a
+		) b
+         LEFT JOIN board_comment c ON b.BBS_NO = c.BBS_NO AND b.CMMT_NO = c.BSS_CMNT_NO
+		<![CDATA[
+			where b.num >= #{startRow} and b.num <= #{endRow}
+		]]>
+         order by report_no desc
+ 	</select>
+ 	
+ 	<update id="updatereportBbsNo" parameterType="boardReportVO">
+ 		UPDATE board_report
+		SET handling_yn = '삭제'
+		WHERE BBS_NO = #{bbsNo}
+ 	</update>
+ 	
+ 	<update id="updatereportcmmtNo" parameterType="boardReportVO">
+ 		UPDATE board_report
+		SET handling_yn = 'Y'
+		WHERE cmmt_no = #{cmmtNo}
+ 	</update>
+ 	
+ 	<delete id="adminDeleteComment" parameterType="boardReportVO">
+		DELETE FROM BOARD_COMMENT	
+		WHERE BSS_CMNT_NO = #{cmmtNo}
+	</delete>
+	
+
+ 
+ </mapper>

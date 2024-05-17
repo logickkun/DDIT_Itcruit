@@ -1,0 +1,84 @@
+package kr.co.itcruit.mypage.member.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.mapper.IMyMemberMapper;
+import kr.co.itcruit.mypage.member.service.IMemberService;
+import kr.co.itcruit.vo.BoardVO;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.MemberPageResumePaginationInfoVO;
+import kr.co.itcruit.vo.MidPaginationVO;
+import kr.co.itcruit.vo.RecruitPaginationVO;
+import kr.co.itcruit.vo.ResumeVO;
+
+
+@Service
+public class MemberServiceImpl implements IMemberService {
+	
+	@Inject
+	private IMyMemberMapper myMemberMapper;
+
+	@Override
+	public List<ResumeVO> selectResume(ResumeVO resumeVO) {
+		return myMemberMapper.selectResume(resumeVO);
+	}
+
+	@Override
+	public int selectResumeCount(MemberPageResumePaginationInfoVO<ResumeVO> rsmManagePagingVO) {
+		return myMemberMapper.selectResumeCount(rsmManagePagingVO);
+	}
+
+	@Override
+	public List<ResumeVO> selectResumeList(MemberPageResumePaginationInfoVO<ResumeVO> rsmManagePagingVO) {
+		return myMemberMapper.selectResumeList(rsmManagePagingVO);
+	}
+
+	@Override
+	public int likeEntCount(RecruitPaginationVO<EnterpriseVO> likeEntPagingVO) {
+		return myMemberMapper.likeEntCount(likeEntPagingVO);
+	}
+
+	@Override
+	public List<EnterpriseVO> likeEntList(RecruitPaginationVO<EnterpriseVO> likeEntPagingVO) {
+		return myMemberMapper.likeEntList(likeEntPagingVO);
+	}
+
+	@Override
+	public ServiceResult deleteEnt(String accountId , String entNo) {
+
+		ServiceResult result = null;
+		
+		int status = myMemberMapper.deleteEnt(accountId , entNo);
+		
+		if(status > 0) {
+			result = ServiceResult.OK;
+		}else {
+			result = ServiceResult.FAILED;
+		}
+		
+		
+		
+		return result;
+	}
+
+	@Override
+	public int selectCount(MidPaginationVO<BoardVO> pagingVO) {
+		return myMemberMapper.selectCount(pagingVO);
+	}
+
+	@Override
+	public List<BoardVO> selectBoardList(MidPaginationVO<BoardVO> pagingVO) {
+		return myMemberMapper.selectBoardList(pagingVO);
+	}
+
+
+	
+
+
+}

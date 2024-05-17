@@ -1,0 +1,21 @@
+package kr.co.itcruit.codingtest.controller;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.co.itcruit.codingtest.service.ICodingTestService;
+
+@Controller
+@RequestMapping("/codingTest")
+public class CodingTestController {
+
+	//
+	//
+	@Inject
+	private ICodingTestService codetestService;
+	
+	
+	
+}

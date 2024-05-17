@@ -1,0 +1,14 @@
+package kr.co.itcruit.main.service;
+
+import java.util.List;
+
+import kr.co.itcruit.vo.CalendarVO;
+import kr.co.itcruit.vo.RecruitVO;
+
+public interface IRecruitListService {
+
+	public String getRecruitList(String time);
+
+	public List<RecruitVO> selectListByRecruitNo(String recruitNo);
+
+}

@@ -1,0 +1,25 @@
+package kr.co.itcruit.vo;
+
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class EntCodingtestVO {
+	
+	private String entNm;
+	private int entNo;
+	
+	private int entCodingtestNo;
+	private int processNo;
+	private int processNoOrder;
+	
+	private String recruitNo;
+	private String pstnCmmncdNm;
+	
+	private String strtDt;
+	private String endDt;
+	
+	//qstnNo; qstnTtl만 가져오면 될듯함
+	private List<CodingtestVO> entCodingtestList;
+}

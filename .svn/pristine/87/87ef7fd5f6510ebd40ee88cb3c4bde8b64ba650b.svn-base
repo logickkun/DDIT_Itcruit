@@ -1,0 +1,5 @@
+package kr.co.itcruit.recruit.service;
+
+public interface IRecruitService {
+
+}

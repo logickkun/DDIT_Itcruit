@@ -1,0 +1,17 @@
+package kr.co.itcruit.mypage.admin.controller;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.co.itcruit.mypage.admin.service.IMemberService;
+
+@Controller
+@RequestMapping("/myPage/member")
+public class MemberController {
+	
+	@Inject
+	private IMemberService memService;
+
+}

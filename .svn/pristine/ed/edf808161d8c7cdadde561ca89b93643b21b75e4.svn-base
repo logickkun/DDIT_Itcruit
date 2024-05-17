@@ -1,0 +1,82 @@
+package kr.co.itcruit.account.service.impl;
+
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.account.service.IEnterpriseAccountService;
+import kr.co.itcruit.mapper.IAccountMapper;
+import kr.co.itcruit.mapper.IEnterpriseMapper;
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.EnterpriseVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class EnterpriseAccountServiceImpl implements IEnterpriseAccountService {
+
+	@Inject
+	private IAccountMapper accountMapper;
+	
+	@Inject
+	private IEnterpriseMapper enterpriseMapper;
+	
+	// 기업회원가입
+	@Override
+	public ServiceResult signup(HttpServletRequest req, Map<String, Object> map) {
+		System.out.println("서비스스슷");
+		ServiceResult result = null;
+		
+		AccountVO accountVO = (AccountVO) map.get("accountVO");
+		EnterpriseVO enterpriseVO = (EnterpriseVO) map.get("enterpriseVO");
+		
+		
+		// 닉네임 추가 기업이름 + 01
+		String nick = enterpriseVO.getEntNm() + 01;
+		accountVO.setAccountNick(nick);
+
+//		String mail = accountVO.getAccountMail();
+//		accountVO.setAccountMail(mail);
+		
+		// 아이디 체크
+		String check = accountMapper.idCheck(accountVO);
+		
+		if(check != null) {
+			result = ServiceResult.FAILED;
+		}else {
+			int memStatus = accountMapper.insert(accountVO);
+			int entStatus = enterpriseMapper.insert(enterpriseVO);
+			
+			if(memStatus > 0 && entStatus > 0) {
+				result = ServiceResult.OK;
+			}else {
+				result = ServiceResult.FAILED;
+			}
+		}
+		
+		return result;
+	}
+
+	// 아이디 찾기
+	@Override
+	public AccountVO searchId(AccountVO accountVO) {
+		
+		return accountMapper.searchId(accountVO);
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}
+	

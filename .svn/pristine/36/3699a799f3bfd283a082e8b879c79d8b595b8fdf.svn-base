@@ -1,0 +1,11 @@
+package kr.co.itcruit.mypage.enterprise.service;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.vo.RecruitVO;
+
+public interface IMyEnterpriseService {
+
+	public ServiceResult recruitRegisterinsert(RecruitVO recruitVO);
+
+
+}

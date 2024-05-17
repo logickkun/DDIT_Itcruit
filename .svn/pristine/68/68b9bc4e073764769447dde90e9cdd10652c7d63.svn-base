@@ -1,0 +1,151 @@
+package kr.co.itcruit.codingtest.service.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.codingtest.service.ICodingTestService;
+import kr.co.itcruit.codingtest.utils.CompileUtils;
+import kr.co.itcruit.mapper.ICodingtestMapper;
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.CodingtestBoardVO;
+import kr.co.itcruit.vo.CodingtestVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class CodingTestImpl implements ICodingTestService{
+
+	@Inject
+	private ICodingtestMapper codingtestMapper;
+	
+	
+	/**
+	 *	문제 전체 리스트 출력(아직 페이징 미처리)
+	 */
+	@Override
+	public List<CodingtestVO> selectList(CodingtestVO codeVO) {
+		return codingtestMapper.selectList(codeVO);
+	}
+	
+	/**
+	 * 문제 번호로 상세페이지 가져오기
+	 * @param qstnNo
+	 * @return
+	 */
+	@Override
+	public CodingtestVO getQstnByNo(int qstnNo) {
+		return codingtestMapper.selectQstnByNo(qstnNo);
+	}
+
+	
+	@Override
+	public String doCompile(CodingtestVO codingtestVO) {
+		
+		//String accountId = "a001";
+		//출력해줄
+		String result = "";
+		CodingtestVO vo = null;
+		//
+		//추후 세션에서 받아올 아이디 setaccountId
+		
+		CompileUtils compileUtils = new CompileUtils();
+		
+		//flag - 테스트인지, 제출인지 판단용
+		if(codingtestVO.isFlag()) {
+			vo = codingtestMapper.doSubmit(codingtestVO);
+		}
+		else {
+			vo = codingtestMapper.doTest(codingtestVO);			
+		}
+		
+		vo.setQstnMcode(getRealCode(vo.getQstnMcode(), vo.getInput(), vo.getOutput()));
+		
+		//사용자로 부터 입력받은 값을 저장
+		vo.setCode(codingtestVO.getCode());
+		//vo에 flag값을 담아서 전달
+		vo.setFlag(codingtestVO.isFlag());
+		
+		try {
+			result = compileUtils.doCompile(vo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		//먼저코드를 solving_test에 저장
+		//codingtestVO에 담긴 값: accountId, code(사용자 입력값), qstnNo
+		
+		log.info("compile >>>>>>>>>>>>>" + codingtestVO);
+		log.info("accountId>>>" + codingtestVO.getAccountId());
+		log.info("code>>>" + codingtestVO.getCode());
+		log.info("qstnNo>>>" + codingtestVO.getQstnNo());
+		
+		//codingtestMapper.checkSolveByVO(vo) 여기서 nullcheck
+		String res = "";
+		if(res.equals("Y")) {
+		  return result;
+		} 
+		
+		if(res.equals("N")) {
+			//N 이면 update
+			if(result.contains("통과")) {
+				codingtestVO.setPassYn("Y");
+			} else {
+				codingtestVO.setPassYn("N");
+			}
+			codingtestMapper.updateSolveByVO(vo);
+		} else {			
+			if(result.contains("통과")) {
+				codingtestVO.setPassYn("Y");
+			} else {
+				codingtestVO.setPassYn("N");
+			}
+			codingtestMapper.insertSolve(vo);
+		}
+				
+		return result;
+	}
+	
+	public String getRealCode(String mainCode, String input, String output) {
+		
+		String realCode = "";
+		
+		realCode = mainCode.replace("String inputfilePath", 
+				"String inputfilePath =" + input +";");
+		
+		realCode = realCode.replace("String outputfilePath", 
+				"String outputfilePath =" + output +";");
+		
+		return realCode;
+		
+	}
+
+	@Override
+	public CodingtestVO getOptionInfo() {
+		CodingtestVO codingtestVO = new CodingtestVO();
+		
+		codingtestVO.setCtgryList(codingtestMapper.getCtgryList());
+		codingtestVO.setQstnSubjectList(codingtestMapper.getSubjectList());
+		return codingtestVO;
+	}
+
+	@Override
+	public AccountVO getMyCodePower(String accountId) {
+		
+		AccountVO accountVO = codingtestMapper.getNickAndScore(accountId);
+		accountVO.setCodePower(codingtestMapper.getCodePower(accountId));
+		
+		log.info("getMyCodePower>>>>>>>>>>>" + accountVO);
+		
+		return accountVO; 
+	}
+
+	@Override
+	public List<CodingtestBoardVO> getCodeBoardByQstnNo(int qstnNo) {
+		return codingtestMapper.getCodeBoardByQstnNo(qstnNo);
+	}
+	
+
+}

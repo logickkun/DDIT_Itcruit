@@ -1,0 +1,40 @@
+package kr.co.itcruit.codingtest.controller;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import kr.co.itcruit.codingtest.service.ICodingTestService;
+import kr.co.itcruit.vo.CodingtestVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@RequestMapping("/codingtest")
+@Slf4j
+public class CodingTestController {
+
+	
+	@Inject
+	private ICodingTestService codingtestService;
+	
+	@RequestMapping(value="/list.do", method=RequestMethod.GET)
+	public String getTestList() {
+		
+		List<CodingtestVO> codeList = codingtestService.selectList();
+		return "main/testList";			
+	}
+	
+	
+	
+	@RequestMapping(value="/detail.do", method=RequestMethod.GET)
+	public String getTestDetailByQstnNo() {
+		return "codingtest/detail";			
+	}
+	
+		
+		
+}

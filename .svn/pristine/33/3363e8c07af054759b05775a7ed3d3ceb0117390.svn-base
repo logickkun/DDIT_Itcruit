@@ -1,0 +1,57 @@
+package kr.co.itcruit.mypage.enterprise.controller;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.mypage.enterprise.service.IMyEnterpriseService;
+import kr.co.itcruit.vo.RecruitVO;
+import lombok.extern.slf4j.Slf4j;
+
+
+@Controller
+@RequestMapping("myPage/enterprise")
+@Slf4j
+public class EnterpriseInsertController {
+	
+	@Autowired
+	private IMyEnterpriseService myEntService;
+	
+	@RequestMapping(value = "/recruitInsertProcess", method = RequestMethod.POST)
+	public String hireInsertProcess(RecruitVO recruitVO, HttpServletRequest req, Model model) throws UnsupportedEncodingException {
+			
+		log.info("########## recruitVO : " + recruitVO);
+		
+		String goPage = "";
+		
+		ServiceResult result = 	myEntService.recruitRegisterInsert(recruitVO, req);
+		
+		if(result.equals(ServiceResult.OK)) {
+			
+			String recruitNo = URLEncoder.encode(recruitVO.getRecruitNo(), StandardCharsets.UTF_8.toString());
+            String pstnCmmncdNm = URLEncoder.encode(recruitVO.getPstnCmmncdNm(), StandardCharsets.UTF_8.toString());
+			
+			goPage = "redirect:/myPage/enterprise/recruitDetail?recruitNo="+recruitNo+"&pstnCmmncdNm="+pstnCmmncdNm;
+			
+			
+		}else {
+			
+			goPage = "";
+			
+		}
+		
+		return goPage;
+		
+	}
+
+}

@@ -1,0 +1,25 @@
+package kr.co.itcruit.vo;
+
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class SearchTelentVO {
+
+	private String accountId;
+	private String accountNm;
+	private String rsmNo;
+	private String accountAddr1;
+	private String rsnNewCareer;
+	private String availLangCmmncdNm;
+	private String pstnCmmncdNm;
+	
+	private String carrer; // 경력여부
+	
+	private String local; //지역은 리스트로 안뽑고 그냥 검색
+	
+	private List<String> langList; //언어 옵션 목록
+	private List<String> pstnList;	//직무 옵션 목록
+	
+}

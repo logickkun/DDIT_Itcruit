@@ -1,0 +1,97 @@
+package kr.co.itcruit.enterprise.info.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.enterprise.info.service.IEnterpriseInfoService;
+import kr.co.itcruit.mapper.IBoardMapper;
+import kr.co.itcruit.mapper.IEnterpriseMapper;
+import kr.co.itcruit.vo.BoardVO;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.ListPaginationVO;
+import kr.co.itcruit.vo.MiniPaginationVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class EnterpriseInfoServiceImpl implements IEnterpriseInfoService{
+
+	@Inject
+	private IEnterpriseMapper enterpriseMapper;
+	
+	@Inject
+	private IBoardMapper boardMapper;
+	
+	/**
+	 * 기업정보목록
+	 */
+	@Override
+	public int selectEntCount(ListPaginationVO<EnterpriseVO> pagingVO) {
+		return enterpriseMapper.selectEntCount(pagingVO);
+	}
+
+	/**
+	 * 기업정보목록
+	 */
+	@Override
+	public List<EnterpriseVO> selectEntList(ListPaginationVO<EnterpriseVO> pagingVO) {
+		return enterpriseMapper.selectEntList(pagingVO);
+	}
+
+	@Override
+	public ServiceResult likeEnt(EnterpriseVO entVO) {
+		
+		ServiceResult result = null;
+		
+		int status = enterpriseMapper.deleteLikeEnt(entVO);
+		
+		if(status > 0) { // 삭제 성공
+			result = ServiceResult.OK;
+		}else {
+			result = ServiceResult.FAILED;
+		}
+		
+		return result;
+	}
+
+	@Override
+	public ServiceResult disLikeEnt(EnterpriseVO entVO) {
+		ServiceResult result = null;
+		
+		int status = enterpriseMapper.insertLikeEnt(entVO);
+		
+		if(status > 0) { // 삭제 성공
+			result = ServiceResult.OK;
+		}else {
+			result = ServiceResult.FAILED;
+		}
+		
+		return result;
+	}
+
+	@Override
+	public EnterpriseVO selectEnt(int entNo) {
+			
+
+		EnterpriseVO entVO = enterpriseMapper.selectEnt(entNo);
+
+		return entVO;
+	}
+
+	@Override
+	public int entBoardCount(MiniPaginationVO<BoardVO> pagingVO) {
+		return boardMapper.entBoardCount(pagingVO);
+	}
+
+	@Override
+	public List<BoardVO> entBoardList(MiniPaginationVO<BoardVO> pagingVO) {
+		return boardMapper.entBoardList(pagingVO);
+	}
+
+	
+}

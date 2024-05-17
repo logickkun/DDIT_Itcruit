@@ -1,0 +1,11 @@
+package kr.co.itcruit.board.comment.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.board.comment.service.IBoardCommentService;
+
+@Service
+public class BoardCommentServiceImpl implements IBoardCommentService{
+
+	
+}

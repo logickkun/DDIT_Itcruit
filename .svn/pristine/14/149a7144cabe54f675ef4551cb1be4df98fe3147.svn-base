@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="kr.co.itcruit.mapper.ICodingtestMapper">
+ 
+ 	<select id="selectList" resultType="codingtestVO">
+		select 
+			qstn_no,
+            qstn_ttl,
+            qstn_grd,
+            qstn_subject,
+            pass_yn,
+            correct_rate,
+            past_qstn_ctgry_nm
+		from(
+		select
+            qstn_no,
+            qstn_ttl,
+            qstn_grd,
+            qstn_subject,
+            reg_dt,
+            pass_yn,
+            correct_rate,
+            past_qstn_ctgry_nm,
+            rnum
+			from 
+			    (SELECT
+			        q.qstn_no,
+			        q.qstn_ttl,
+			        q.qstn_grd,
+			        q.qstn_subject,
+			        q.reg_dt,
+			        q.past_qstn_ctgry_nm,
+			        NVL(pass_yn, 'N') as pass_yn,
+			        COALESCE(p.solve_rate, 0) AS correct_rate,
+			        rownum rnum
+			    FROM
+			        codingtest_question q
+			    LEFT JOIN
+			        (SELECT * FROM codingtest_solving
+                        where 1=1
+                        <if test="accountId != null or accountId !='' ">
+                        and  account_id = #{accountId}
+                        </if>
+                    ) s ON q.qstn_no = s.qstn_no
+			    LEFT JOIN
+			        (SELECT 
+			            qstn_no, 
+			            COUNT(*) AS total_attempts, 
+			            SUM(CASE WHEN pass_yn = 'Y' THEN 1 ELSE 0 END) AS total_solved,
+			            ROUND((SUM(CASE WHEN pass_yn = 'Y' THEN 1 ELSE 0 END) / COUNT(*)) * 100, 2) AS solve_rate
+			         FROM 
+			            codingtest_solving
+			         GROUP BY qstn_no) p ON q.qstn_no = p.qstn_no
+			    WHERE 
+			         q.QSTN_RLS_YN = 'Y') 
+		   		where 1 = 1
+		   		<if test="passYn != null and passYn !=''">
+				and (pass_yn = #{passYn} or pass_yn is null)
+				</if>
+				<if test="qstnTtl != null and qstnTtl !=''">
+				and (qstn_ttl like '%' || #{qstnTtl} || '%')
+				</if>
+				<if test="qstnGrd != null and qstnGrd !='' ">
+				and (qstn_Grd = #{qstnGrd} )
+				</if>
+			     <if test="qstnSubject != null and qstnSubject !=''">
+				and (qstn_subject = #{qstnSubject})
+				</if>
+			     <if test="pastQstnCtgryNm != null and pastQstnCtgryNm !=''">
+				and (past_qstn_ctgry_nm = #{pastQstnCtgryNm} )
+				</if>
+		   	)
+		   	where rnum between 1 and 20
+ 	</select>
+ 
+<!--  	jdbcType="CLOB" javaType="java.lang.String" -->
+	<resultMap type="codingtestVO" id="codingtestMap">
+	    <result property="qstnNo" column="qstn_no" />
+	    <result property="qstnTtl" column="qstn_ttl" />
+	    <result property="qstnCn" column="qstn_cn" />
+	    <result property="qstnGrd" column="qstn_grd" />
+	    <result property="qstnScr" column="qstn_scr" />
+	    <result property="qstnExmpl" column="qstn_exmpl" />
+	    <result property="restriction" column="restriction" />
+	    <result property="qstnMcode" column="qstn_mcode"/>
+	    <result property="correctRate" column="correct_rate"/>
+	    <result property="c" column="c"/>
+	    <result property="cpp" column="cpp"/>
+	    <result property="cs" column="cs"/>
+	    <result property="java" column="java"/>
+	    <result property="javascript" column="javascript"/>
+	    <result property="python" column="python"/>
+	    <result property="input" column="input" />
+	    <result property="output" column="output" />
+	   
+<!-- 	    <result property="qstnInputg" column="qstn_inputg" jdbcType="CLOB" javaType="java.lang.String"/> -->
+<!-- 	    <result property="qstnOutput" column="qstn_output" jdbcType="CLOB" javaType="java.lang.String"/> -->
+		
+	</resultMap>
+
+	<select id="selectQstnByNo" parameterType="int" resultMap="codingtestMap">
+	    SELECT 
+	        qstn_no,
+	        qstn_ttl,
+	        qstn_cn,
+	        qstn_grd,
+	        qstn_scr,
+	        qstn_exmpl,
+	        restriction,
+	        qstn_subject,
+			past_qstn_ctgry_nm,
+	        c,
+	        cpp,
+	        cs,
+	        java,
+	        javascript,
+	        python
+	    FROM codingtest_question
+	    WHERE qstn_rls_yn = 'Y'
+	    AND qstn_no = #{qstnNo}
+	</select>
+	
+	<select id="doTest" parameterType="codingtestVO" resultMap="codingtestMap">
+		select
+			cq.qstn_mcode,
+		    cq.qstn_no,
+		    ct.input,
+		    ct.output
+		from
+		    codingtest_question cq 
+		inner join codingtest_testcase ct
+		on cq.qstn_no = ct.qstn_no
+		where cq.qstn_no = #{qstnNo}
+	</select>
+ 
+ 	<select id="doSubmit" parameterType="codingtestVO" resultMap="codingtestMap">
+		select
+			qstn_mcode,
+		    qstn_no,
+		    input,
+		    output
+		from
+		    codingtest_question
+		where qstn_no = #{qstnNo}
+	</select>
+ 	
+ 	<select id="getCtgryList" resultType="string">
+ 		SELECT cmmncd_grp_nm || ' ' || cmmncd_nm1 AS ctgryList
+			FROM COMMONCODE
+		WHERE cmmncd_grp_cd BETWEEN 'CT1' AND 'CT4'
+		order by cmmncd
+ 	</select>
+ 	
+ 	
+ 	<select id="getSubjectList" resultType="string">
+		 SELECT cmmncd_grp_nm as qstnSubjectList
+			FROM COMMONCODE
+		 where CMMNCD_GRP_CD like 'CTSBJ'
+		 order by cmmncd_grp_nm
+ 	</select>
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	<select id="getNickAndScore" parameterType="string" resultType="accountVO">
+		select account_nick, codingtest_score, rnum as ranking
+		from(select  ac.*, rownum rnum
+		from (select account_nick, codingtest_score, account_id
+		from account
+		order by codingtest_score desc) ac)
+		where account_id=#{accountId}
+ 	</select>
+ 	
+ 	
+ 	
+ 	
+ 	<select id="getCodePower" parameterType="string" resultType="codepowerVO">
+ 		SELECT
+	    cq.QSTN_SUBJECT, 
+	    (
+	        SELECT COUNT(QSTN_SUBJECT)
+	        FROM codingtest_solving a
+	        INNER JOIN codingtest_question b ON a.qstn_no = b.qstn_no
+	        WHERE ACCOUNT_ID = #{accountId}
+	        AND cq.QSTN_SUBJECT = b.QSTN_SUBJECT
+	        AND a.pass_yn = 'Y'
+	    ) CNT,
+	    (
+	        SELECT COUNT(QSTN_SUBJECT)
+	        FROM codingtest_question cq2
+	        WHERE cq.QSTN_SUBJECT = cq2.QSTN_SUBJECT
+	    ) AS TOTAL_CNT
+		FROM
+		    codingtest_question cq
+		INNER JOIN codingtest_solving cs ON cs.qstn_no = cq.qstn_no
+		GROUP BY
+		   QSTN_SUBJECT
+ 	
+ 	</select>
+ 	
+ 	
+ 	
+ 	
+<!--  	getCodeBoardByQstnNo(int qstnNo); -->
+ 	<select id="getCodeBoardByQstnNo" parameterType="int" resultType="codingtestBoardVO">
+		select 
+		    code_bbs_no,
+		    code_bbs_ttl,
+		    code_bbs_reg_dt,
+		    code_bbs_writer	
+		from code_board
+ 		where qstn_no = #{qstnNo}
+ 		and code_bbs_delyn = 'N'
+ 	</select>
+ 	
+ 	
+ 	<select id="checkSolveByVO" parameterType="codingtestVO" resultType="string">
+ 		select pass_yn
+ 		from codingtest_solving
+ 		where account_id=#{accountId}
+ 		and qstn_no = #{qstnNo}
+ 	</select>
+ 	
+ 	
+ 	<update id="updateSolveByVO" parameterType="codingtestVO">
+ 		UPDATE codingtest_solving
+		SET
+		    pass_yn = #{passYn},
+		    expl_cn = #{code}
+		WHERE
+		    qstn_no = #{qstnNo}
+		    AND account_id = #{accountId}	
+ 	</update>
+ 	
+ 	
+ 	<update id="updateCode" parameterType="codingtestVO">
+ 		UPDATE codingtest_solving
+		SET
+		    expl_cn = #{code}
+		WHERE
+		    qstn_no = #{qstnNo}
+		    AND account_id = #{accountId}	
+ 	</update>
+ 	
+ 	
+ 	<insert id="insertSolve" parameterType="codingtestVO">
+	 		INSERT INTO codingtest_solving (
+			    qstn_no,
+			    account_id,
+			    pass_yn,
+			    expl_cn
+			) VALUES (
+			    #{qstnNo},
+			    #{accountId},
+			    #{passYn},
+			    #{code}
+			)
+ 	</insert>
+ 	
+ 	
+ 	<update id="getScore" parameterType="codingtestVO">
+ 		UPDATE account
+		SET
+		    CODINGTEST_SCORE = CODINGTEST_SCORE + #{qstnScr}
+		WHERE
+		    account_id = #{accountId}
+ 	</update>
+ 	
+ 	
+ </mapper>

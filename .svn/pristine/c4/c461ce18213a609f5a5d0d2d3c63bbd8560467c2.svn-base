@@ -1,0 +1,60 @@
+package kr.co.itcruit.board.controller;
+
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import kr.co.itcruit.board.service.IFreeBoardService;
+import kr.co.itcruit.vo.BoardVO;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
+
+@Controller
+@RequestMapping("/freeBoard")
+@Slf4j
+public class FreeBoardController {
+	
+	@Inject
+	private IFreeBoardService freeBoardService;
+	
+	
+	@RequestMapping(value = "/listForm", method = RequestMethod.GET)
+	public String freeBoardListForm() {
+		
+		return "freeBoard/list";
+	}
+	
+	@RequestMapping(value = "list")
+	public String freeBoardList(Model model) {
+		List<BoardVO> freeBoardList = freeBoardService.list();
+		model.addAttribute("freeBoardList", freeBoardList);
+		log.info("#############" + freeBoardList);
+		return "freeBoard/list";
+	}
+	
+	@RequestMapping(value = "/detailForm", method = RequestMethod.GET)
+	public String freeBoardDetailForm() {
+		
+		return "freeBoard/detail";
+	}
+	
+	@RequestMapping(value = "/insertForm", method = RequestMethod.GET)
+	public String freeBoardInsertForm() {
+		
+		return "freeBoard/insert";
+	}
+	
+	@RequestMapping(value = "/insert", method = RequestMethod.POST)
+	public String freeBoardInsert() {
+		return null;
+	}
+	
+
+
+}

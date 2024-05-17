@@ -1,0 +1,10 @@
+package kr.co.itcruit.mapper;
+
+import kr.co.itcruit.vo.AccountVO;
+
+public interface IAccountMapper {
+
+	public int signup(AccountVO accountVO);
+
+
+}

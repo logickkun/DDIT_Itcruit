@@ -1,0 +1,422 @@
+<%@ page language="java" contentType="text/html; UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<%@ page import="org.springframework.security.core.context.SecurityContextHolder" %>
+<%@ page import="org.springframework.security.core.userdetails.UserDetails" %>
+
+<%
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+    String username;
+
+    if (principal instanceof UserDetails) {
+        username = ((UserDetails)principal).getUsername();
+    } else {
+        username = principal.toString();
+    }
+%>
+
+<style>
+.btn-purple {
+    background-color: #bf64d6;
+    color: white;
+}
+.btn-purple:hover {
+    background-color: darkmagenta;
+}
+</style>
+
+<main>
+
+<!-- Page content START -->
+
+<div class="page-content justify-content-center">
+
+	<div class="container row">
+	
+			<!-- Page main content START -->
+	<div class="page-content-wrapper border col-md-7">
+
+		<!-- Card START -->
+		<div class="card bg-transparent border">
+
+			<!-- Card header START -->
+			<div class="card-header bg-light border-bottom">
+				<!-- Search and select START -->
+				<div class="row g-3 align-items-center justify-content-between">
+					<!-- Search bar -->
+					<div class="col-md-8">
+						<form class="rounded position-relative">
+							<input class="form-control bg-body" id = "qstnTtl" type="search" placeholder="Search" aria-label="Search">
+							<button class="bg-transparent p-2 position-absolute top-50 end-0 translate-middle-y border-0 text-primary-hover text-reset" type="submit">
+								<i class="fas fa-search fs-6 "></i>
+							</button>
+						</form>
+					</div>
+
+					<!-- Select option -->
+					<div class="col-md-3">
+						<select id="sortBy" class="form-select border-0 z-index-9" aria-label=".form-select-sm">
+							<option value="">Sort by</option>
+							<option value="new">최신순</option>
+							<option value="high">정답률 높은 순</option>
+							<option value="low">정답률 낮은 순</option>
+						</select>
+					</div>
+				
+				</div>
+				<!-- Search and select END -->
+				
+				<input type="hidden" id="ttt" value="${username}">
+				
+				<div class="row g-3 align-items-center">
+					<div class="col-md-2">
+						<select id="qstnGrd" class="form-select border-0 z-index-9" aria-label=".form-select-sm">
+							<option value="">난이도</option>
+							<option value="1">초보</option>
+							<option value="2">중급</option>
+							<option value="3">상급</option>
+						</select>
+					</div>
+					
+					<c:set var="qstnSubjectList" value="${codingtestVO.qstnSubjectList }"/>
+					<div class="col-md-3">
+						<select id = "qstnSubject" class="form-select border-0 js-choice z-index-9" aria-label=".form-select-sm">
+							<option value="">유형</option>
+						<c:forEach var="qstnSubject" items="${qstnSubjectList }" varStatus="status">
+							<option value="${qstnSubject}">${qstnSubject}</option>
+						</c:forEach>		
+						</select>
+					</div>
+					
+					<c:set var="ctgryList" value="${codingtestVO.ctgryList}"/>
+					<div class="col-md-5">
+						<select id = "pastQstnCtgryNm" class="form-select border-0 js-choice z-index-9" aria-label=".form-select-sm">
+							<option value="">기출문제</option>
+						<c:forEach var="ctgry" items="${ctgryList }" varStatus="status">
+							<option value="${ctgry}">${ctgry}</option>
+						</c:forEach>
+						</select>
+					</div>
+					
+					<div class="col-md-2">
+						<input type="checkbox" id="passYn">
+						<label>안 푼 문제</label>
+					</div>
+				</div>
+
+			</div>
+			<!-- Card header END -->
+
+			<!-- Card body START -->
+			<div class="card-body">
+				<!-- Course table START -->
+				<div class="table-responsive border-0 rounded-3">
+					<!-- Table START -->
+					<table class="table table-dark-gray align-middle p-4 mb-0 table-hover">
+						<!-- Table head -->
+						<thead>
+							<tr>
+								<th scope="col" class="border-0 rounded-start" style="text-align: center">상태</th>
+								<th scope="col" class="border-0" style="text-align: center">제목</th>
+								<th scope="col" class="border-0" style="text-align: center">유형</th>
+								<th scope="col" class="border-0" style="text-align: right">난이도</th>
+								<th scope="col" class="border-0 rounded-end" style="text-align: right">정답률</th>
+							</tr>
+						</thead>
+						
+						<!-- Table body START -->
+						<tbody id ="tbodyPrint">
+							<c:choose>
+								<c:when test="${empty codeList}">
+									<tr><td colspan="5">검색결과가 없어요</td></tr>								
+								</c:when>
+								
+								<c:otherwise>
+								
+									<c:forEach items="${codeList }" var="code">
+									<tr>
+										<c:choose>
+												<c:when test="${code.passYn eq 'Y'}">
+													<td style="color: green;">해결</td>					
+												</c:when>
+												<c:otherwise>
+													<td>미해결</td>							
+												</c:otherwise>
+										</c:choose>
+										
+									
+										<td>
+											<div class="d-flex align-items-center position-relative">
+											
+												<h6 class="table-responsive-title mb-0 ms-2">	
+													<a href="/codingtest/detail.do?qstnNo=${code.qstnNo}" class="stretched-link">${code.qstnTtl }</a>
+													</h6>
+												</div>
+											</td>
+			
+											<td>
+												<div style="text-align: center;">
+														${code.qstnSubject}
+												</div>
+											</td>
+			
+											<td style="text-align: right">
+											<c:choose>
+												<c:when test="${code.qstnGrd eq 1}">
+													<span class="badge text-bg-primary">초보 </span>							
+												</c:when>
+												<c:when test="${code.qstnGrd eq 2}">
+													<span class="badge text-bg-success">중급</span>							
+												</c:when>
+												<c:otherwise>
+													<span class="badge text-bg-danger">상급</span>
+												</c:otherwise>
+											</c:choose>
+											</td>
+											
+											<td style="text-align: right;">${code.correctRate} %</td>
+			
+									</tr>
+									</c:forEach>								
+							
+								</c:otherwise>
+								
+							</c:choose>
+						
+						</tbody>
+						<!-- Table body END -->
+					</table>
+					<!-- Table END -->
+				</div>
+				<!-- Course table END -->
+			</div>
+			<!-- Card body END -->
+
+		</div>
+		
+		<p>qwqewqwqwe</p>
+		<!-- Card END -->
+		
+				<div class="card-footer bg-transparent pt-0">
+				<!-- Pagination START -->
+				<div class="d-sm-flex justify-content-sm-between align-items-sm-center">
+					<!-- Content -->
+					
+					<p class="mb-0 text-center text-sm-start"></p>
+					<!-- Pagination -->
+					
+					<nav class="d-flex justify-content-center mb-0" aria-label="navigation" id="pagingArea">
+						${customPagingVO.pagingHTML }
+					</nav>
+				</div>
+				
+			</div>
+	</div>
+
+
+	<div class="page-content-wrapper border col-md-3"
+			style="position: sticky; top: 0;">
+        <!-- Profile content here -->
+        <div class="card-body">
+        	<div class="user-info">
+        	
+        		<c:choose>
+        			<c:when test="${empty sessionScope['SPRING_SECURITY_CONTEXT'].authentication.principal.username}">
+        				<p style="text-align: center; font-weight: bold;">로그인 후 코딩테스트 연습하러가기</p>
+        				<button type="button" class="btn btn-purple" 
+				    	style="display: block; margin: auto;"
+				    	onclick="location.href='/main/loginForm.do'">
+				    	로그인</button>
+        			</c:when>
+        			<c:otherwise>
+        				
+        				<c:set var="accoutVO" value="${accoutVO }"/>
+        				<c:set var="codepower" value="${accoutVO.codePower} "/>
+        				
+        				<c:set var="sumCnt" value="0"/>
+						<c:set var="sumTotalCnt" value="0"/>
+						
+						<c:forEach items="${codepower}" var="cp">
+<%-- 						    <C:SET VAR="SUMCNT" VALUE="${SUMCNT + CP.CNT}"/> --%>
+<%-- 						    <C:Set var="sumTotalCnt" value="${sumTotalCnt + cp.totalCnt}"/> --%>
+						    ${cp}
+						</c:forEach>
+        				
+        				<h3 class="name">${accoutVO.accountNick }</h3>
+					    <table style="width: 100%;">
+					        <tr>
+					            <td class="label" style="font-size: 14px;">순위: </td>
+					            <td class="value" style="font-size: 16px; font-weight: bold; text-align: right;">${accoutVO.ranking } 위</td>
+					        </tr>
+					        <tr>
+					            <td class="label" style="font-size: 14px;">전투력: </td>
+					            <td class="value" style="font-size: 16px; font-weight: bold; text-align: right;">${accoutVO.codingtestScore}cp</td>
+					        </tr>
+					        <tr>
+					            <td class="label" style="font-size: 14px;">해결한 문제: </td>
+					            <td class="value" style="font-size: 16px; font-weight: bold; text-align: right;">${sumCnt } / ${sumTotalCnt } 개</td>
+					        </tr>
+					    </table>
+        			</c:otherwise>
+        			
+        		</c:choose>        		
+        		
+			</div>
+
+			 
+			 <div class="tags">
+				<span class="tag">JavaScript</span>
+				<!-- 필요한 만큼 태그를 추가하세요 -->
+			 </div>
+			 <div class="buttons">
+				<button class="edit-button">수정하기</button>
+				<button class="other-button">다른 버튼</button>
+			 </div>
+        </div>
+    </div>
+	
+	</div>
+
+</div>
+<!-- Page content END -->
+
+
+<script type="text/javascript">
+	//<input type="hidden" id="ttt" value="${principal}">
+	var asd = document.getElementById("ttt");
+	
+	//console.log(${principal});
+	
+	var test = "${qstnSubject}";
+	if(test != null && test != "") {
+	    document.getElementById("qstnSubject").value = "${qstnSubject}";
+	}
+	test = "${pastQstnCtgryNm}";
+	if(test != null && test != ""){
+	    document.getElementById("pastQstnCtgryNm").value = "${pastQstnCtgryNm}";
+	}
+	
+	
+	document.addEventListener("DOMContentLoaded", function() {
+		
+		var qstnTtl = document.getElementById("qstnTtl");
+	   	var qstnGrd = document.getElementById("qstnGrd");
+	   	var qstnSubject = document.getElementById("qstnSubject");
+	   	var pastQstnCtgryNm = document.getElementById("pastQstnCtgryNm");
+	   	var sortBy = document.getElementById("sortBy");
+	   	var passYn = document.getElementById("passYn");
+	   	
+	   	
+	   	const tbodyPrint = document.getElementById("tbodyPrint");
+	   
+		//var pagingArea = document.getElementById("pagingArea");
+	       
+	  	qstnTtl.addEventListener('input', function() {
+	    	getQstnList();
+		}); //
+		
+		qstnGrd.addEventListener('change', function() {
+	    	getQstnList();
+		}); //
+		
+		qstnSubject.addEventListener('change', function() {
+			getQstnList();
+		}); //
+		
+		pastQstnCtgryNm.addEventListener('change', function() {
+			getQstnList();
+		}); //
+		
+		sortBy.addEventListener('change', function() {
+	    	getQstnList();
+		});
+		
+		passYn.addEventListener('change', function() {
+	    	getQstnList();
+		});
+		
+		
+		
+		function getQstnList() {
+			//alert(pastQstnCtgryNm.value);
+			html = "";
+			
+			var passChecked = passYn.checked ? "N" : ""
+			
+			var formData = {
+		    	qstnTtl : qstnTtl.value,
+		    	qstnGrd : qstnGrd.value,
+				qstnSubject : qstnSubject.value,
+				pastQstnCtgryNm : pastQstnCtgryNm.value,
+				passYn : passChecked,
+				sortBy : sortBy.value
+	    	}
+		
+			
+			
+			$.ajax({
+				type : "post",
+				url : "/codingtest/list.do",
+				contentType : "application/json; charset=utf-8",
+				data : JSON.stringify(formData),
+				beforeSend: function(xhr) {
+             	xhr.setRequestHeader(header, token);
+           	    },
+	          	success : function(res) {
+					if (res.length === 0) {
+					    html += '<tr><td colspan="5">검색결과가 없어요</td></tr>';
+						tbodyPrint.innerHTML = html;
+					} else {
+					    drawNewTable(res);
+					}
+				}
+			})
+		}
+		
+		
+		 function drawNewTable(data) {
+	    	html = "";
+			
+			// 데이터를 반복하면서 HTML 문자열을 생성합니다.
+			for (var i = 0; i < data.length; i++) {
+				
+			    var code = data[i];
+			
+				    html += '<tr>';
+				
+					if(code.passYn === 'Y') {
+						html += '<td style="color: green;">' + '해결' + '</td>';
+					} else {
+						html += '<td>' + '미해결' + '</td>';
+					}
+				   
+				
+				    html += '<td><div class="d-flex align-items-center position-relative"><h6 class="table-responsive-title mb-0 ms-2"><a href="/codingtest/detail.do?qstnNo=' + code.qstnNo + '" class="stretched-link">' + code.qstnTtl + '</a></h6></div></td>';
+				
+				    html += '<td><div style="text-align: center;">' + code.qstnSubject + '</div></td>';
+				
+				    
+				    if (code.qstnGrd === 1) {
+				        html += '<td style="text-align: right;"><span class="badge text-bg-primary">' + '초보' + '</span></td>';
+				    } else if (code.qstnGrd === 2) {
+				        html += '<td style="text-align: right;"><span class="badge text-bg-success">' + '중급' + '</span></td>';
+				    } else {
+				        html += '<td style="text-align: right;"><span class="badge text-bg-danger">' + '상급' + '</span></td>';
+				    }
+				    
+				
+				  html += '<td style="text-align: right;">' + code.correctRate + '%' + '</td>';
+				
+				    html += '</tr>';
+				}
+				
+				document.querySelector('tbody').innerHTML = html;
+				
+		}
+	  	
+	});
+
+</script>
+
+</main>

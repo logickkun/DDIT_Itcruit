@@ -1,0 +1,785 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<div class="page-content-wrapper border">
+
+		<!-- Title -->
+		<div class="d-flex justify-content-between mb-3">
+		<span class="h4 me-5">지원자 통계</span> 
+		<select class="form-select" aria-label="Default select example" id="tabSelect" style="width: 50%;">
+			<c:forEach items="${recruitList}" var="recruit">
+				<option value="#tab-2-1" data-pstnCmmncdNm="${recruit.pstnCmmncdNm}" data-recruitNo="${recruit.recruitNo}">${recruit.recruitTtl}</option>
+			</c:forEach>
+		</select>
+        <div class="card-body d-flex justify-content-end">
+        	<span class="input-group-text text-black">월 조회</span> 
+            <select id="monthSelect" class="form-select" aria-label="Month select"  style="width: 50%;">
+                <option value="">월 선택</option>
+                <option value="1" selected>1월</option>
+                <option value="2">2월</option>
+                <option value="3">3월</option>
+                <option value="4">4월</option>
+                <option value="5">5월</option>
+                <option value="6">6월</option>
+                <option value="7">7월</option>
+                <option value="8">8월</option>
+                <option value="9">9월</option>
+                <option value="10">10월</option>
+                <option value="11">11월</option>
+                <option value="12">12월</option>
+            </select>
+        </div>
+		</div>
+		<hr>
+
+		<div class="wrapper">
+
+        <div class="container-fluid mt-15">
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4">
+
+                <div class="col">
+				    <div class="card mb-15">
+				        <div class="card-body">
+				            <span class="badge bg-success float-right">전체조회수</span>
+				            <h3 class="mb-10 total-hits">120,160수</h3>
+				        </div>
+				    </div>
+				</div>
+				
+				<div class="col">
+				    <div class="card mb-15">
+				        <div class="card-body">
+				            <span class="badge bg-success float-right">전체지원자수</span>
+				            <h3 class="mb-10 total-applicants">100,007명</h3>
+				        </div>
+				    </div>
+				</div>
+				
+				<div class="col">
+				    <div class="card mb-15">
+				        <div class="card-body">
+				            <span class="badge bg-success float-right">전체경력자수</span>
+				            <h3 class="mb-10 total-experienced">1,234명</h3>
+				        </div>
+				    </div>
+				</div>
+				
+				<div class="col">
+				    <div class="card mb-15">
+				        <div class="card-body">
+				            <span class="badge bg-success float-right">전체신입수</span>
+				            <h3 class="mb-10 total-entry-level">100,000명</h3>
+				        </div>
+				    </div>
+				</div>
+				
+
+            </div>
+
+
+            <div class="row">
+                <div class="col-lg-8 col-12">
+
+                    <div class="card mb-15">
+                        <div class="card-body">
+                            <div style="height: 400px; max-width: 100%;" id="hl-line-main"></div>
+                        </div>
+                    </div>
+					      <div id="area-container" style="width: 100%; height: 300px;">
+					      
+					      
+					      </div>
+                </div>
+
+                <div class="col-lg-4 col-12">
+
+                    <div class="card mb-15">
+
+                        <div class="card-body">
+
+
+
+                            <div class="mb-15">
+                                <div style="height: 280px; max-width: 100%;" id="hl-pie-ref"></div>
+                            </div>
+							<div class="progress progress-xs mt-5">
+                                    <div class="progress-bar" id="high-school-progress" style="width: 30.5%;"></div>
+                            </div>
+                            
+                            
+                            
+							<div class="mb-15">
+							    <a href="https://www.google.com" class="text-body">고등학교졸업</a>
+							    <div class="float-right text-muted" id="high-school-percent">30.5%</div>
+							    <div class="progress progress-xs mt-5">
+							        <div class="progress-bar"  id="uni2-progress" style="width: 25.5%;"></div>
+							    </div>
+							</div>
+
+
+
+                            <div class="mb-15">
+                                <a href="https://www.twitter.com" class="text-body">대학교(2년)</a>
+                                <div class="float-right text-muted" id="uni2-percent">
+                                    25.5%
+                                </div>
+                                <div class="progress progress-xs mt-5">
+                                    <div class="progress-bar"  id="uni4-progress" style="width: 16%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-15">
+                                <a href="https://morioh.com" class="text-body">대학교(4년)</a>
+                                <div class="float-right text-muted" id="uni4-percent">
+                                    16%
+                                </div>
+
+                                <div class="progress progress-xs mt-5">
+                                    <div class="progress-bar"  id="uni5-progress" style="width: 8%;"></div>
+                                </div>
+                            </div>
+
+
+                            <div class="mb-15">
+                                <a href="https://facebook.com" class="text-body">대학교(석사)</a>
+                                <div class="float-right text-muted" id="uni5-percent">
+                                    8%
+                                </div>
+                                
+                                <div class="progress progress-xs mt-5">
+                                    <div class="progress-bar"  id="uni6-progress" style="width: 3%;"></div>
+                                </div>
+                                
+                            </div>
+                            <div class="mb-15">
+                           	     <a href="https://facebook.com" class="text-body">대학교(박사)</a>
+                                <div class="float-right text-muted" id="uni6-percent">
+                                    3%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+        </div>
+
+    </div>
+ </div>
+	<script src="https://code.highcharts.com/highcharts.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
+	<script src="https://code.highcharts.com/modules/export-data.js"></script>
+	<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+	
+ <script>
+ $(function(){ 
+	 
+	 
+    function initialDataLoad() {
+        var recruitNo = $('#tabSelect').find("option:selected").data("recruitno");
+        var pstnCmmncdNm = $('#tabSelect').find("option:selected").data("pstncmmncdnm");
+        var month = $('#monthSelect').val(); // 1월이 기본 선택
+        if (recruitNo && month) {
+            getRecruitApply(recruitNo, pstnCmmncdNm, parseInt(month));
+        }
+    }
+   // Line 그래프 
+   Highcharts.chart('hl-line-main', {
+       chart: {
+           type: 'line'
+       },
+       title: {
+           text: '지원자 통계'
+       },
+       xAxis: {
+           categories: ['1~5일', '6~10일', '11~15일', '16~20일', '21~25일', '25~30일']
+       },
+       yAxis: {
+           title: {
+               text: ''
+           }
+       },
+       plotOptions: {
+           line: {
+               dataLabels: {
+                   enabled: true
+               },
+               enableMouseTracking: true
+           }
+       },
+       series: [{
+           name: '조회수',
+           data: [16.0, 18.2, 23.1, 27.9, 32.2, 36.4]
+       }, {
+           name: '지원자수',
+           data: [5.0, 7.2, 3.4, 4.8, 10.2, 14.5]
+       }, {
+           name: '경력자수',
+           data: [12.1, 5.5, 8.1, 4.8, 10.2, 14.5]
+       }, {
+           name: '신입수',
+           data: [4.7, 8.3, 7.2, 4.8, 10.2, 14.5]
+       }
+       
+       ]
+   });
+   
+   /////원 그래프
+   (function (H) {
+	   H.seriesTypes.pie.prototype.animate = function (init) {
+	       const series = this,
+	           chart = series.chart,
+	           points = series.points,
+	           {
+	               animation
+	           } = series.options,
+	           {
+	               startAngleRad
+	           } = series;
+	
+	       function fanAnimate(point, startAngleRad) {
+	           const graphic = point.graphic,
+	               args = point.shapeArgs;
+	
+	           if (graphic && args) {
+	
+	               graphic
+	                   // Set inital animation values
+	                   .attr({
+	                       start: startAngleRad,
+	                       end: startAngleRad,
+	                       opacity: 1
+	                   })
+	                   // Animate to the final position
+	                   .animate({
+	                       start: args.start,
+	                       end: args.end
+	                   }, {
+	                       duration: animation.duration / points.length
+	                   }, function () {
+	                       // On complete, start animating the next point
+	                       if (points[point.index + 1]) {
+	                           fanAnimate(points[point.index + 1], args.end);
+	                       }
+	                       // On the last point, fade in the data labels, then
+	                       // apply the inner size
+	                       if (point.index === series.points.length - 1) {
+	                           series.dataLabelsGroup.animate({
+	                               opacity: 1
+	                           },
+	                           void 0,
+	                           function () {
+	                               points.forEach(point => {
+	                                   point.opacity = 1;
+	                               });
+	                               series.update({
+	                                   enableMouseTracking: true
+	                               }, false);
+	                               chart.update({
+	                                   plotOptions: {
+	                                       pie: {
+	                                           innerSize: '40%',
+	                                           borderRadius: 8
+	                                       }
+	                                   }
+	                               });
+	                           });
+	                       }
+	                   });
+	           }
+	       }
+	
+	       if (init) {
+	           // Hide points on init
+	           points.forEach(point => {
+	               point.opacity = 0;
+	           });
+	       } else {
+	           fanAnimate(points[0], startAngleRad);
+	       }
+	   };
+	}(Highcharts));
+
+	Highcharts.chart('hl-pie-ref', {
+	    chart: {
+	        type: 'pie'
+	    },
+	    title: {
+	        text: '고졸 / 대졸자 비율',
+	        align: 'left'
+	    },
+	    tooltip: {
+	        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+	    },
+	    accessibility: {
+	        point: {
+	            valueSuffix: '%'
+	        }
+	    },
+	    plotOptions: {
+	        pie: {
+	            allowPointSelect: true,
+	            borderWidth: 2,
+	            cursor: 'pointer',
+	            dataLabels: {
+	                enabled: true,
+	                format: '<b>{point.name}</b><br>{point.percentage}%',
+	                distance: 20
+	            }
+	        }
+	    },
+	    series: [{
+	        // Disable mouse tracking on load, enable after custom animation
+	        enableMouseTracking: false,
+	        animation: {
+	            duration: 2000
+	        },
+	        colorByPoint: true,
+	        data: [{
+	            name: '고등학교졸업',
+	            y: 21.3
+	        }, {
+	            name: '대학교(2년)',
+	            y: 18.7
+	        }, {
+	            name: '대학교(4년)',
+	            y: 20.2
+	        }, {
+	            name: '대학교(석사)',
+	            y: 14.2
+	        }, {
+	            name: '대학교(박사)',
+	            y: 25.6
+	        }]
+	    }]
+	});
+	
+	
+	
+	
+	
+	/////
+	function initPieChart(containerId, titleText, data) {
+	    Highcharts.chart(containerId, {
+	        chart: { type: 'pie' },
+	        title: { text: titleText, align: 'left' },
+	        tooltip: { pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>' },
+	        accessibility: { point: { valueSuffix: '%' } },
+	        plotOptions: {
+	            pie: {
+	                allowPointSelect: true,
+	                cursor: 'pointer',
+	                borderWidth: 2,
+	                dataLabels: {
+	                    enabled: true,
+	                    format: '<b>{point.name}</b><br>{point.percentage}%',
+	                    distance: 20
+	                },
+	                animation: {
+	                    duration: 2000
+	                }
+	            }
+	        },
+	        series: [{
+	            name: '인원 수',
+	            colorByPoint: true,
+	            data: data,
+	            enableMouseTracking: false // 초기 애니메이션 후 활성화 예정
+	        }]
+	    });
+	}
+
+	// 교육 수준 데이터 집계 및 파이 차트 데이터 형식으로 변환
+	function aggregateEducationData(educationData, month) {
+	    var eduCounts = {
+	        '고등학교졸업': 0,
+	        '대학교(2년)': 0,
+	        '대학교(4년)': 0,
+	        '대학교(석사)': 0,
+	        '대학교(박사)': 0
+	    };
+	
+	    // 날짜 필터링을 위한 현재 월 설정
+	    const currentMonth = month - 1; // JavaScript에서는 월이 0부터 시작합니다.
+	
+	    // 월에 해당하는 데이터만 필터링
+	    const filteredData = educationData.filter(edu => {
+	        const applyDate = new Date(edu.applyDt);
+	        return applyDate.getMonth() === currentMonth;
+	    });
+	
+	    // 필터링된 데이터를 기반으로 eduCounts 객체의 각 교육 수준 카운트를 업데이트
+	    filteredData.forEach(function(edu) {
+	        if (eduCounts.hasOwnProperty(edu.eduAcdmcr)) {
+	            eduCounts[edu.eduAcdmcr]++;
+	        }
+	    });
+	
+	    // 실제 카운트가 있는 교육 수준만 차트 데이터로 포함
+	    var chartData = [];
+	    Object.keys(eduCounts).forEach(function(key) {
+	        if (eduCounts[key] > 0) { // 데이터가 실제로 있는 경우에만 추가
+	            chartData.push({ name: key, y: eduCounts[key] });
+	        }
+	    });
+	
+	    return chartData;
+	}
+
+
+	// 파이 차트 데이터 업데이트 함수
+	function updatePieChartData(chart, newData) {
+	    chart.series[0].update({
+	        data: newData,
+	        enableMouseTracking: true
+	    });
+	    chart.redraw();
+	}
+	//////
+   var genderTrendChart = initGenderTrendChart();
+
+    $('#tabSelect').on('change', function() {
+        var recruitNo = $(this).find("option:selected").data("recruitno");
+        var pstnCmmncdNm = $(this).find("option:selected").data("pstncmmncdnm");
+        var month = $('#monthSelect').val();
+        if (month) {
+            getRecruitApply(recruitNo, pstnCmmncdNm, parseInt(month));
+        }
+    });
+    
+    $('#monthSelect').on('change', function() {
+        var month = $(this).val();
+        var recruitNo = $('#tabSelect').find("option:selected").data("recruitno");
+        var pstnCmmncdNm = $('#tabSelect').find("option:selected").data("pstncmmncdnm");
+        if (recruitNo && month) {
+            getRecruitApply(recruitNo, pstnCmmncdNm, parseInt(month));
+        }
+    })
+
+    function initGenderTrendChart() {
+        return Highcharts.chart('area-container', {
+            chart: {
+                type: 'area'
+            },
+            title: {
+                text: '지원 성별 추이'
+            },
+            xAxis: {
+                categories: ['1~5일', '6~10일', '11~15일', '16~20일', '21~25일', '26~30일']
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            series: [{
+                name: '남자',
+                data: []
+            }, {
+                name: '여자',
+                data: []
+            }]
+        });
+    }
+    
+    
+    function aggregateAndCalculatePercentages(data, month) {
+        var eduCounts = {
+            '고등학교졸업': 0,
+            '대학교(2년)': 0,
+            '대학교(4년)': 0,
+            '대학교(석사)': 0,
+            '대학교(박사)': 0
+        };
+
+        var filteredData = data.filter(item => {
+            var applyDate = new Date(item.applyDt); 
+            return applyDate.getMonth() + 1 === month;
+        });
+
+        var totalCount = filteredData.length; // 전체 응답자 수를 필터링된 데이터로 계산
+
+        // 데이터 집계
+        filteredData.forEach(function(item) {
+            if (eduCounts.hasOwnProperty(item.eduAcdmcr)) {
+                eduCounts[item.eduAcdmcr]++;
+            }
+        });
+
+        var percentages = {};
+
+        // 퍼센테이지 계산
+        for (var eduLevel in eduCounts) {
+            if (totalCount > 0) { // 0으로 나누는 것을 방지
+                percentages[eduLevel] = ((eduCounts[eduLevel] / totalCount) * 100).toFixed(1); // 소수점 첫째 자리
+            } else {
+                percentages[eduLevel] = "0.0"; // 데이터가 없는 경우 0% 처리
+            }
+        }
+
+        return percentages;
+    }
+
+    
+    function updateEducationStatsUI(percentages) {
+        // 각 교육 수준별 엘리먼트 업데이트
+        document.getElementById('high-school-percent').textContent = percentages['고등학교졸업'] + '%';
+        document.getElementById('high-school-progress').style.width = percentages['고등학교졸업'] + '%';
+
+        document.getElementById('uni2-percent').textContent = percentages['대학교(2년)'] + '%';
+        document.getElementById('uni2-progress').style.width = percentages['대학교(2년)'] + '%';
+        
+        document.getElementById('uni4-percent').textContent = percentages['대학교(4년)'] + '%';
+        document.getElementById('uni4-progress').style.width = percentages['대학교(4년)'] + '%';
+        
+        document.getElementById('uni5-percent').textContent = percentages['대학교(석사)'] + '%';
+        document.getElementById('uni5-progress').style.width = percentages['대학교(석사)'] + '%';
+        
+        document.getElementById('uni6-percent').textContent = percentages['대학교(박사)'] + '%';
+        document.getElementById('uni6-progress').style.width = percentages['대학교(박사)'] + '%';
+
+    }
+    
+    function getRecruitApply(recruitNo, pstnCmmncdNm, month) {
+        $.ajax({
+            url: "/myPage/enterprise/getRecruitApply",
+            method: "GET",
+            data: { recruitNo: recruitNo, pstnCmmncdNm: pstnCmmncdNm },
+            success: function(res) {
+// 			console.log(res.applyPassStat);
+
+       
+// 			console.log(res.applyHitStat);	
+// 			console.log(res.applyCareerStat);
+
+// 			console.log(categorizeApplicantsByCareer(res.applyCareerStat, month));
+// 			console.log(monthlyApplicationCount(res.applyDateStat, month));
+// 			console.log(monthlyHitStat(res.applyHitStat, month));
+// 			console.log(res.applyEduStat);
+
+			var totalStats = calculateTotalStats(res);
+            updateTotalStatsOnPage(totalStats);
+            
+		 	var hitStats = monthlyHitStat(res.applyHitStat, month);
+            var applicantStats = monthlyApplicationCount(res.applyDateStat, month);
+            var careerStats = categorizeApplicantsByCareer(res.applyCareerStat, month);
+        	updateCharts(hitStats, applicantStats, careerStats);
+			var percentages = aggregateAndCalculatePercentages(res.applyEduStat, month);
+			updateEducationStatsUI(percentages);
+         	var eduChartData = aggregateEducationData(res.applyEduStat, month);
+            var pieChart = $('#hl-pie-ref').highcharts() || initPieChart('hl-pie-ref', '고졸 / 대졸자 비율', eduChartData);
+            updatePieChartData(pieChart, eduChartData); // 차트 데이터 업데이트
+            var genderData = categorizeApplicantsByGenderCount(res.applyGenderStat, month);
+            updateGenderTrendChart(genderTrendChart, genderData);
+                
+                
+            }
+        });
+    }
+    
+    function calculateTotalStats(data) {
+        return {
+            totalHits: data.applyHitStat.length,
+            totalApplicants: data.applyDateStat.length,
+            totalExperienced: data.applyCareerStat.filter(item => item.rsmCareerYear > 0).length,
+            totalEntryLevel: data.applyCareerStat.filter(item => item.rsmCareerYear === 0).length
+        };
+    }
+    
+    function updateTotalStatsOnPage(stats) {
+        document.querySelector('.total-hits').textContent = stats.totalHits.toLocaleString() + '조회';
+        document.querySelector('.total-applicants').textContent = stats.totalApplicants.toLocaleString() + '명';
+        document.querySelector('.total-experienced').textContent = stats.totalExperienced.toLocaleString() + '명';
+        document.querySelector('.total-entry-level').textContent = stats.totalEntryLevel.toLocaleString() + '명';
+    }
+
+
+    function categorizeApplicantsByGenderCount(applicantData, month) {
+        const genderCounts = {
+            male: { '05': 0, '10': 0, '15': 0, '20': 0, '25': 0, 'lastDay': 0 },
+            female: { '05': 0, '10': 0, '15': 0, '20': 0, '25': 0, 'lastDay': 0 }
+        };
+        const dateMonth = month - 1;
+
+        $.each(applicantData, function(index, app) {
+            var date = new Date(app.applyDt);
+            var appMonth = date.getUTCMonth();
+            var day = date.getUTCDate();
+            var key;
+
+            if (appMonth === dateMonth) {
+                if (day <= 5) key = '05';
+                else if (day <= 10) key = '10';
+                else if (day <= 15) key = '15';
+                else if (day <= 20) key = '20';
+                else if (day <= 25) key = '25';
+                else key = 'lastDay';
+
+                if (app.rsmGender === 'M') genderCounts.male[key]++;
+                else if (app.rsmGender === 'F') genderCounts.female[key]++;
+            }
+        });
+
+        return genderCounts;
+    }
+
+    function updateGenderTrendChart(chart, genderData) {
+        var maleSeriesData = [
+            genderData.male['05'],
+            genderData.male['10'],
+            genderData.male['15'],
+            genderData.male['20'],
+            genderData.male['25'],
+            genderData.male['lastDay']
+        ];
+
+        var femaleSeriesData = [
+            genderData.female['05'],
+            genderData.female['10'],
+            genderData.female['15'],
+            genderData.female['20'],
+            genderData.female['25'],
+            genderData.female['lastDay']
+        ];
+
+        chart.series[0].setData(maleSeriesData);
+        chart.series[1].setData(femaleSeriesData);
+    }
+    
+    function monthlyHitStat(dataList, month) {
+        const hits = {
+            '5일': 0,
+            '10일': 0,
+            '15일': 0,
+            '20일': 0,
+            '25일': 0,
+            '30일': 0
+        };
+
+        const dateMonth = month - 1;  
+        
+        $.each(dataList, function(idx, list) {
+            var date = new Date(list.logDate);
+            var appMonth = date.getUTCMonth();
+            var day = date.getUTCDate();  
+
+            if (appMonth === dateMonth) {  
+                if (day <= 5) {
+                    hits['5일'] += list.increaseCount;
+                } else if (day <= 10) {
+                    hits['10일'] += list.increaseCount;
+                } else if (day <= 15) {
+                    hits['15일'] += list.increaseCount;
+                } else if (day <= 20) {
+                    hits['20일'] += list.increaseCount;
+                } else if (day <= 25) {
+                    hits['25일'] += list.increaseCount;
+                } else if (day <= 31) { 
+                    hits['30일'] += list.increaseCount;
+                }
+            }
+        });
+
+        return hits;
+    }
+    
+    function monthlyApplicationCount(dataList, month) {
+        const counts = {
+            '5일': 0,
+            '10일': 0,
+            '15일': 0,
+            '20일': 0,
+            '25일': 0,
+            '30일': 0
+        };
+
+        const dateMonth = month - 1; 
+
+        $.each(dataList, function(idx, item) {
+            var date = new Date(item.applyDt);
+            var appMonth = date.getUTCMonth();
+            var day = date.getUTCDate();
+
+            if (appMonth === dateMonth) { 
+                if (day <= 5) {
+                    counts['5일']++;
+                } else if (day <= 10) {
+                    counts['10일']++;
+                } else if (day <= 15) {
+                    counts['15일']++;
+                } else if (day <= 20) {
+                    counts['20일']++;
+                } else if (day <= 25) {
+                    counts['25일']++;
+                } else {
+                    counts['30일']++;  
+                }
+            }
+        });
+
+        return counts;
+    }
+    
+    function categorizeApplicantsByCareer(dataList, month) {
+        // 날짜 구간별로 신입과 경력자 수를 저장할 객체 초기화
+        const entryCounts = Array(6).fill(0);
+        const experiencedCounts = Array(6).fill(0);
+
+        const dateMonth = month - 1; // JavaScript에서 월은 0부터 시작하므로 1을 빼줍니다.
+
+        dataList.forEach(item => {
+            const date = new Date(item.applyDt);
+            const appMonth = date.getUTCMonth();
+            const day = date.getUTCDate();
+
+            if (appMonth === dateMonth) {  // 해당 월의 데이터만 처리
+                let index = Math.ceil(day / 5) - 1; // 날짜에 따라 인덱스를 계산 (0-5:0, 6-10:1, ...)
+                index = index >= 5 ? 5 : index; // 마지막 구간을 '26~30일'로 한정
+
+                if (item.rsmCareerYear > 0) {
+                    experiencedCounts[index]++; // 경력자 배열에 카운트
+                } else {
+                    entryCounts[index]++; // 신입자 배열에 카운트
+                }
+            }
+        });
+
+        return { entryCounts, experiencedCounts };
+    }
+	
+    
+    function updateCharts(hitStats, applicantStats, careerStats) {
+        Highcharts.chart('hl-line-main', {
+            chart: { type: 'line' },
+            title: { text: '지원자 통계' },
+            xAxis: {
+                categories: ['1~5일', '6~10일', '11~15일', '16~20일', '21~25일', '26~30일']
+            },
+            yAxis: { title: { text: '5월' } },
+            series: [{
+                name: '조회수',
+                data: Object.values(hitStats)
+            }, {
+                name: '지원자수',
+                data: Object.values(applicantStats)
+            }, {
+                name: '경력자수',
+                data: Object.values(careerStats.experiencedCounts)
+            }, {
+                name: '신입수',
+                data: Object.values(careerStats.entryCounts)
+            }]
+        });
+    }
+
+    initialDataLoad();
+	
+});
+
+</script>

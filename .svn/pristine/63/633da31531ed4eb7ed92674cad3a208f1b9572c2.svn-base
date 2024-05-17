@@ -1,0 +1,40 @@
+package kr.co.itcruit.mypage.member.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.mapper.IMyMemberMapper;
+import kr.co.itcruit.mypage.member.service.IMemberService;
+import kr.co.itcruit.vo.MemberPageResumePaginationInfoVO;
+import kr.co.itcruit.vo.ResumeVO;
+
+
+@Service
+public class MemberServiceImpl implements IMemberService {
+	
+	@Inject
+	private IMyMemberMapper myMemberMapper;
+
+	@Override
+	public List<ResumeVO> selectResume(ResumeVO resumeVO) {
+		return myMemberMapper.selectResume(resumeVO);
+	}
+
+	@Override
+	public int selectResumeCount(MemberPageResumePaginationInfoVO<ResumeVO> rsmManagePagingVO) {
+		return myMemberMapper.selectResumeCount(rsmManagePagingVO);
+	}
+
+	@Override
+	public List<ResumeVO> selectResumeList(MemberPageResumePaginationInfoVO<ResumeVO> rsmManagePagingVO) {
+		return myMemberMapper.selectResumeList(rsmManagePagingVO);
+	}
+
+	
+
+
+}

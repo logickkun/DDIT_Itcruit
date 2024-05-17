@@ -1,0 +1,50 @@
+package kr.co.itcruit.recruit.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import kr.co.itcruit.recruit.service.IRecruitService;
+import kr.co.itcruit.vo.RecruitVO;
+import lombok.extern.slf4j.Slf4j;
+import kr.co.itcruit.vo.EntIntroQSTNANSRVO;
+import kr.co.itcruit.vo.EntIntroQSTNDSNCTVO;
+
+
+
+@Controller
+@RequestMapping("/recruit")
+@Slf4j
+public class RecruitController {
+
+	//여기 컨트롤러는
+	//채용 리스트를 입력, 수정, 삭제하는 곳
+	
+	@Inject
+	private IRecruitService recruitService;
+	
+	@RequestMapping(value="/info", method = RequestMethod.POST)
+	public ResponseEntity<List<RecruitVO>> getRecruitInfo(
+			@RequestBody Map<String, String> recruitNo
+			) {
+		
+		String rNo = recruitNo.get("recruitNo");
+		List<RecruitVO> recruitInfo = recruitService.getRecruitInfoByNo(rNo);
+		log.info("getRecruitInfo>>>>>>>" + recruitInfo);
+		return new ResponseEntity<List<RecruitVO>>(recruitInfo , HttpStatus.OK); 
+	}
+	
+	@RequestMapping(value = "/paginationInfo", method = RequestMethod.POST)
+	public ResponseEntity<List<EntIntroQSTNDSNCTVO>> getPaginationInfo(EntIntroQSTNANSRVO ansrVO) {
+		System.out.println("!!!!!  == " + ansrVO);
+		return null;
+	} 
+}

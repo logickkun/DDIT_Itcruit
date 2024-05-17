@@ -1,0 +1,140 @@
+package kr.co.itcruit.enterprise.like.service.impl;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.enterprise.like.service.ILikeService;
+import kr.co.itcruit.mapper.IEnterpriseMapper;
+import kr.co.itcruit.mapper.IRecruitMapper;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.RecruitApplicantVO;
+import kr.co.itcruit.vo.RecruitVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class LikeServiceImpl implements ILikeService{
+
+	@Inject
+	private IEnterpriseMapper enterpriseMapper;
+	
+	@Inject
+	private IRecruitMapper recruitMapper;
+	
+	private static int num = 1000001; // 
+	
+	@Override
+	public ServiceResult loveEnt(EnterpriseVO enterpriseVO) {
+		ServiceResult result = null;
+		
+		int staus = enterpriseMapper.insertLikeEnt(enterpriseVO);
+		
+		if(staus > 0) {
+			result = ServiceResult.OK;
+					
+		}else {
+			result = ServiceResult.FAILED;
+			
+		}
+		
+		return result;
+	}
+
+	@Override
+	public ServiceResult hateEnt(EnterpriseVO enterpriseVO) {
+		
+		ServiceResult result = null;
+		
+		int staus = enterpriseMapper.deleteLikeEnt(enterpriseVO);
+		
+		if(staus > 0) {
+			result = ServiceResult.OK;
+					
+		}else {
+			result = ServiceResult.FAILED;
+			
+		}
+		
+		return result;
+	}
+
+	@Override
+	public RecruitVO applyCheck(RecruitVO recruitVO) {
+		
+		return recruitMapper.applyCheck(recruitVO);
+	}
+
+	@Override
+	public ServiceResult hateRecruit(RecruitVO recruitVO) {
+		
+		ServiceResult result = null;
+		
+		int staus = recruitMapper.hateRecruit(recruitVO);
+		
+		if(staus > 0) {
+			result = ServiceResult.OK;
+					
+		}else {
+			result = ServiceResult.FAILED;
+			
+		}
+		
+		return result;
+	}
+
+	@Override
+	public ServiceResult loveRecruit(RecruitVO recruitVO) {
+		ServiceResult result = null;
+		
+		int staus = recruitMapper.loveRecruit(recruitVO);
+		
+		if(staus > 0) {
+			result = ServiceResult.OK;
+					
+		}else {
+			result = ServiceResult.FAILED;
+			
+		}
+		
+		return result;
+	}
+
+	@Override
+	public int countLikeEnt(EnterpriseVO enterpriseVO) {
+		return enterpriseMapper.countLikeEnt(enterpriseVO);
+	}
+
+	@Override
+	public void insertApplicant(RecruitVO recruitVO) {
+		String applyNo = ""; 
+	    
+	    String recruitNo = recruitVO.getRecruitNo();
+
+	    applyNo = recruitNo + "_" + num;
+
+	    log.info("채용지원테 테이블 등록: {}", recruitVO);
+	    
+	    RecruitApplicantVO recruitApplicantVO = new RecruitApplicantVO();
+	    
+	    recruitApplicantVO.setAccountId(recruitVO.getAccountId());
+	    recruitApplicantVO.setApplyNo(applyNo);
+	    recruitApplicantVO.setRecruitNo(recruitNo);
+	    
+	    // 채용 지원자수 증가
+	    recruitMapper.incrementRecruitHit(recruitVO);
+	    
+	    // 변경된 recruitVO를 사용하여 지원자를 등록합니다.
+	    recruitMapper.insertApplicant(recruitApplicantVO);
+	    
+	    num++;
+		
+	}
+
+	@Override
+	public RecruitApplicantVO applicantCheck(RecruitVO recruitVO) {
+		return recruitMapper.applicantCheck(recruitVO);
+	}
+
+}

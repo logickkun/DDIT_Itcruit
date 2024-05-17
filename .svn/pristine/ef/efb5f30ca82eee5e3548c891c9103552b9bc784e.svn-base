@@ -1,0 +1,15 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.ResumeVO;
+
+public interface IResumeMapper {
+
+	public AccountVO selectMember(String accountId);
+
+	public List<Map<String, Object>> langList(Map<String, Object> paramMap);
+
+}

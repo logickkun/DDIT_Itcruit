@@ -1,0 +1,402 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
+
+<body  data-bs-spy="scroll" data-bs-target="#nav-scroll">
+<section>
+	<div class="container" data-sticky-container>
+
+		<div class="row g-4">
+			<!-- Advance Usage content START -->
+			<div id="item">
+				<div class="card bg-transparent">
+					<!-- Article title -->
+					<div class="card-header bg-transparent border-bottom py-0 px-0">
+						<h3>채용 정보</h3>
+					</div>
+
+					<!-- Article Info -->
+					<div class="card-body px-0">
+						
+						<!-- Card item START -->
+						<div class="card rounded overflow-hidden shadow">
+							<div class="row g-0">
+
+								<!-- Card body -->
+								<div class="col-md-12" style="border: 1px solid #6F5CF3;">
+									<div class="card-body">
+										<!-- Title -->
+										<div class="d-flex mb-2">
+											<h5 class="card-title mb-0">(주)케이티</h5>&nbsp;
+											<button class="h6 fw-light" style="border: solid 1px; background-color: white;"><i class="far fa-heart">관심기업</i></button>
+										</div>
+										<h3>${recruit.recruitTtl }</h3>
+										<hr/>
+										<!-- Content -->
+										<!-- Info -->
+										<table style="width: 100%;">
+											<tr>
+												<th width="20%">지원자격</th>
+												<th width="30%"></th>
+												<th width="20%">근무조건</th>
+												<th width="30%"></th>
+											</tr>
+											<tr>
+												<td>경력</td>
+												<td>${recruit.recruitCareerCode }</td>
+												<td>고용형태</td>
+												<td>정규직</td>
+											</tr>
+											<tr>
+												<td></td>
+												<td></td>
+												<td>지역</td>
+												<td>${recruit.cmmncdGrpCd } ${recruit.cmmncdNm1 }</td> 
+											</tr>
+										</table>
+
+										
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- Card item END -->
+
+					</div>
+					
+				</div>
+			</div>
+			<!-- Advance Usage content END -->
+		</div>
+
+		<div class="col-md-12 d-flex justify-content-center">
+			<a href="" class="btn btn-primary" style="width: 200px; height: 40px;"><i class="bi bi-check-lg"></i>즉시지원</a>
+			<a href="" class="btn" style="width: 200px; height: 40px; border: solid 1px;"><i class="bi bi-star"></i>스크랩</a>
+		</div>
+		<br/>
+
+		<div class="row g-4">
+			<!-- Left side START -->
+			<div class="col-md-2">
+				<div data-sticky data-margin-top="80" data-sticky-for="576">
+					<div id="nav-scroll" class="navbar" style="padding-top: 30px;">
+						<nav class="nav nav-pills nav-pill-soft flex-column">
+							<a class="nav-link" href="#item-1"><i class="bi bi-emoji-smile fa-fw me-2"></i>상세요강</a>
+							<a class="nav-link" href="#item-2"><i class="bi bi-layers fa-fw me-2"></i>접수기간/방법</a>
+							<a class="nav-link" href="#item-3"><i class="bi bi-info-circle fa-fw me-2"></i>지원자 정보</a>
+							<a class="nav-link" href="#item-4"><i class="bi bi-house fa-fw me-2"></i>기업 정보</a>
+							<a class="nav-link" href="#item-5"><i class="bi bi-house fa-fw me-2"></i>기업 게시판</a>
+						</nav>
+					</div>
+				</div>
+			</div>
+			<!-- Left side END -->
+
+			<!-- Right side START -->
+			<div class="col-md-10">
+				<div class="nav-scroll" data-bs-spy="scroll" data-bs-target="#nav-scroll" data-bs-smooth-scroll="true" tabindex="0">
+					<!-- Get Started content START -->
+					<div id="item-1">
+						<div class="card bg-transparent">
+							<!-- Article title -->
+							<div class="card-header bg-transparent border-bottom py-0 px-0">
+								<h3>상세요강</h3>
+								<!-- Update and author -->
+								<!-- <ul class="nav nav-divider mb-3">
+									<li class="nav-item">Last updated: 7 months ago</li>
+									<li class="nav-item">by Sam Lanson</li>
+								</ul> -->
+							</div>
+							<!-- Article Info -->
+							<div class="card-body px-0 pb-0">
+								<div class="col-md-12" style="border: 1px solid #6F5CF3;">
+									<div class="card-body">
+										<label for="boContent">내용을 입력해주세요</label>
+										<textarea id="boContent" name="boContent" class="form-control" rows="14"></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Get Started content END -->
+
+					<!-- Divider -->
+					<div class="text-center h5 my-5"></div>
+
+
+					<!-- Account setup content START -->
+					<div id="item-2">
+						<div class="card bg-transparent">
+							<!-- Article title -->
+							<div class="card-header bg-transparent border-bottom py-0 px-0">
+								<h3>접수기간/방법</h3>
+							</div>
+
+							<!-- Article Info -->
+							<div class="card-body px-0">
+								<div class="col-md-12" style="border: 1px solid #6F5CF3;">
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-5" style="text-align: center;">
+												<div>
+													<i class="bi bi-calendar-range" style="font-size: 2em;"></i><br/>
+													<span style="font-size: 1em;">남은시간</span>
+												</div>
+												<span style="color: red; font-size: 1.3em;">12일</span>&nbsp;
+												<span style="color: red; font-size: 1.3em;">06:07:03(시간)</span><br/>
+												시작일&nbsp;&nbsp;<span style="font-weight: bold;">2024.04.03(화)</span><br/>
+												마감일&nbsp;&nbsp;<span style="font-weight: bold;">2024.04.03(화)</span><br/>
+												<br/>
+												<p>18시00분 마감</p>
+											</div>
+											<div class="col-md-7">
+												<a href="" class="btn btn-primary">채용페이지로 이동</a>
+												<span>홈페이지 지원 클릭수 : 51</span><br/>
+												모집분야&nbsp;&nbsp;&nbsp;<span>백엔드</span><br/>
+												모집인원&nbsp;&nbsp;&nbsp;<span>00명</span><br/>
+												<input type="button" value="즉시 지원">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							
+						</div>
+					</div>
+					<!-- Account setup content END -->
+
+					<!-- Divider -->
+					<div class="text-center h5 my-5"></div>
+
+					<!-- Other Topics content START -->
+					<div id="item-3">
+						<div class="card bg-transparent">
+							<!-- Article title -->
+							<div class="card-header bg-transparent border-bottom py-0 px-0">
+								<h3>지원자 정보</h3>
+							</div>
+
+							<!-- Article Info -->
+							<div class="card-body px-0">
+								<div class="col-md-12" style="border: 1px solid #6F5CF3;">
+									<div class="card-body">
+										<div class="row">
+											<div class="col-md-4">
+												<table width="100%;">
+													<span style="font-size: 18px;">학교</span><hr/>
+													<tr>
+														<td width="20%">1위</td>
+														<td width="60%">학교명</td>
+														<td width="20%">1.8%</td>
+													</tr>
+													<tr>
+														<td>2위</td>
+														<td>학교명</td>
+														<td>1.8%</td>
+													</tr>
+													<tr>
+														<td>3위</td>
+														<td>학교명</td>
+														<td>1.8%</td>
+													</tr>
+													<tr>
+														<td>4위</td>
+														<td>학교명</td>
+														<td>1.8%</td>
+													</tr>
+													<tr>
+														<td>5위</td>
+														<td>학교명</td>
+														<td>1.8%</td>
+													</tr>
+												</table>
+											</div>
+
+
+											<div class="col-md-4">
+												<table width="100%;">
+													<span style="font-size: 18px;">전공</span><hr/>
+													<tr>
+														<td width="20%">1위</td>
+														<td width="60%">학과</td>
+														<td width="20%">30.8%</td>
+													</tr>
+													<tr>
+														<td>2위</td>
+														<td>학과</td>
+														<td>25.8%</td>
+													</tr>
+													<tr>
+														<td>3위</td>
+														<td>학과</td>
+														<td>22.8%</td>
+													</tr>
+													<tr>
+														<td>4위</td>
+														<td>학과</td>
+														<td>12.8%</td>
+													</tr>
+													<tr>
+														<td>5위</td>
+														<td>학과</td>
+														<td>11.8%</td>
+													</tr>
+												</table>
+											</div>
+
+											<!-- 크기조절실패 -->
+											<div class="col-md-4" style="position: relative;">
+												<span style="font-size: 18px;">성별</span><hr/>
+												<!-- <div id="ChartPageViews" style="min-height: 100px; width: 300px;"></div> -->
+												<div class="mb-3 mb-xl-0 d-flex justify-content-center" id="apexChartPageViews">
+													
+												</div>
+											</div>
+											
+										</div>
+									</div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+					<!-- Other Topics content END -->
+
+					<!-- Divider -->
+					<div class="text-center h5 my-5"></div>
+
+					<!-- Advance Usage content START -->
+					<div id="item-4">
+						<div class="card bg-transparent">
+							<!-- Article title -->
+							<div class="card-header bg-transparent border-bottom py-0 px-0">
+								<h3>기업 정보</h3>
+							</div>
+
+							<!-- Article Info -->
+							<div class="card-body px-0">
+								<div class="col-md-12" style="border: 1px solid #6F5CF3;">
+									<div class="card-body">
+
+										<!-- Card item START -->
+										<div class="card rounded overflow-hidden shadow">
+											<div class="row g-0">
+
+												<!-- Image -->
+												<div class="col-md-3">
+													<img src="${pageContext.request.contextPath }/resources/assets/images/courses/4by3/02.jpg" alt="card image" style="height: 100%;">
+												</div>
+												
+												<!-- Card body -->
+												<div class="col-md-9">
+													<div class="card-body">
+														<!-- Title -->
+														<div class="d-flex mb-2" style="display: flex; align-items: baseline;">
+															<h5 class="card-title mb-0"><a href="#">ITcruit</a></h5>
+															&nbsp;
+															<button class="h6 fw-light" style="height: 30px; border: solid 1px; background-color: white;"><span>기업정보</span></button>
+															&nbsp;
+															<!-- Wishlist icon -->
+															<button class="h6 fw-light" style="height: 30px; border: solid 1px; background-color: white;"><i class="far fa-heart">154 관심기업</i></button>
+														</div>
+														<!-- Content -->
+														<!-- Info -->
+														<table width="100%">
+															<tr>
+																<td>산업</td>
+																<td>무전 및 위성 통신업</td>
+																<td>사원수</td>
+																<td>20019명</td>
+															</tr>
+															<tr>
+																<td>설립</td>
+																<td>1981년(44년차)</td>
+																<td>기업형태</td>
+																<td>대기업(코스피)</td>
+															</tr>
+															<tr>
+																<td>매출액</td>
+																<td>18조 2892억 4300만원</td>
+															</tr>
+														</table>
+
+													</div>
+												</div>
+											</div>
+										</div>
+										<!-- Card item END -->
+
+									</div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+					<!-- Advance Usage content END -->
+
+					<!-- Divider -->
+					<div class="text-center h5 my-5"></div>
+
+					<div id="item-5">
+						<div class="card bg-transparent">
+							<!-- Article title -->
+							<div class="card-header bg-transparent border-bottom py-0 px-0" style="display: flex; justify-content: space-between; align-items: flex-end;">
+								<h3>기업 게시판</h3><a href=""><span>게시판 더보기<i class="bi bi-chevron-right"></i></span></a>
+							</div>
+							<!-- Article Info -->
+							<div class="card-body px-0">
+								<div class="col-md-12" style="border: 1px solid #6F5CF3;">
+									<div class="card-body">
+										<table width="100%">
+											<tr>
+												<td><a href=""><h4>[공지] KT 대졸 신입 채용 시작</h4></a></td>
+											</tr>
+											<tr>
+												<td><h5>KT 대졸 신입 채용을 시작했습니다</h5></td>
+											</tr>
+											<tr>
+												<td>
+													<i class="bi bi-eye"></i>조회수&nbsp;&nbsp;
+													<i class="bi bi-chat-left"></i>댓글수&nbsp;&nbsp;
+													등록일(2024.04.04)
+												</td>
+											</tr>
+										</table>
+										<br/><hr/>
+										<table width="100%">
+											<tr>
+												<td><a href=""><h4><i class="bi bi-question-lg" style="color: #6F5CF3;"></i>직무 PT,창의면접 대비</h4></a></td>
+											</tr>
+											<tr>
+												<td><h5>KT 직무 PT 대비하느라 전공과정을 리뷰하고 있는데 좀 딥하게 파고...</h5></td>
+											</tr>
+											<tr>
+												<td>
+													<i class="bi bi-eye"></i>조회수&nbsp;&nbsp;
+													<i class="bi bi-chat-left"></i>댓글수&nbsp;&nbsp;
+													등록일(2024.04.04)
+												</td>
+											</tr>
+										</table>
+									</div>
+								</div>
+							</div>
+							
+							
+						</div>
+					</div>
+
+				<!-- Divider -->
+				<div class="text-center h5 my-5"></div>
+
+				</div>
+			</div>
+			<!-- Right side END -->
+		</div>
+	</div>
+</section>
+</body>
+
+<script src="${pageContext.request.contextPath }/resources/assets/vendor/apexcharts/js/apexcharts.min.js"></script>
+<script src="${pageContext.request.contextPath }/resources/assets/vendor/sticky-js/sticky.min.js"></script>

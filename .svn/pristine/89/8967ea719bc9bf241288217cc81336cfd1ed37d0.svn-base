@@ -1,0 +1,11 @@
+package kr.co.itcruit.board.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.board.service.IEnterpriseNoticeBoardService;
+
+
+@Service
+public class EnterpriseNoticeBoardImpl implements IEnterpriseNoticeBoardService{
+
+}

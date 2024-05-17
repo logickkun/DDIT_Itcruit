@@ -1,0 +1,76 @@
+package kr.co.itcruit.main.service.impl;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kr.co.itcruit.main.service.IRecruitListService;
+import kr.co.itcruit.mapper.IRecruitMapper;
+import kr.co.itcruit.vo.CalendarVO;
+import kr.co.itcruit.vo.RecruitVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class RecruitListServiceImpl implements IRecruitListService{
+
+	@Inject
+	private IRecruitMapper recruitMapper;
+	
+	
+	
+	//이곳은 (일반회원이) 채용정보를 조회하는 곳
+	@Override
+	public String getRecruitList() {
+//		color: '#808080',
+//      color: '#CC77FF',
+		
+		String recruitJson = "";
+		
+		List<CalendarVO> recruitList = new ArrayList<>();
+
+		LocalDate now = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        String time = now.format(formatter);
+        time = time+"%";
+		List<CalendarVO> startList = recruitMapper.getRecruitStartList(time);
+		List<CalendarVO> endList = recruitMapper.getRecruitEndList(time);
+		
+		for(CalendarVO rv : startList) 
+			rv.setColor("#CC77FF");
+		for(CalendarVO rv : endList) 
+			rv.setColor("#808080");
+		
+		recruitList.addAll(startList);
+        recruitList.addAll(endList);
+        
+        log.info(startList.get(0).getExtendedProps().toString());
+        
+        
+//        log.info(">>>>>>>>>>>>>>>>>>" + startList);
+//        log.info(">>>>>>>>>>>>>>>>>>" + endList);
+//        log.info(">>>>>>>>>>>>>>>>>>" + recruitList);
+        
+        ObjectMapper objectMapper = new ObjectMapper();
+        
+        try {
+			recruitJson = objectMapper.writeValueAsString(recruitList);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+        
+        log.info(recruitJson);
+        
+		return recruitJson;
+	}
+
+	
+}

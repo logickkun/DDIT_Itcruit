@@ -1,0 +1,14 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.AtchVO;
+
+public interface IAdminMapper {
+
+	public List<AtchVO> entSttsList();
+
+	public int entApproval(AccountVO av);
+
+}

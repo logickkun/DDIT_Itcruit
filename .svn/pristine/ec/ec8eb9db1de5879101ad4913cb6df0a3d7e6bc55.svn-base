@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="kr.co.itcruit.mapper.ICodingtestMapper">
+ 
+ 	<select id="selectList" resultType="codingtestVO">
+ 		SELECT
+	    qstn_no,
+	    qstn_ttl,
+	    qstn_grd,
+	    qstn_exmpl
+		FROM
+		    codingtest_question
+		where 
+		    QSTN_RLS_YN = 'Y'
+ 	</select>
+ 
+<!--  	jdbcType="CLOB" javaType="java.lang.String" -->
+	<resultMap type="codingtestVO" id="codingtestMap">
+	    <result property="qstnNo" column="qstn_no" />
+	    <result property="qstnTtl" column="qstn_ttl" />
+	    <result property="qstnCn" column="qstn_cn" />
+	    <result property="qstnGrd" column="qstn_grd" />
+	    <result property="qstnScr" column="qstn_scr" />
+	    <result property="qstnExmpl" column="qstn_exmpl" />
+	    <result property="restriction" column="restriction" />
+	    <result property="qstnMcode" column="qstn_mcode"/>
+	    <result property="c" column="c"/>
+	    <result property="cpp" column="cpp"/>
+	    <result property="cs" column="cs"/>
+	    <result property="java" column="java"/>
+	    <result property="javascript" column="javascript"/>
+	    <result property="python" column="python"/>
+	    
+	    <result property="input" column="input" />
+	    <result property="output" column="output" />
+	   
+<!-- 	    <result property="qstnInputg" column="qstn_inputg" jdbcType="CLOB" javaType="java.lang.String"/> -->
+<!-- 	    <result property="qstnOutput" column="qstn_output" jdbcType="CLOB" javaType="java.lang.String"/> -->
+		
+	</resultMap>
+
+	<select id="selectQstnByNo" parameterType="int" resultMap="codingtestMap">
+	    SELECT 
+	        qstn_no,
+	        qstn_ttl,
+	        qstn_cn,
+	        qstn_grd,
+	        qstn_scr,
+	        qstn_exmpl,
+	        restriction,	    
+	        c,
+	        cpp,
+	        cs,
+	        java,
+	        javascript,
+	        python
+	    FROM codingtest_question
+	    WHERE qstn_rls_yn = 'Y'
+	    AND qstn_no = #{qstnNo}
+	</select>
+	
+	<select id="doTest" parameterType="codingtestVO" resultMap="codingtestMap">
+		select
+			cq.qstn_mcode,
+		    cq.qstn_no,
+		    ct.input,
+		    ct.output
+		from
+		    codingtest_question cq 
+		inner join codingtest_testcase ct
+		on cq.qstn_no = ct.qstn_no
+		where cq.qstn_no = #{qstnNo}
+	</select>
+ 
+ </mapper>

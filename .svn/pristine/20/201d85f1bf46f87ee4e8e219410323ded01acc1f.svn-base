@@ -1,0 +1,42 @@
+package kr.co.itcruit.vo;
+
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.Data;
+
+@Data
+public class RecruitVO {
+	
+	private String recruitNo;						// 공고번호
+	private int entNo;								// 기업번호
+	private String recruitTtl; 						// 공고제목
+	private String recruitStrtDt; 					// 공고 시작일
+	private String recruitEndDt; 					// 공고 종료일
+	private String recruitPay; 						// 공고 연봉
+	private String entUrl; 							// 공고 URL
+	private String cmmncdGrpCd; 					// 근무지
+	private String cmmncdNm1; 						// 상세 근무지
+	private String pstnCmmncdNm;					// 모집 분야
+	private String processYn;						// 프로세스 신청 여부
+	private int processAmt;							// 프로세스 비용
+	private int recruitHit;							// 모집공고 클릭수
+	private String recruitCareerCodeNm;				// 지원 자격 (신입/경력/경력무관/)
+	private String recruitCareerDt;					// 경력 기간
+	private MultipartFile[] recruitFile;			// 공고 파일
+	private String recruitYn;						// 수시채용여부
+	private int recruitCnt;							// 채용 인원
+	
+	private String accountId;
+	private String entNm;
+	private String esntlLangCmmncdNm;				// 필수 조건
+	private String preferLangCmmncdNm;				// 우대 조건
+	private String hireCmmncdNm; 					// 고용형태
+	private String recruitEnrollYmd;				// 등록일
+	
+	
+	private List<String> esntlLangCmmncdNms;			// 필수 조건
+	private List<String> preferLangCmmncdNms;		// 우대 조건
+	private List<String> hireCmmncdNms; 				// 고용형태
+}

@@ -1,0 +1,5 @@
+package kr.co.itcruit.account.service;
+
+public interface IEnterpriseAccountService {
+
+}

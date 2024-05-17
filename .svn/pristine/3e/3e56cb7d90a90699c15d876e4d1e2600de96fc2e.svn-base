@@ -1,0 +1,5 @@
+package kr.co.itcruit.enterprise.like.service;
+
+public interface ILikeService {
+
+}

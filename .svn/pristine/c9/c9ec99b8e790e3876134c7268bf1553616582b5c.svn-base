@@ -1,0 +1,13 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import kr.co.itcruit.vo.ResumeVO;
+
+public interface IMyMemberMapper {
+
+	public List<Map<String, Object>> selectResume(ResumeVO resumeVO);
+
+
+}

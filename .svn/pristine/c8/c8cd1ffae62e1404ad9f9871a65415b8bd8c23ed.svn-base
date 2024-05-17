@@ -1,0 +1,13 @@
+package kr.co.itcruit.recruit.service;
+
+import java.util.List;
+
+import kr.co.itcruit.vo.PaginationInfoVO;
+import kr.co.itcruit.vo.RecruitVO;
+
+public interface IRecruitService {
+
+	public List<RecruitVO> selectInitRecruitList(PaginationInfoVO<RecruitVO> pagingVO);
+
+	public RecruitVO recruitDetail(String recruitNo);
+}

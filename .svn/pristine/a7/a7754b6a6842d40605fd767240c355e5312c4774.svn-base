@@ -1,0 +1,13 @@
+package kr.co.itcruit.codingtest.service;
+
+import java.util.List;
+
+import kr.co.itcruit.vo.CodingtestVO;
+
+public interface ICodingTestService {
+
+	public List<CodingtestVO> selectList();
+
+	public CodingtestVO getQstnByNo(int qstnNo);
+
+}

@@ -1,0 +1,148 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<main>
+    <div class="page-content-wrapper border">
+        <canvas id="line-chart" width="800"></canvas>
+        <br/><br/><br/>
+         <div style="display: flex; justify-content: space-between;">
+        <div style="display: inline-block; width: 45%;">
+            <canvas id="pie-chart" width="200" height="200"></canvas>
+        </div>
+        <div style="display: inline-block; width: 45%;">
+            <canvas id="bar-chart-grouped" width="200" height="200"></canvas>
+        </div>
+        </div>
+    </div>
+</main>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+
+<script>
+$(document).ready(function(){ 
+    getGraph();
+    getpieGraph();
+    getbar();
+    
+});
+
+function getGraph(){
+    
+    var timeList = [];
+    var posList = [];
+    
+    $.ajax({
+        url: "/myPage/admin/mainChart",
+        type: "GET",
+        dataType: "json", 
+        success: function(data) {
+            new Chart(document.getElementById("line-chart"), {
+                type: 'line',
+                data: {
+                	labels: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                    datasets: [{ 
+                        data: [282,850,411,502,635],
+                        label: "2024",
+                        borderColor: "#3e95cd",
+                        fill: false
+                    }, { 
+                        data: [786,514,406,306,407,711,633,621,783,978, 1000, 550],
+                        label: "2023",
+                        borderColor: "#8e5ea2",
+                        fill: false
+                    }]
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: '월별 매출',
+                        fontSize: 20
+                    }
+                }
+            });
+        },
+        error: function() {
+            console.log("실패");
+        }
+    });
+}
+
+function getpieGraph(){
+    
+    var timeList = [];
+    var posList = [];
+    
+    $.ajax({
+        url: "/myPage/admin/mainChart",
+        type: "GET",
+        dataType: "json", 
+        success: function(data) {
+        	new Chart(document.getElementById("pie-chart"), {
+        	    type: 'pie',
+        	    data: {
+        	      labels: ["가입 기업", "미가입 기업"],
+        	      datasets: [{
+        	        label: "Population (millions)",
+        	        backgroundColor: ["#3e95cd", "#8e5ea2"],
+        	        data: [2478,5267]
+        	      }]
+        	    },
+        	    options: {
+        	      title: {
+        	        display: true,
+        	        text: '채용프로세스 이용률',
+        	        fontSize: 20
+        	      }
+        	    }
+        	});
+        },
+        error: function() {
+            console.log("실패");
+        }
+    });
+
+}
+
+
+function getbar(){
+    
+    var timeList = [];
+    var posList = [];
+    
+    $.ajax({
+        url: "/myPage/admin/mainChart",
+        type: "GET",
+        dataType: "json", 
+        success: function(data) {
+        	new Chart(document.getElementById("bar-chart-grouped"), {
+        	    type: 'bar',
+        	    data: {
+        	      labels: ["1월", "2월", "3월", "4월", "5월"],
+        	      datasets: [
+        	        {
+        	          label: "1차",
+        	          backgroundColor: "#3e95cd",
+        	          data: [408,647,575,734,300]
+        	        }, {
+        	          label: "2차",
+        	          backgroundColor: "#8e5ea2",
+        	          data: [133,221,483,278,130]
+        	        }
+        	      ]
+        	    },
+        	    options: {
+        	      title: {
+        	        display: true,
+        	        text: '지원자',
+        	        fontSize: 20
+        	      }
+        	    }
+        	});
+        },
+        error: function() {
+            console.log("실패");
+        }
+    });
+
+}
+</script>

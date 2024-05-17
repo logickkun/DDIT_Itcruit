@@ -1,0 +1,5 @@
+package kr.co.itcruit.mypage.member.service;
+
+public interface IMemberService {
+
+}

@@ -1,0 +1,26 @@
+package kr.co.itcruit.vo;
+
+import java.util.Date;
+
+import lombok.Data;
+
+@Data
+public class ResumeVO {
+	
+	private int rsmNo;				//이력서번호
+	private String accountId;		//아이디
+	private Date birthYmd;			//생년월일
+	private String rsmGender;		//성별
+	private String rsmTtl;			//이력서제목
+	private int rsmCareerYear;		//경력연차
+	private String rsmRlsYn;		//공개여부
+	private String rsmPhoto;		//사진
+	private String rsmIntroduction;	//간단소개
+	private Date eduEnd;			//졸업(예정)일
+	private String eduNm; 			//학교명
+	private int grade;				//학점
+	private int full;				//만점
+	private String rsmMjrNm;		//주전공
+	private String rsmMjrCd;		//부전공
+	
+}

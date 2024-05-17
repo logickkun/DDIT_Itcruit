@@ -1,0 +1,7 @@
+<%@ page language="java" contentType="UTF-8" pageEncoding="UTF-8"%>
+<main>
+	
+	
+	<a href = "/codingtest/detail.do">이동</a>
+	
+</main>

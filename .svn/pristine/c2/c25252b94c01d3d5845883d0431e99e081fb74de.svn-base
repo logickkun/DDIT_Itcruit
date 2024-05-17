@@ -1,0 +1,10 @@
+package kr.co.itcruit.resume.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.resume.service.IResumeService;
+
+@Service
+public class ResumeServiceImpl implements IResumeService{
+
+}

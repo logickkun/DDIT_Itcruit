@@ -1,0 +1,15 @@
+package kr.co.itcruit.vo;
+
+import lombok.Data;
+
+@Data
+/**
+ * 이력서-개발직무
+ * @author 김나혜
+ *
+ */
+public class PositionVO {
+	private int pstnSeq;		//직무시퀀스
+	private int rsmNo;			//이력서번호(fk)
+	private String pstnCmmncd;	//직무코드번호
+}

@@ -1,0 +1,67 @@
+package kr.co.itcruit.enterprise.like.service.impl;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.enterprise.like.service.ILikeService;
+import kr.co.itcruit.mapper.IEnterpriseMapper;
+import kr.co.itcruit.mapper.IRecruitMapper;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.RecruitVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class LikeServiceImpl implements ILikeService{
+
+	@Inject
+	private IEnterpriseMapper enterpriseMapper;
+	
+	@Inject
+	private IRecruitMapper recruitMapper;
+	
+	
+	@Override
+	public ServiceResult loveEnt(EnterpriseVO enterpriseVO) {
+		ServiceResult result = null;
+		
+		int staus = enterpriseMapper.insertLikeEnt(enterpriseVO);
+		
+		if(staus > 0) {
+			result = ServiceResult.OK;
+					
+		}else {
+			result = ServiceResult.FAILED;
+			
+		}
+		
+		return result;
+	}
+
+	@Override
+	public ServiceResult hateEnt(EnterpriseVO enterpriseVO) {
+		
+		ServiceResult result = null;
+		
+		int staus = enterpriseMapper.deleteLikeEnt(enterpriseVO);
+		
+		if(staus > 0) {
+			result = ServiceResult.OK;
+					
+		}else {
+			result = ServiceResult.FAILED;
+			
+		}
+		
+		return result;
+	}
+
+	@Override
+	public RecruitVO applyCheck(RecruitVO recruitVO) {
+		
+		return recruitMapper.applyCheck(recruitVO);
+	}
+
+}

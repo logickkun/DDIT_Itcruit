@@ -1,0 +1,11 @@
+package kr.co.itcruit.mapper;
+
+import java.util.List;
+
+import kr.co.itcruit.vo.AtchVO;
+
+public interface IAdminMapper {
+
+	public List<AtchVO> entSttsList();
+
+}

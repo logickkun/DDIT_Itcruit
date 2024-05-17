@@ -1,0 +1,18 @@
+package kr.co.itcruit.board.comment.service;
+
+import java.util.List;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.vo.BoardCommentVO;
+
+public interface IBoardCommentService {
+
+	public void insertComment(BoardCommentVO boardCommentVO);
+
+//	public List<BoardCommentVO> commentList(BoardCommentVO boardCommentVO);
+
+	public ServiceResult deleteComment(BoardCommentVO boardCommentVO);
+
+	public ServiceResult updateComment(BoardCommentVO boardCommentVO);
+
+}

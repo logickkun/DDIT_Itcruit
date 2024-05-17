@@ -1,0 +1,16 @@
+//package kr.co.itcruit.mypage.enterprise.service.impl;
+//
+//import org.springframework.stereotype.Service;
+//
+//import kr.co.itcruit.mypage.enterprise.service.IEnterpriseService;
+//
+//@Service
+//public class EnterpriseServiceImpl implements IEnterpriseService{
+////
+////	@Override
+////	public void hireRegisterinsert() {
+////		// TODO Auto-generated method stub
+////		
+////	}
+//
+//}

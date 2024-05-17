@@ -1,0 +1,65 @@
+package kr.co.itcruit.vo;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class AccountVO {
+	private String applyNo;				//회사 이름
+	private String eachProcessNo;
+	private int processSeq;
+	private String passYn;				// 합격 여부.
+	private String entNm;
+
+
+	private int rsmCareerYear;			//경력
+	private String accountId; 			// 아이디 loginId
+	private int entNo;
+	private String kakaoId;				// 카카오 랜덤아이디
+	
+	private String accountNm;			// 회원명(가입명)
+	private String accountNick;			// 닉네임
+	private String accountMail;			// 이메일
+	private String accountTell;			// 전화번호
+	private String accountZip;			// 우편번호
+	private String accountAddr1;		// 주소
+	private String accountAddr2;		// 상세주소
+	private String accountPswd;			// 비밀번호
+	private String enabled;				// enabled
+	private String authCmmncd;			// 계정권한s
+	private Date joinYmd;				// 가입일
+	private String accountSttsCmmncd;	// 계정상태
+	private String socialName;			// 소셜가입(kakao, naver, null)
+	
+	private String rsmNo;				// 이력서번호
+	private Date birthYmd;				// 생년월일
+	private String birthY;				// 출생연도
+	private String gender;				// 성별
+	
+	private String token;
+	
+	
+	List<AccountAuthVO> authList;
+	
+	
+	List<String> accountIds; // 아이디값을 배열형태로 받을 필드명 
+	
+	private int ranking;	
+	private int codingtestScore;
+	private List<CodepowerVO> codePower;
+	
+	
+	public void setBirthYmd(String birthYmd) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+            try {
+				this.birthYmd = dateFormat.parse(birthYmd);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+    }
+	
+}

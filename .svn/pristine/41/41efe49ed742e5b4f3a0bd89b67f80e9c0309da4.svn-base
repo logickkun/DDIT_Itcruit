@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="kr.co.itcruit.mapper.IMyEnterpriseMapper">
+ 	
+ 	<insert id="recruitRegisterinsert" parameterType="hireInfoVO">
+ 	
+ 		INSERT INTO recruit (
+ 		
+		    recruit_no,
+		    ent_no,
+		    recruit_ttl,
+		    recruit_strt_dt,
+		    recruit_end_dt,
+		    recruit_yn,
+		    recruit_career_code,
+		    recruit_career_dt,
+		    ent_url,
+		    recruit_hit,
+		    process_yn,
+		    process_amt,
+		    recruit_pay,
+		    recruit_enroll_ymd,
+		    cmmncd_grp_cd,
+		    cmmncd_nm1
+		    
+		) VALUES (
+		
+		    #{recruitNo},
+		    #{entNo},
+		    #{recruitTitle},
+		    #{recruitStartDt},
+		    #{recruitEndDt},
+		    #{recruitYn},
+		    #{recruitCareerCode},
+		    #{recruitCareerDt},
+		    #{entUrl},
+		    #{recruitHit},
+		    #{processYn},
+		    #{processAmt},
+		    #{recruitPay},
+		    SYSDATE,
+		    #{cmmncdGrpCd},
+		    #{cmmncdNm1}
+		)
+		 	
+ 	
+ 	</insert>
+ 	
+ 	
+ </mapper>

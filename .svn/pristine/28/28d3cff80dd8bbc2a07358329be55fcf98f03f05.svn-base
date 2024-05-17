@@ -1,0 +1,461 @@
+package kr.co.itcruit.mypage.member.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.co.itcruit.ServiceResult;
+import kr.co.itcruit.alarm.service.IAlarmService;
+import kr.co.itcruit.main.service.IRecruitListService;
+import kr.co.itcruit.mypage.member.service.IMemberService;
+import kr.co.itcruit.recruit.service.IRecruitService;
+import kr.co.itcruit.vo.AccountVO;
+import kr.co.itcruit.vo.AddScheduleVO;
+import kr.co.itcruit.vo.AvailLangListVO;
+import kr.co.itcruit.vo.BoardVO;
+import kr.co.itcruit.vo.CustomUser;
+import kr.co.itcruit.vo.EnterpriseVO;
+import kr.co.itcruit.vo.MemberPageResumePaginationInfoVO;
+import kr.co.itcruit.vo.MemberProcessCheckVO;
+import kr.co.itcruit.vo.MidPaginationVO;
+import kr.co.itcruit.vo.RecruitPaginationVO;
+import kr.co.itcruit.vo.RecruitVO;
+import kr.co.itcruit.vo.ResumeVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/myPage/member")
+public class MemberController {
+	
+	static String bbsCtgryCmmncdinquiry = "BBS104";	// 문의
+	
+	@Inject
+	private IMemberService memService;
+	
+	
+	@Inject
+	private IAlarmService alarmService;
+	
+//	@Inject
+//	private ILikeService likeService; // 관심기업, 채용 가져오는 서비스
+	
+	@Inject
+	private IRecruitListService recruitService;
+	
+	@Inject
+	private PasswordEncoder pe;
+	
+	
+	//회원별 채용 진행상황 보기 위한 서비스
+	@Inject
+	private IRecruitService recruitCheckService;
+	
+	//메인 페이지 갔을 때 보여줄 달력 정보
+	//일단 마이페이지 눌렀을 때 myPage/member/index인것 수정
+	@PreAuthorize("hasAnyRole('ROLE_AUTH102')")
+	@RequestMapping(value = "", method = RequestMethod.GET)
+	public String index(HttpSession session, Model model) {
+		
+		String goPage = "";
+//		String goPage = "memberPage/home";
+		
+		//[스프링 시큐리티] 회원 ID를 스프링 시큐리티 UserDetails 정보에서 가져오기
+//		if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() == null) {
+//			return "redirect:/main/index";
+//		}
+		
+		CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		AccountVO account = user.getAccount();
+		
+//		CalInfoListVO calInfoVO = new CalInfoListVO();
+//		MyScheduleVO scheduleVO = new MyScheduleVO();
+//		calInfoVO = recruitService.getCalInfo();
+		
+		String schedule = memService.getMyScheduleById(account.getAccountId());
+		
+		log.info("index>>>>>>>>>>\n" + schedule);
+		
+		model.addAttribute("eventSources", schedule);
+		
+		
+		if(account != null) {
+			session.setAttribute("SessionInfo", account);
+			goPage = "memberPage/home";
+		}
+		
+		return goPage;
+	}
+	
+	//회원마이페이지-이력서관리탭-이력서 목록보여주기
+	@PreAuthorize("hasAnyRole('ROLE_AUTH102')")
+	@RequestMapping(value = "/resumeManage", method = RequestMethod.GET)
+	public String resumeManageList(
+			
+			@RequestParam(name="page", required = false, defaultValue ="1") int currentPage
+			, @RequestParam(required = false, defaultValue = "defaultSort") String searchType
+			, HttpSession session, Model model
+			, ResumeVO resumeVO, AvailLangListVO availLangVO) {
+		
+		String goPage = "";
+		
+		//[스프링 시큐리티] 회원 ID를 스프링 시큐리티 UserDetails 정보에서 가져오기
+		CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		AccountVO account = user.getAccount();
+		
+		if(account != null) {
+			
+			resumeVO.setAccountId(account.getAccountId());
+			
+			List<ResumeVO> rsmLangList = memService.selectResume(resumeVO);
+			System.out.println("rrrrrrrrrrr");
+			System.out.println(rsmLangList);
+			
+			MemberPageResumePaginationInfoVO<ResumeVO> rsmManagePagingVO = new MemberPageResumePaginationInfoVO<ResumeVO>();
+			rsmManagePagingVO.setAccountId(account.getAccountId());
+			
+			//현재 페이지 전달
+			rsmManagePagingVO.setCurrentPage(currentPage);
+			//총 게시글 수 가져오기
+			int totalRecord = memService.selectResumeCount(rsmManagePagingVO);
+			//총 게시글 전달 후, 총 페이지 설정
+			rsmManagePagingVO.setTotalRecord(totalRecord);
+			
+			//데이터 목록 받아오기
+			List<ResumeVO> dataList = memService.selectResumeList(rsmManagePagingVO);
+			System.out.println("llllllll");
+			System.out.println(dataList);
+			
+			rsmManagePagingVO.setDataList(dataList);
+			
+			session.setAttribute("SessionInfo", account);
+			model.addAttribute("rsmManagePagingVO", rsmManagePagingVO);
+			goPage = "memberPage/resumeManage";
+        }
+		
+		return goPage;
+	}
+	
+	
+	
+	
+	//addSchedule.do
+	@RequestMapping(value="/addSchedule.do", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> addSchedule(
+			@RequestBody AddScheduleVO addScheduleVO
+		) {
+		
+		
+		CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String accountId = user.getAccount().getAccountId();
+		
+		addScheduleVO.setAccountId(accountId);
+ 		log.info("시간: >>>>>>>>>>>>>>>>>>" + addScheduleVO);
+		
+ 		//달력에 추가하고
+ 		memService.addScheduleByVO(addScheduleVO);
+		
+ 		//추가한뒤 데이터 새로 받아오기
+ 		String schedule = memService.getMyScheduleById(accountId);	
+		log.info("index>>>>>>>>>>\n" + schedule);
+		
+		
+		return new ResponseEntity<String>(schedule, HttpStatus.OK);
+	}
+	
+	
+	
+	//deleteSchedule.do
+		@RequestMapping(value="/deleteSchedule.do", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+		public ResponseEntity<String> deleteSchedule(
+				@RequestBody Map<String, Object> deleteData
+			) {
+			
+			
+			CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			String accountId = user.getAccount().getAccountId();
+			
+//			boolean flag = (boolean) deleteData.get("flag");
+			deleteData.put("accountId", accountId);
+			memService.deleteSchedule(deleteData);
+			
+	 		//삭제한 뒤 데이터 새로 받아오기
+	 		String schedule = memService.getMyScheduleById(accountId);	
+			log.info("index>>>>>>>>>>\n" + schedule);
+			
+			return new ResponseEntity<String>(schedule, HttpStatus.OK);
+		}
+	
+	
+	
+	//updateSchedule
+		@RequestMapping(value="/updateSchedule.do", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+		public ResponseEntity<String> updateSchedule(
+				@RequestBody AddScheduleVO addScheduleVO
+			) {
+			
+			
+			CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			String accountId = user.getAccount().getAccountId();
+			
+//			boolean flag = (boolean) deleteData.get("flag");
+			addScheduleVO.setAccountId(accountId);
+			memService.updateSchedule(addScheduleVO);
+			
+	 		//업데이트 한 뒤 데이터 새로 받아오기
+	 		String schedule = memService.getMyScheduleById(accountId);	
+			log.info("index>>>>>>>>>>\n" + schedule);
+			
+			return new ResponseEntity<String>(schedule, HttpStatus.OK);
+		}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@RequestMapping(value = "/likeEntList")
+	public String likeEntList(Model model,
+			@RequestParam(name = "likeEntListPage", required = false, defaultValue = "1") int currentPage
+			) {
+		
+		CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		AccountVO av = user.getAccount();
+		
+		RecruitPaginationVO<EnterpriseVO> likeEntPagingVO = new RecruitPaginationVO<EnterpriseVO>();
+		
+		likeEntPagingVO.setAccountId(av.getAccountId());
+		likeEntPagingVO.setCurrentPage(currentPage);
+		
+		int likeEntCount = memService.likeEntCount(likeEntPagingVO);
+		
+		likeEntPagingVO.setTotalRecord(likeEntCount);
+		
+		List<EnterpriseVO> likeEntList = memService.likeEntList(likeEntPagingVO);
+		
+		likeEntPagingVO.setDataList(likeEntList);
+		
+		model.addAttribute("likeEntPagingVO", likeEntPagingVO);
+		
+		return "memberPage/likeEntList";
+		
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/likeEntRecruit.do")
+	public ResponseEntity<List<RecruitVO>> likeEntRecruit (@RequestParam("entNo") int entNo){
+		
+		List<RecruitVO> recruitList = memService.likeEntRecruit(entNo);
+		
+		
+		return new ResponseEntity<List<RecruitVO>>(recruitList,HttpStatus.OK);
+	}
+	
+	
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "/deleteEnt.do" , method = RequestMethod.POST)
+	public ResponseEntity<ServiceResult> deleteEnt(@RequestParam("entNo") String entNo){
+
+		CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		AccountVO av = user.getAccount();
+		
+		String accountId = av.getAccountId();
+		
+		ServiceResult result = memService.deleteEnt(accountId,entNo);
+		
+		log.info(accountId + "<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+		System.out.println(entNo );
+		
+		if(result.equals(ServiceResult.OK)) {
+			return new ResponseEntity<ServiceResult>(result,HttpStatus.OK);
+		}else {
+			return new ResponseEntity<ServiceResult>(result,HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/inquiryList.do")
+	public String inquiryList(Model model,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int currentPage,
+			HttpServletRequest req
+			) {
+		
+		CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		AccountVO av = user.getAccount();
+		
+		MidPaginationVO<BoardVO> pagingVO = new MidPaginationVO<BoardVO>(); 
+		
+		pagingVO.setCurrentPage(currentPage);
+		pagingVO.setBbsCtgryCmmncd(bbsCtgryCmmncdinquiry);
+		pagingVO.setAccountId(av.getAccountId());
+		int totalRecord = memService.selectCount(pagingVO);
+		pagingVO.setTotalRecord(totalRecord);
+		
+		List<BoardVO> dataList = memService.selectBoardList(pagingVO);
+		pagingVO.setDataList(dataList);
+		
+		model.addAttribute("pagingVO", pagingVO);
+		
+		return "memberPage/memberInquiry";
+	}
+	
+	
+	@RequestMapping(value = "/signUpUpdateForm.do")
+	public String signUpUpdateForm(Model model) {
+		
+		
+		
+		CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		AccountVO av = user.getAccount();
+		
+		model.addAttribute("av", av);
+		
+		
+		return "memberPage/signUpUpdateForm";
+	}
+	
+	@RequestMapping(value = "/passwordCheck.do")
+	public String passCheck(Model model) {
+		
+		
+		return "memberPage/passwordCheck";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/passCheck")
+	public ResponseEntity<String> password(@RequestParam("pswd") String pswd) {
+	    
+	    CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	    AccountVO av = user.getAccount();
+	    
+	    String memPw = av.getAccountPswd();
+	    
+	    // 여기서는 matches() 메소드를 사용하여 입력받은 비밀번호와 저장된 비밀번호를 비교
+	    boolean isMatch = pe.matches(pswd, memPw);
+	    
+	    String result = null;
+	    
+	    if (isMatch) {
+	        result = "SUCCESS";
+	        return new ResponseEntity<>(result, HttpStatus.OK);
+	    } else {
+	        result = "FAILED";
+	        return new ResponseEntity<>(result, HttpStatus.OK);
+	    }
+	}
+	
+	
+	//내 채용 정보 보기
+	@RequestMapping(value = "/recruitCheck.do")
+	public String recruitCheck(@RequestParam(required = false, name="alarmNo")String alarmNo, Model model) {
+		//memberProcessCheckVO
+		
+		String updateAlarmNo = alarmNo;
+		
+		alarmService.setUpdateReadY(alarmNo);
+		
+		CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	    String loginUser = (String) user.getAccount().getAccountId();
+		
+	    List<MemberProcessCheckVO> memberProcessCheckList = recruitCheckService.getProcessListById(loginUser);
+	    
+	    log.info(">>>>>>>>>>>>>>>" +memberProcessCheckList);
+		
+	    model.addAttribute("processList", memberProcessCheckList);
+		return "memberPage/recruitCheck";
+	}
+	
+	
+	
+	
+	
+	
+	
+	//요청된 인재제안
+	@RequestMapping(value = "/talentCheck.do")
+	public String talentCheck(Model model) {
+		
+		
+		
+		
+		
+		
+		
+		return "memberPage/talentCheck";
+	}
+	
+	
+}

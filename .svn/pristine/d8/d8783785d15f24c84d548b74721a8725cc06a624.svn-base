@@ -1,0 +1,29 @@
+package kr.co.itcruit.codingtest.service.impl;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.co.itcruit.codingtest.service.ICodingTestService;
+import kr.co.itcruit.mapper.ICodingtestMapper;
+import kr.co.itcruit.vo.CodingtestVO;
+
+@Service
+public class CodingTestImpl implements ICodingTestService{
+
+	@Inject
+	private ICodingtestMapper codingtestMapper;
+	
+	@Override
+	public List<CodingtestVO> selectList() {
+		return codingtestMapper.selectList();
+	}
+
+	@Override
+	public CodingtestVO getQstnByNo(int qstnNo) {
+		return codingtestMapper.selectQstnByNo(qstnNo);
+	}
+
+}
